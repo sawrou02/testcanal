@@ -496,3 +496,150 @@ export const envoyerSms = async (abonneIds: string[]): Promise<{ sent: number }>
   const res = await apiClient.post<{ sent: number }>('/service-abonnement/sms', { abonneIds })
   return res.data
 }
+
+// ---- Logistique : Décodeurs / Entrepôts / Mouvements de stock ----
+
+export type DecodeurStatut =
+  | 'EN_STOCK_ENTREPOT'
+  | 'EN_STOCK_PDV'
+  | 'VENDU'
+  | 'IMMOBILISE'
+  | 'DEFECTUEUX'
+
+export interface LogistiqueStats {
+  totalDecodeurs: number
+  enEntrepot: number
+  enPdv: number
+  vendus: number
+  immobilises: number
+  defectueux: number
+}
+
+export interface DecodeurRow {
+  id: string
+  numSerie: string
+  type: string
+  statut: DecodeurStatut
+  dateEntree: string
+  entrepot: { code: string; nom: string } | null
+  pdv: { code: string; raisonSociale: string } | null
+}
+
+export interface ImmobiliseRow extends DecodeurRow {
+  joursImmobilise: number
+}
+
+export interface DecodeurAbonne {
+  numAbonne: string
+  nom: string
+  prenom: string
+  statut: string
+}
+
+export interface DecodeurDetail {
+  numSerie: string
+  type: string
+  statut: DecodeurStatut
+  dateEntree: string
+  entrepot: { nom: string } | null
+  pdv: { raisonSociale: string } | null
+  abonnes: DecodeurAbonne[]
+}
+
+export interface RechercheDecodeurResult {
+  found: boolean
+  decodeur: DecodeurDetail | null
+}
+
+export interface InventaireRow {
+  lieu: { code: string; nom: string }
+  total: number
+  z4: number
+  globaz: number
+  g11: number
+}
+
+export type MouvementType =
+  | 'EN_ENTREPOT_PDV'
+  | 'PDV_PDV'
+  | 'ENTREPOT_ENTREPOT'
+  | 'PDV_ENTREPOT'
+
+export interface MouvementRow {
+  id: string
+  date: string
+  type: MouvementType
+  materiel: string
+  quantite: number
+  numBonLivraison: string
+  sourceNom: string
+  destinationNom: string
+  statut: string
+}
+
+export interface CreateMouvementBody {
+  type: MouvementType
+  materiel: string
+  sourceId: string
+  destinationId: string
+  quantite: number
+  numBonLivraison: string
+  date: string
+}
+
+export const logistiqueStats = async (): Promise<LogistiqueStats> => {
+  const res = await apiClient.get<LogistiqueStats>('/logistique/stats')
+  return res.data
+}
+
+export const listDecodeurs = async (params: {
+  type?: string
+  statut?: string
+  scope?: 'entrepot' | 'pdv'
+}): Promise<DecodeurRow[]> => {
+  const search = new URLSearchParams()
+  if (params.type) search.set('type', params.type)
+  if (params.statut) search.set('statut', params.statut)
+  if (params.scope) search.set('scope', params.scope)
+  const qs = search.toString()
+  const res = await apiClient.get<DecodeurRow[]>(`/decodeurs${qs ? `?${qs}` : ''}`)
+  return Array.isArray(res.data) ? res.data : []
+}
+
+export const rechercheDecodeur = async (
+  numSerie: string,
+): Promise<RechercheDecodeurResult> => {
+  const res = await apiClient.get<RechercheDecodeurResult>('/decodeurs/recherche', {
+    params: { numSerie },
+  })
+  return res.data
+}
+
+export const listImmobilises = async (type?: string): Promise<ImmobiliseRow[]> => {
+  const res = await apiClient.get<ImmobiliseRow[]>('/logistique/immobilises', {
+    params: type ? { type } : undefined,
+  })
+  return Array.isArray(res.data) ? res.data : []
+}
+
+export const inventaire = async (
+  scope: 'entrepot' | 'pdv',
+  type?: string,
+): Promise<InventaireRow[]> => {
+  const res = await apiClient.get<InventaireRow[]>('/logistique/inventaire', {
+    params: { scope, ...(type ? { type } : {}) },
+  })
+  return Array.isArray(res.data) ? res.data : []
+}
+
+export const listMouvements = async (): Promise<MouvementRow[]> => {
+  const res = await apiClient.get<MouvementRow[]>('/mouvements')
+  return Array.isArray(res.data) ? res.data : []
+}
+
+export const createMouvement = async (
+  body: CreateMouvementBody,
+): Promise<MouvementRow> => {
+  const res = await apiClient.post<MouvementRow>('/mouvements', body)
+  return res.data
+}

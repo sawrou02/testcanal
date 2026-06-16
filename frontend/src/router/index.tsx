@@ -25,6 +25,11 @@ import NonQualifiesPage from '../pages/service-abonnement/NonQualifiesPage'
 import SuiviMpPage from '../pages/service-abonnement/SuiviMpPage'
 import BienvenuePage from '../pages/service-abonnement/BienvenuePage'
 import RecrutementPage from '../pages/service-abonnement/RecrutementPage'
+import InventairePage from '../pages/logistique/InventairePage'
+import DecodeursPage from '../pages/logistique/DecodeursPage'
+import RechercheDecodeurPage from '../pages/logistique/RechercheDecodeurPage'
+import ImmobilisesPage from '../pages/logistique/ImmobilisesPage'
+import MouvementsPage from '../pages/logistique/MouvementsPage'
 
 function ProtectedRoute() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -69,6 +74,55 @@ export const router = createBrowserRouter([
       { path: 'app/suivi-mp', element: <SuiviMpPage /> },
       { path: 'app/bienvenue-abonnes', element: <BienvenuePage /> },
       { path: 'app/periode-recrutement', element: <RecrutementPage /> },
+
+      // --- Logistique SAT ---
+      {
+        path: 'app/inventaire-entrepot',
+        element: <InventairePage scope="entrepot" title="Inventaire Entrepôt" />,
+      },
+      {
+        path: 'app/inventaire-pdv',
+        element: <InventairePage scope="pdv" title="Inventaire PDV" />,
+      },
+      {
+        path: 'app/consultation-entrepot',
+        element: <DecodeursPage scope="entrepot" title="Consultation Entrepôt" />,
+      },
+      {
+        path: 'app/consultation-reseau',
+        element: <DecodeursPage scope="pdv" title="Consultation Réseau" />,
+      },
+      { path: 'app/recherche-decodeur', element: <RechercheDecodeurPage /> },
+      {
+        path: 'app/decodeurs-immobilises',
+        element: <ImmobilisesPage title="Décodeurs Immobilisés" />,
+      },
+      { path: 'app/livraison', element: <MouvementsPage title="Livraison" /> },
+      {
+        path: 'app/appro-entrepot',
+        element: <MouvementsPage title="Approvisionnement Entrepôt" />,
+      },
+
+      // --- Logistique G11 ---
+      {
+        path: 'app/g11-inventaire-entrepot',
+        element: <InventairePage scope="entrepot" type="G11" title="Inventaire Entrepôt G11" />,
+      },
+      {
+        path: 'app/g11-inventaire-pdv',
+        element: <InventairePage scope="pdv" type="G11" title="Inventaire PDV G11" />,
+      },
+      {
+        path: 'app/g11-consultation-entrepot',
+        element: <DecodeursPage scope="entrepot" type="G11" title="Consultation Entrepôt G11" />,
+      },
+      {
+        path: 'app/g11-consultation-reseau',
+        element: <DecodeursPage scope="pdv" type="G11" title="Consultation Réseau G11" />,
+      },
+      { path: 'app/g11-recherche', element: <RechercheDecodeurPage /> },
+      { path: 'app/g11-livraison', element: <MouvementsPage title="Livraison G11" /> },
+
       { path: 'app/:pageId', element: <GenericTablePage /> },
     ],
   },

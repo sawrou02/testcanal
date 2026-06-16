@@ -1,4 +1,4 @@
-import { PrismaClient, PDVType, AbonneStatut, NatureEncaissement, ModePaiement, VersementStatut, BanqueType, StatutMatching, NotificationType } from '@prisma/client';
+import { PrismaClient, PDVType, AbonneStatut, NatureEncaissement, ModePaiement, VersementStatut, BanqueType, StatutMatching, NotificationType, EntrepotType, DecodeurType, DecodeurStatut, MouvementType } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -1372,6 +1372,271 @@ async function main() {
   }
 
   console.log('Notifications created');
+
+  // ============================================================
+  // ENTREPOTS (3 total)
+  // ============================================================
+  const entrepot1 = await prisma.entrepot.upsert({
+    where: { id: 'ent-001' },
+    update: {},
+    create: {
+      id: 'ent-001',
+      code: 'ENT-DKR-01',
+      nom: 'Entrepôt Central Dakar',
+      type: EntrepotType.PRINCIPAL,
+      capacite: 5000,
+    },
+  });
+
+  const entrepot2 = await prisma.entrepot.upsert({
+    where: { id: 'ent-002' },
+    update: {},
+    create: {
+      id: 'ent-002',
+      code: 'ENT-THS-01',
+      nom: 'Entrepôt Thiès',
+      type: EntrepotType.SECONDAIRE,
+      capacite: 2000,
+    },
+  });
+
+  const entrepot3 = await prisma.entrepot.upsert({
+    where: { id: 'ent-003' },
+    update: {},
+    create: {
+      id: 'ent-003',
+      code: 'ENT-ZIG-01',
+      nom: 'Entrepôt Sud Ziguinchor',
+      type: EntrepotType.SECONDAIRE,
+      capacite: 1500,
+    },
+  });
+
+  console.log('Entrepôts created');
+
+  // ============================================================
+  // DECODEURS (60 total, distributed across types & statuts)
+  // ============================================================
+  const entrepotIds = [entrepot1.id, entrepot2.id, entrepot3.id];
+  const pdvIds = [
+    pdv1.id, pdv2.id, pdv3.id, pdv4.id, pdv5.id, pdv6.id,
+    pdv7.id, pdv8.id, pdv9.id, pdv10.id, pdv11.id, pdv12.id,
+  ];
+  const decodeurTypes = [DecodeurType.Z4, DecodeurType.GLOBAZ, DecodeurType.G11];
+  const typePrefix: Record<DecodeurType, string> = {
+    [DecodeurType.Z4]: 'Z4',
+    [DecodeurType.GLOBAZ]: 'GZ',
+    [DecodeurType.G11]: 'G11',
+  };
+
+  const now = new Date();
+  const daysAgo = (d: number) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000);
+
+  // Track décodeurs marked VENDU so we can link them to abonnés afterwards.
+  const venduDecodeurIds: string[] = [];
+
+  for (let i = 0; i < 60; i++) {
+    const seq = String(i + 1).padStart(3, '0');
+    const id = `dec-${seq}`;
+    const type = decodeurTypes[i % 3];
+    const numSerie = `${typePrefix[type]}-0088${String(42001 + i)}`;
+
+    // Distribution: 0-23 (40%) EN_STOCK_ENTREPOT, 24-41 (30%) EN_STOCK_PDV,
+    // 42-53 (20%) VENDU, 54-56 (5%) IMMOBILISE, 57-59 (5%) DEFECTUEUX.
+    let statut: DecodeurStatut;
+    let entrepotId: string | null = null;
+    let pdvId: string | null = null;
+    let dateEntree: Date;
+
+    if (i < 24) {
+      statut = DecodeurStatut.EN_STOCK_ENTREPOT;
+      entrepotId = entrepotIds[i % entrepotIds.length];
+      // A handful aged > 90 days so the "immobilisés > 3 mois" view has rows.
+      dateEntree = i < 4 ? daysAgo(120 + i * 10) : daysAgo((i % 20) + 1);
+    } else if (i < 42) {
+      statut = DecodeurStatut.EN_STOCK_PDV;
+      pdvId = pdvIds[i % pdvIds.length];
+      dateEntree = i < 27 ? daysAgo(110 + (i - 24) * 8) : daysAgo((i % 25) + 1);
+    } else if (i < 54) {
+      statut = DecodeurStatut.VENDU;
+      pdvId = pdvIds[i % pdvIds.length];
+      dateEntree = daysAgo((i % 40) + 5);
+      venduDecodeurIds.push(id);
+    } else if (i < 57) {
+      statut = DecodeurStatut.IMMOBILISE;
+      entrepotId = entrepotIds[i % entrepotIds.length];
+      dateEntree = daysAgo(60 + (i - 54) * 5);
+    } else {
+      statut = DecodeurStatut.DEFECTUEUX;
+      entrepotId = entrepotIds[i % entrepotIds.length];
+      dateEntree = daysAgo(45 + (i - 57) * 5);
+    }
+
+    const data = {
+      id,
+      numSerie,
+      type,
+      statut,
+      entrepotId,
+      pdvId,
+      dateEntree,
+    };
+
+    await prisma.decodeur.upsert({
+      where: { id },
+      update: data,
+      create: data,
+    });
+  }
+
+  console.log('Décodeurs created');
+
+  // ============================================================
+  // LINK DECODEURS -> ABONNES (link ~12 abonnés to distinct VENDU décodeurs)
+  // ============================================================
+  const abonnesToLink = [
+    abonne1, abonne2, abonne4, abonne5, abonne6, abonne7,
+    abonne9, abonne10, abonne11, abonne12, abonne13, abonne14,
+  ];
+
+  for (let i = 0; i < abonnesToLink.length && i < venduDecodeurIds.length; i++) {
+    await prisma.abonne.update({
+      where: { id: abonnesToLink[i].id },
+      data: { decodeurId: venduDecodeurIds[i] },
+    });
+  }
+
+  console.log('Décodeurs linked to abonnés');
+
+  // ============================================================
+  // FIX DATEECHEANCE: realistic future spread (AAE / échéances)
+  // ============================================================
+  const inDays = (d: number) => new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
+
+  // ~8 abonnés à échéance dans les 30 prochains jours.
+  const echeanceUpdates: { id: string; date: Date; statut: AbonneStatut }[] = [
+    { id: abonne1.id, date: inDays(3), statut: AbonneStatut.ACTIF },
+    { id: abonne2.id, date: inDays(7), statut: AbonneStatut.ACTIF },
+    { id: abonne4.id, date: inDays(10), statut: AbonneStatut.ACTIF },
+    { id: abonne5.id, date: inDays(14), statut: AbonneStatut.ACTIF },
+    { id: abonne6.id, date: inDays(18), statut: AbonneStatut.ACTIF },
+    { id: abonne7.id, date: inDays(22), statut: AbonneStatut.ACTIF },
+    { id: abonne9.id, date: inDays(26), statut: AbonneStatut.ACTIF },
+    { id: abonne10.id, date: inDays(29), statut: AbonneStatut.ACTIF },
+    // 30-90 days out.
+    { id: abonne11.id, date: inDays(40), statut: AbonneStatut.ACTIF },
+    { id: abonne12.id, date: inDays(55), statut: AbonneStatut.ACTIF },
+    { id: abonne13.id, date: inDays(70), statut: AbonneStatut.ACTIF },
+    { id: abonne14.id, date: inDays(85), statut: AbonneStatut.ACTIF },
+    // Keep at least one ECHU (past).
+    { id: abonne3.id, date: daysAgo(20), statut: AbonneStatut.ECHU },
+  ];
+
+  for (const u of echeanceUpdates) {
+    await prisma.abonne.update({
+      where: { id: u.id },
+      data: { dateEcheance: u.date, statut: u.statut },
+    });
+  }
+
+  console.log('Abonnés dateEcheance updated');
+
+  // ============================================================
+  // MOUVEMENTS STOCK (8 total)
+  // ============================================================
+  const mouvementsData = [
+    {
+      id: 'mvt-001',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Décodeur Z4',
+      sourceId: entrepot1.id,
+      destinationId: pdv1.id,
+      quantite: 30,
+      numBonLivraison: 'BL-2026-001',
+      date: daysAgo(40),
+    },
+    {
+      id: 'mvt-002',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Kit parabole',
+      sourceId: entrepot1.id,
+      destinationId: pdv2.id,
+      quantite: 20,
+      numBonLivraison: 'BL-2026-002',
+      date: daysAgo(35),
+    },
+    {
+      id: 'mvt-003',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Décodeur G11',
+      sourceId: entrepot2.id,
+      destinationId: pdv5.id,
+      quantite: 15,
+      numBonLivraison: 'BL-2026-003',
+      date: daysAgo(30),
+    },
+    {
+      id: 'mvt-004',
+      type: MouvementType.ENTREPOT_ENTREPOT,
+      materiel: 'Décodeur Z4',
+      sourceId: entrepot1.id,
+      destinationId: entrepot2.id,
+      quantite: 50,
+      numBonLivraison: 'BL-2026-004',
+      date: daysAgo(25),
+    },
+    {
+      id: 'mvt-005',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Décodeur G11',
+      sourceId: entrepot3.id,
+      destinationId: pdv11.id,
+      quantite: 12,
+      numBonLivraison: 'BL-2026-005',
+      date: daysAgo(20),
+    },
+    {
+      id: 'mvt-006',
+      type: MouvementType.PDV_PDV,
+      materiel: 'Décodeur Z4',
+      sourceId: pdv1.id,
+      destinationId: pdv3.id,
+      quantite: 10,
+      numBonLivraison: 'BL-2026-006',
+      date: daysAgo(14),
+    },
+    {
+      id: 'mvt-007',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Kit parabole',
+      sourceId: entrepot2.id,
+      destinationId: pdv6.id,
+      quantite: 18,
+      numBonLivraison: 'BL-2026-007',
+      date: daysAgo(7),
+    },
+    {
+      id: 'mvt-008',
+      type: MouvementType.PDV_ENTREPOT,
+      materiel: 'Décodeur G11',
+      sourceId: pdv5.id,
+      destinationId: entrepot2.id,
+      quantite: 5,
+      numBonLivraison: 'BL-2026-008',
+      date: daysAgo(2),
+    },
+  ];
+
+  for (const mvt of mouvementsData) {
+    await prisma.mouvementStock.upsert({
+      where: { id: mvt.id },
+      update: {},
+      create: mvt,
+    });
+  }
+
+  console.log('Mouvements de stock created');
+
   console.log('Seed completed successfully!');
   console.log('');
   console.log('Test accounts (password: Demo123!):');

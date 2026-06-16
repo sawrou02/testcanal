@@ -15,6 +15,7 @@ import { OperationsBancairesModule } from './operations-bancaires/operations-ban
 import { RapportsModule } from './rapports/rapports.module';
 import { CommissionsModule } from './commissions/commissions.module';
 import { ServiceAbonnementModule } from './service-abonnement/service-abonnement.module';
+import { LogistiqueModule } from './logistique/logistique.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { ServiceAbonnementModule } from './service-abonnement/service-abonnement
     RapportsModule,
     CommissionsModule,
     ServiceAbonnementModule,
+    LogistiqueModule,
   ],
   providers: [
     {
