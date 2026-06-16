@@ -1,23 +1,11 @@
 import { useMemo } from 'react'
 import { formatDate } from '../../lib/utils'
 
-// Generate 30 days of mock data
-function generateData() {
-  const data = []
-  const now = new Date()
-  for (let i = 29; i >= 0; i--) {
-    const date = new Date(now)
-    date.setDate(date.getDate() - i)
-    data.push({
-      date,
-      recrut: Math.round(40 + Math.random() * 80 + Math.sin(i * 0.3) * 20),
-      reabo: Math.round(150 + Math.random() * 100 + Math.cos(i * 0.2) * 30),
-    })
-  }
-  return data
+export interface ActivitePoint {
+  date: string
+  recrut: number
+  reabo: number
 }
-
-const CHART_DATA = generateData()
 
 function smoothPath(points: [number, number][]) {
   if (points.length < 2) return ''
@@ -31,35 +19,51 @@ function smoothPath(points: [number, number][]) {
   return d
 }
 
-export function ActivityChart() {
+interface ActivityChartProps {
+  data?: ActivitePoint[]
+  loading?: boolean
+}
+
+export function ActivityChart({ data = [], loading = false }: ActivityChartProps) {
   const WIDTH = 800
   const HEIGHT = 220
   const PAD = { top: 20, right: 20, bottom: 40, left: 50 }
   const innerW = WIDTH - PAD.left - PAD.right
   const innerH = HEIGHT - PAD.top - PAD.bottom
 
-  const { recrutPoints, reaboPoints, maxVal, minVal, xLabels } = useMemo(() => {
-    const recruts = CHART_DATA.map((d) => d.recrut)
-    const reabos = CHART_DATA.map((d) => d.reabo)
+  const { recrutPoints, reaboPoints, maxVal, minVal, xLabels, hasData } = useMemo(() => {
+    if (data.length < 2) {
+      return {
+        recrutPoints: [] as [number, number][],
+        reaboPoints: [] as [number, number][],
+        maxVal: 0,
+        minVal: 0,
+        xLabels: [] as { x: number; label: string }[],
+        hasData: false,
+      }
+    }
+    const recruts = data.map((d) => d.recrut)
+    const reabos = data.map((d) => d.reabo)
     const allVals = [...recruts, ...reabos]
-    const maxVal = Math.max(...allVals) * 1.1
-    const minVal = Math.min(...allVals) * 0.9
+    const rawMax = Math.max(...allVals)
+    const rawMin = Math.min(...allVals)
+    const maxVal = rawMax * 1.1 || 1
+    const minVal = rawMin * 0.9
+    const span = maxVal - minVal || 1
 
-    const toX = (i: number) => PAD.left + (i / (CHART_DATA.length - 1)) * innerW
-    const toY = (v: number) => PAD.top + (1 - (v - minVal) / (maxVal - minVal)) * innerH
+    const toX = (i: number) => PAD.left + (i / (data.length - 1)) * innerW
+    const toY = (v: number) => PAD.top + (1 - (v - minVal) / span) * innerH
 
-    const recrutPoints: [number, number][] = CHART_DATA.map((d, i) => [toX(i), toY(d.recrut)])
-    const reaboPoints: [number, number][] = CHART_DATA.map((d, i) => [toX(i), toY(d.reabo)])
+    const recrutPoints: [number, number][] = data.map((d, i) => [toX(i), toY(d.recrut)])
+    const reaboPoints: [number, number][] = data.map((d, i) => [toX(i), toY(d.reabo)])
 
-    const xLabels = CHART_DATA
-      .filter((_, i) => i % 5 === 0 || i === CHART_DATA.length - 1)
-      .map((d, _, arr) => {
-        const i = CHART_DATA.indexOf(d)
-        return { x: toX(i), label: formatDate(d.date) }
-      })
+    const xLabels = data
+      .map((d, i) => ({ d, i }))
+      .filter(({ i }) => i % 5 === 0 || i === data.length - 1)
+      .map(({ d, i }) => ({ x: toX(i), label: formatDate(d.date) }))
 
-    return { recrutPoints, reaboPoints, maxVal, minVal, xLabels }
-  }, [])
+    return { recrutPoints, reaboPoints, maxVal, minVal, xLabels, hasData: true }
+  }, [data, innerW, innerH, PAD.left, PAD.top])
 
   return (
     <div
@@ -88,6 +92,19 @@ export function ActivityChart() {
       </div>
 
       <div className="overflow-x-auto">
+        {loading ? (
+          <div
+            className="w-full rounded-lg bg-gray-100 animate-pulse"
+            style={{ height: 220 }}
+          />
+        ) : !hasData ? (
+          <div
+            className="w-full flex items-center justify-center text-sm text-app-muted"
+            style={{ height: 220, color: 'var(--text-muted)' }}
+          >
+            Aucune donnée d'activité disponible
+          </div>
+        ) : (
         <svg
           viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
           className="w-full"
@@ -124,6 +141,7 @@ export function ActivityChart() {
             <circle key={i} cx={x} cy={y} r="3.5" fill="#0E8A4F" />
           ))}
         </svg>
+        )}
       </div>
     </div>
   )

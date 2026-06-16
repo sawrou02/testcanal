@@ -13,7 +13,7 @@ import { UsersModule } from '../users/users.module';
     UsersModule,
     PassportModule,
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'sendistri-secret-key',
+      secret: process.env.JWT_SECRET || 'sendistri-dev-secret',
       signOptions: { expiresIn: '24h' },
     }),
   ],

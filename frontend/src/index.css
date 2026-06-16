@@ -37,6 +37,14 @@ body {
   font-family: 'IBM Plex Mono', monospace;
 }
 
+/* Anti-jank: reserve scrollbar space so the layout never shifts when the
+   scrollbar appears/disappears between pages. `overflow-y: scroll` is a
+   fallback for browsers that do not support scrollbar-gutter. */
+.main-scroll {
+  overflow-y: scroll;
+  scrollbar-gutter: stable both-edges;
+}
+
 /* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 6px;

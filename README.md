@@ -107,7 +107,12 @@ IBM Plex Mono (montants/codes).
       mise à jour du solde PDV), recherche abonné, vue Bureau/Terrain (mobile),
       et Suivi Solde PDV (`solde = Σ encaissements − Σ versements validés`,
       dépassement vs caution).
-- [ ] Étape 4 — Finances (Versements, Retraits, Arrêtés)
+- [x] **Étape 4 — Finances + sécurité** : Versements & Retraits (création +
+      validation/rejet avec mise à jour réelle des soldes PDV **et** banque +
+      journal d'audit), Détails opérations bancaires, tableau de bord branché
+      sur des données **réelles**. Durcissement : Helmet, rate-limiting (login),
+      secret JWT obligatoire, validation stricte. Anti-saut-de-page (scrollbar
+      gutter + squelettes à hauteur fixe).
 - [ ] Étape 5 — Rapports & contrôle (Import, Matching, Commissions)
 - [ ] Étape 6 — Service Abonnement
 - [ ] Étape 7 — Logistique (SAT, G11, Accessoires, VAD)
