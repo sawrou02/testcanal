@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing:border-box; }
+  html, body { margin:0; padding:0; }
+  body { background:#E7EAE4; font-family:'Manrope',system-ui,sans-serif; color:#1C2B23; -webkit-font-smoothing:antialiased; }
+  p { margin:0 0 11px; }
+  .lead { font-size:15px; line-height:1.62; color:#33433A; }
+  @media print {
+    body { background:#fff; }
+    .doc-bg { background:#fff !important; padding:0 !important; }
+    .no-print { display:none !important; }
+    .page { box-shadow:none !important; border-radius:0 !important; margin:0 !important; max-width:none !important; width:auto !important; padding:0 !important; break-after:page; }
+    .page:last-child { break-after:auto; }
+    .avoid { break-inside:avoid; }
+    @page { margin:0.7in; }
+  }
+</style>
+</helmet>
+
+<div class="doc-bg" style="background:#E7EAE4; min-height:100vh; padding:44px 20px 64px;">
+
+  <button class="no-print" onClick="{{ doPrint }}" style="position:fixed; top:22px; right:24px; z-index:50; display:flex; align-items:center; gap:8px; padding:11px 17px; border:none; border-radius:11px; background:#0E8A4F; color:#fff; font-family:'Manrope',sans-serif; font-size:13.5px; font-weight:700; cursor:pointer; box-shadow:0 6px 18px rgba(14,138,79,0.34);">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+    Imprimer / PDF
+  </button>
+
+  <!-- ===================== COUVERTURE ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#0B2A1B; border-radius:5px; box-shadow:0 4px 22px rgba(11,30,18,0.28); overflow:hidden; position:relative; min-height:1040px; display:flex; flex-direction:column;">
+    <div style="position:absolute; right:-140px; top:-90px; width:560px; height:560px; border-radius:50%; background:radial-gradient(circle, rgba(226,160,0,0.17), transparent 62%);"></div>
+    <div style="position:absolute; left:-120px; bottom:-140px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, rgba(210,58,44,0.15), transparent 62%);"></div>
+    <div style="position:relative; padding:64px 68px; flex:1; display:flex; flex-direction:column;">
+      <div style="display:flex; align-items:center; gap:15px;">
+        <svg width="58" height="58" viewBox="0 0 48 48"><defs><linearGradient id="cv" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10A05B"/><stop offset="1" stop-color="#0A6B3D"/></linearGradient></defs><rect width="48" height="48" rx="13" fill="url(#cv)"/><polygon points="24 12 26.7 18.2 33.4 18.6 28.2 23 29.9 29.6 24 26 18.1 29.6 19.8 23 14.6 18.6 21.3 18.2 24 12" fill="#fff"/><rect x="11" y="40.5" width="8.6" height="3" rx="1.5" fill="#10A05B"/><rect x="19.7" y="40.5" width="8.6" height="3" rx="1.5" fill="#F2B600"/><rect x="28.4" y="40.5" width="8.6" height="3" rx="1.5" fill="#E2402F"/></svg>
+        <div>
+          <div style="font-size:27px; font-weight:800; letter-spacing:.05em; color:#fff; line-height:1;">SENDISTRI</div>
+          <div style="font-size:12px; font-weight:600; letter-spacing:.2em; color:#7FB394; text-transform:uppercase; margin-top:4px;">Gestion Commerciale Télécom</div>
+        </div>
+      </div>
+
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:center; padding:40px 0;">
+        <div style="width:72px; height:6px; border-radius:3px; display:flex; overflow:hidden; margin-bottom:30px;"><div style="flex:1; background:#0E8A4F;"></div><div style="flex:1; background:#E2A000;"></div><div style="flex:1; background:#D23A2C;"></div></div>
+        <div style="font-size:13px; font-weight:700; letter-spacing:.18em; text-transform:uppercase; color:#E2A000; margin-bottom:16px;">Manuel de Formation</div>
+        <h1 style="margin:0; font-size:54px; line-height:1.05; font-weight:800; color:#fff; letter-spacing:-0.02em;">Bien comprendre<br>et maîtriser<br>la plateforme</h1>
+        <p style="margin:26px 0 0; font-size:17px; line-height:1.6; color:#A9CDB6; max-width:46ch;">Guide complet par profil — Vendeur, Administrateur, Manager, Comptable, Logisticien et Commercial. Tout ce qu'il faut pour former vos équipes, du siège jusqu'au terrain.</p>
+      </div>
+
+      <div style="position:relative; display:flex; align-items:flex-end; justify-content:space-between; border-top:1px solid rgba(255,255,255,0.12); padding-top:24px;">
+        <div style="display:flex; gap:36px;">
+          <div><div style="font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600; color:#fff;">14</div><div style="font-size:12.5px; color:#7FB394; font-weight:600;">Modules</div></div>
+          <div><div style="font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600; color:#fff;">7</div><div style="font-size:12.5px; color:#7FB394; font-weight:600;">Profils utilisateurs</div></div>
+          <div><div style="font-family:'IBM Plex Mono',monospace; font-size:24px; font-weight:600; color:#fff;">8</div><div style="font-size:12.5px; color:#7FB394; font-weight:600;">Chapitres</div></div>
+        </div>
+        <div style="text-align:right;"><div style="font-size:13px; color:#fff; font-weight:700;">Version 1.0</div><div style="font-size:12.5px; color:#5E8169;">Juin 2026 · Dakar, Sénégal</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== À PROPOS ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F; margin-bottom:8px;">Introduction</div>
+    <h2 style="margin:0 0 18px; font-size:30px; font-weight:800; letter-spacing:-0.015em;">À propos de SENDISTRI</h2>
+    <p class="lead">SENDISTRI est le logiciel de <strong>gestion commerciale</strong> d'un distributeur télécom. Il centralise, en un seul endroit, toute l'activité du réseau&nbsp;: la vente d'abonnements et de décodeurs, les réabonnements, les encaissements, le suivi des stocks, les versements en banque et le calcul des commissions partenaires — du siège jusqu'aux points de vente sur le terrain.</p>
+    <p class="lead">L'objectif est simple&nbsp;: que <strong>chaque opération soit tracée</strong>, que les chiffres soient fiables en temps réel, et que chaque profil (vendeur, admin, comptable…) dispose exactement des outils dont il a besoin, ni plus, ni moins.</p>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:13px; margin:26px 0 30px;">
+      <div style="background:#F1F9F4; border:1px solid #DCEEE3; border-radius:13px; padding:17px;"><div style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:600; color:#0A6B3D;">1 248</div><div style="font-size:12.5px; color:#48584E; font-weight:600; margin-top:3px;">Points de vente</div></div>
+      <div style="background:#FBF6E7; border:1px solid #EFE2BE; border-radius:13px; padding:17px;"><div style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:600; color:#8A5E00;">42 880</div><div style="font-size:12.5px; color:#48584E; font-weight:600; margin-top:3px;">Abonnés actifs</div></div>
+      <div style="background:#FBEEEC; border:1px solid #F0D2CC; border-radius:13px; padding:17px;"><div style="font-family:'IBM Plex Mono',monospace; font-size:23px; font-weight:600; color:#A82E22;">FCFA</div><div style="font-size:12.5px; color:#48584E; font-weight:600; margin-top:3px;">Montants en francs CFA</div></div>
+    </div>
+
+    <h3 style="margin:0 0 14px; font-size:18px; font-weight:800;">Les 14 modules en un coup d'œil</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px 16px;">
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">01</span><div><div style="font-size:13.5px; font-weight:700;">Paramétrage</div><div style="font-size:12px; color:#67746C;">Formules, PDV, banques, objectifs, critères</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">02</span><div><div style="font-size:13.5px; font-weight:700;">Opérations</div><div style="font-size:12px; color:#67746C;">Encaissement, matching, versements</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">03</span><div><div style="font-size:13.5px; font-weight:700;">Gestion Crédit</div><div style="font-size:12px; color:#67746C;">Crédit affectable, dettes</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">04</span><div><div style="font-size:13.5px; font-weight:700;">Service Abonnement</div><div style="font-size:12px; color:#67746C;">Échéances, accueil, non qualifiés</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">05</span><div><div style="font-size:13.5px; font-weight:700;">Suivi Commercial</div><div style="font-size:12px; color:#67746C;">RPE, ARPU, performances, poids</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">06</span><div><div style="font-size:13.5px; font-weight:700;">Logistique SAT</div><div style="font-size:12px; color:#67746C;">Décodeurs, stock, livraisons</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">07</span><div><div style="font-size:13.5px; font-weight:700;">Logistique G11</div><div style="font-size:12px; color:#67746C;">Parc décodeurs nouvelle génération</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">08</span><div><div style="font-size:13.5px; font-weight:700;">Gestion Accessoires</div><div style="font-size:12px; color:#67746C;">Approvisionnement, ventes, retours</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">09</span><div><div style="font-size:13.5px; font-weight:700;">Gestion des VAD</div><div style="font-size:12px; color:#67746C;">Vendeurs à domicile, kits</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">10</span><div><div style="font-size:13.5px; font-weight:700;">États Analytiques</div><div style="font-size:12px; color:#67746C;">Recouvrement, rendement, commissions</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">11</span><div><div style="font-size:13.5px; font-weight:700;">Statistiques</div><div style="font-size:12px; color:#67746C;">Classement, CA, objectifs PDV & SR</div></div></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:11px 13px; border:1px solid #ECEFE9; border-radius:11px;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0E8A4F; background:#E7F4EC; border-radius:6px; padding:3px 7px;">+3</span><div><div style="font-size:13.5px; font-weight:700;">Tableau de bord & outils</div><div style="font-size:12px; color:#67746C;">KPI, alertes, recherche, mode sombre</div></div></div>
+    </div>
+
+    <div style="display:flex; gap:11px; align-items:flex-start; padding:14px 16px; border-radius:12px; background:#F4F7F2; border-left:4px solid #0E8A4F; margin-top:26px;">
+      <div><div style="font-size:13px; font-weight:800; color:#0A6B3D; margin-bottom:3px;">Le cycle de l'activité</div><div style="font-size:13.5px; line-height:1.55; color:#33433A;">Le vendeur <strong>encaisse</strong> → l'argent est <strong>versé en banque</strong> → l'admin <strong>valide</strong> et <strong>importe le rapport</strong> de l'opérateur → le <strong>matching</strong> contrôle la cohérence → les <strong>commissions</strong> sont calculées. Chaque profil intervient sur un maillon de cette chaîne.</div></div>
+    </div>
+  </section>
+
+  <!-- ===================== PROFILS ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F; margin-bottom:8px;">Avant de commencer</div>
+    <h2 style="margin:0 0 18px; font-size:30px; font-weight:800; letter-spacing:-0.015em;">Profils &amp; niveaux d'accès</h2>
+    <p class="lead">Chaque utilisateur reçoit un <strong>rôle</strong> qui détermine ce qu'il peut voir et faire. Repérez le vôtre&nbsp;: il indique quels chapitres de ce manuel vous concernent.</p>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; overflow:hidden; margin:22px 0 8px;">
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; background:#0B2A1B; color:#fff; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.05em;"><div style="padding:12px 16px;">Profil</div><div style="padding:12px 16px;">Périmètre d'accès</div></div>
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; border-top:1px solid #EDEFE9;"><div style="padding:13px 16px; font-weight:800; color:#0A6B3D;">Super Admin</div><div style="padding:13px 16px; font-size:13.5px; color:#33433A;">Accès total + suppression définitive + configuration système</div></div>
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; border-top:1px solid #EDEFE9; background:#FAFBF9;"><div style="padding:13px 16px; font-weight:800;">Admin</div><div style="padding:13px 16px; font-size:13.5px; color:#33433A;">Tout sauf la suppression définitive</div></div>
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; border-top:1px solid #EDEFE9;"><div style="padding:13px 16px; font-weight:800;">Manager</div><div style="padding:13px 16px; font-size:13.5px; color:#33433A;">Lecture + création + modification de tout</div></div>
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; border-top:1px solid #EDEFE9; background:#FAFBF9;"><div style="padding:13px 16px; font-weight:800;">Comptable</div><div style="padding:13px 16px; font-size:13.5px; color:#33433A;">Module Finances uniquement (soldes, versements, arrêtés)</div></div>
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; border-top:1px solid #EDEFE9;"><div style="padding:13px 16px; font-weight:800;">Logisticien</div><div style="padding:13px 16px; font-size:13.5px; color:#33433A;">Stocks, entrepôts, livraisons, accessoires, VAD</div></div>
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; border-top:1px solid #EDEFE9; background:#FAFBF9;"><div style="padding:13px 16px; font-weight:800;">Commercial</div><div style="padding:13px 16px; font-size:13.5px; color:#33433A;">Encaissement + service abonné + suivi commercial</div></div>
+      <div style="display:grid; grid-template-columns:1.1fr 2fr; border-top:1px solid #EDEFE9;"><div style="padding:13px 16px; font-weight:800;">Vendeur / PDV</div><div style="padding:13px 16px; font-size:13.5px; color:#33433A;">Encaissement et consultation de SON point de vente uniquement</div></div>
+    </div>
+
+    <h3 style="margin:30px 0 14px; font-size:18px; font-weight:800;">Comment lire ce manuel</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:12px 14px; border-radius:11px; background:#F1F9F4; border:1px solid #DCEEE3;"><span style="width:20px;height:20px;border-radius:50%;background:#0E8A4F;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✓</span><span style="font-size:13px; line-height:1.5; color:#33433A;"><strong>Réussite</strong> — résultat attendu quand tout se passe bien.</span></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:12px 14px; border-radius:11px; background:#FBEEEC; border:1px solid #F0D2CC;"><span style="width:20px;height:20px;border-radius:50%;background:#D23A2C;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✕</span><span style="font-size:13px; line-height:1.5; color:#33433A;"><strong>Erreur</strong> — message d'erreur et comment réagir.</span></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:12px 14px; border-radius:11px; background:#FBF6E7; border:1px solid #EFE2BE;"><span style="width:20px;height:20px;border-radius:50%;background:#E2A000;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">!</span><span style="font-size:13px; line-height:1.5; color:#33433A;"><strong>Attention</strong> — point de vigilance important.</span></div>
+      <div style="display:flex; gap:11px; align-items:flex-start; padding:12px 14px; border-radius:11px; background:#EAF1F9; border:1px solid #CFE0F0;"><span style="width:20px;height:20px;border-radius:50%;background:#2B6CB0;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">★</span><span style="font-size:13px; line-height:1.5; color:#33433A;"><strong>Astuce</strong> — conseil pour aller plus vite ou éviter un piège.</span></div>
+    </div>
+    <div style="margin-top:20px; padding:13px 16px; border-radius:11px; background:#F4F7F2; font-size:13px; color:#48584E; line-height:1.55;">Tout au long du manuel, les chemins d'accès sont notés sous forme de fil&nbsp;: <span style="display:inline-flex; align-items:center; gap:5px; vertical-align:middle;"><span style="background:#0E8A4F; color:#fff; font-size:11px; font-weight:700; padding:2px 8px; border-radius:6px;">Menu</span><span style="color:#0E8A4F; font-weight:700;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11px; font-weight:700; padding:2px 8px; border-radius:6px;">Module</span><span style="color:#0E8A4F; font-weight:700;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11px; font-weight:700; padding:2px 8px; border-radius:6px;">Page</span></span></div>
+  </section>
+
+  <!-- ===================== CHAPITRE 1 ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">01</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 1 · Tous les profils</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">Connexion &amp; navigation</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 24px;"></div>
+
+    <figure style="margin:0 0 22px;" class="avoid">
+      <div style="border:1px solid #E6EAE3; border-radius:13px; overflow:hidden; box-shadow:0 3px 14px rgba(16,40,28,0.10);"><img src="screens/01-s.png" alt="Interface SENDISTRI" style="display:block; width:100%; height:auto;"></div>
+      <figcaption style="display:flex; gap:18px; flex-wrap:wrap; margin-top:11px; font-size:12px; color:#48584E;"><span><strong style="color:#0B2A1B;">① Menu gauche</strong> — les modules</span><span><strong style="color:#0B2A1B;">② En-tête</strong> — recherche, alertes, profil</span><span><strong style="color:#0B2A1B;">③ Contenu</strong> — formulaires &amp; tableaux</span></figcaption>
+    </figure>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:16px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:12px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;">1</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Se connecter</h3></div>
+      <ol style="margin:0; padding-left:20px; font-size:14px; line-height:1.7; color:#33433A;">
+        <li>Ouvrez votre navigateur (Chrome recommandé) et saisissez l'adresse fournie par votre responsable.</li>
+        <li>Sur la page de connexion, renseignez votre <strong>email</strong> et votre <strong>mot de passe</strong>.</li>
+        <li>Cliquez sur <strong>« Se connecter »</strong>.</li>
+      </ol>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#F1F9F4; border:1px solid #D6E8DD; margin:12px 0 0;"><span style="width:19px;height:19px;border-radius:50%;background:#0E8A4F;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✓</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Connexion réussie&nbsp;: vous arrivez sur le <strong>Tableau de Bord</strong>.</span></div>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#FBEEEC; border:1px solid #F0D2CC; margin:8px 0 0;"><span style="width:19px;height:19px;border-radius:50%;background:#D23A2C;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✕</span><span style="font-size:13.5px;line-height:1.55;color:#243029;"><strong>« Email ou mot de passe incorrect »</strong>&nbsp;: vérifiez les majuscules et réessayez. Après <strong>5 tentatives</strong>, le compte est bloqué 15&nbsp;minutes — contactez l'admin.</span></div>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#FBF6E7; border:1px solid #EFE2BE; margin:8px 0 0;"><span style="width:19px;height:19px;border-radius:50%;background:#E2A000;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">!</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Ne partagez <strong>jamais</strong> votre mot de passe. Déconnectez-vous toujours sur un ordinateur partagé.</span></div>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:16px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:12px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;">2</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Changer son mot de passe</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:12px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Votre nom (en haut à droite)</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Changer le mot de passe</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0;">Saisissez l'ancien mot de passe, puis le nouveau (<strong>8 caractères minimum, 1 majuscule, 1 chiffre</strong>), confirmez et cliquez sur <strong>« Enregistrer »</strong>. Un message vert confirme l'opération.</p>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:14px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;">3</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Comprendre l'interface</h3></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:11px; margin-bottom:16px;">
+        <div style="background:#0B2A1B; border-radius:11px; padding:14px;"><div style="font-size:11px; font-weight:800; color:#7FB394; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Zone 1</div><div style="font-size:13.5px; font-weight:700; color:#fff; margin-bottom:3px;">Menu gauche</div><div style="font-size:12px; color:#A9CDB6; line-height:1.45;">Tous les modules en sections dépliables.</div></div>
+        <div style="background:#F4F7F2; border:1px solid #E0E7DC; border-radius:11px; padding:14px;"><div style="font-size:11px; font-weight:800; color:#0E8A4F; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Zone 2</div><div style="font-size:13.5px; font-weight:700; margin-bottom:3px;">En-tête</div><div style="font-size:12px; color:#67746C; line-height:1.45;">Titre de page, recherche, alertes, votre nom.</div></div>
+        <div style="background:#F4F7F2; border:1px solid #E0E7DC; border-radius:11px; padding:14px;"><div style="font-size:11px; font-weight:800; color:#0E8A4F; text-transform:uppercase; letter-spacing:.06em; margin-bottom:5px;">Zone 3</div><div style="font-size:13.5px; font-weight:700; margin-bottom:3px;">Contenu central</div><div style="font-size:12px; color:#67746C; line-height:1.45;">Formulaires, tableaux et rapports.</div></div>
+      </div>
+      <div style="font-size:13.5px; font-weight:800; margin-bottom:9px; color:#1C2B23;">Lire un tableau</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; font-size:13.5px; line-height:1.5; color:#33433A;">
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F; font-weight:800;">•</span><span><strong>Rechercher</strong> — case en haut à droite du tableau.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F; font-weight:800;">•</span><span><strong>Trier</strong> — cliquez sur le titre d'une colonne.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F; font-weight:800;">•</span><span><strong>Lignes par page</strong> — 10 / 25 / 50 / 100 en haut à gauche.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F; font-weight:800;">•</span><span><strong>Pages</strong> — boutons ‹ 1 2 3 › en bas.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F; font-weight:800;">•</span><span><strong>Exporter</strong> — bouton « Excel » ou « PDF ».</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F; font-weight:800;">•</span><span><strong>Sélection</strong> — cases à cocher pour agir en masse.</span></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#EAF1F9; border:1px solid #CFE0F0; margin:14px 0 0;"><span style="width:19px;height:19px;border-radius:50%;background:#2B6CB0;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">★</span><span style="font-size:13.5px;line-height:1.55;color:#243029;"><strong>Déconnexion</strong>&nbsp;: cliquez sur votre nom › « Déconnexion ». Le logiciel se déconnecte automatiquement après 1&nbsp;h d'inactivité.</span></div>
+    </div>
+  </section>
+
+  <!-- ===================== CHAPITRE 2 — VENDEUR ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">02</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 2 · Profil terrain</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">Vendeur / Opérateur PDV</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 22px;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;" class="avoid">
+      <div style="background:#F1F9F4; border:1px solid #DCEEE3; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D;">Votre rôle</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Enregistrer les paiements clients dans le logiciel.</div></div>
+      <div style="background:#FBF6E7; border:1px solid #EFE2BE; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#8A5E00;">Vos accès</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Uniquement les données de <strong>votre</strong> point de vente.</div></div>
+    </div>
+
+    <!-- Tâche 1 -->
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Enregistrer un réabonnement</h3></div>
+      <p style="font-size:12.5px; color:#67746C; margin:0 0 12px; padding-left:37px;">Client qui vient renouveler un abonnement existant.</p>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-bottom:13px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Encaissement</span></div>
+      <div style="font-size:13px; font-weight:800; margin-bottom:6px; color:#0A6B3D;">Rechercher le client</div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 12px;">Tapez le <strong>n° d'abonné</strong>, le <strong>n° de décodeur</strong> ou le <strong>téléphone</strong> → Entrée → cliquez sur la ligne. Le formulaire se remplit automatiquement.</p>
+      <div style="font-size:13px; font-weight:800; margin-bottom:8px; color:#0A6B3D;">Remplir le formulaire</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:7px 18px; font-size:13.5px; line-height:1.5; color:#33433A; margin-bottom:12px;">
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>PDV</strong> — vérifiez que c'est le vôtre.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Formule</strong> — celle du client (ACCESS, ÉVASION…).</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Nature</strong> — RÉABONNEMENT.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Nombre de mois</strong> — 1, ou plus si paiement d'avance.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Mode de paiement</strong> — Espèce, Wave, OM, Chèque…</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Options</strong> — Premium +6 000, Intl +6 000, Timbre +100.</span></div>
+      </div>
+      <div style="background:#F4F7F2; border-radius:11px; padding:13px 15px; margin-bottom:12px;">
+        <div style="font-size:13px; font-weight:800; margin-bottom:6px; color:#1C2B23;">Calcul automatique</div>
+        <div style="font-size:13.5px; line-height:1.6; color:#33433A;">Le <strong>Montant total</strong> se calcule seul. Saisissez le <strong>Montant reçu</strong>&nbsp;; la <strong>Monnaie rendue</strong> s'affiche. <span style="color:#A82E22; font-weight:700;">Si elle est en rouge, le client n'a pas assez payé&nbsp;!</span></div>
+      </div>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#F1F9F4; border:1px solid #D6E8DD;"><span style="width:19px;height:19px;border-radius:50%;background:#0E8A4F;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✓</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Cliquez <strong>« Enregistrer »</strong>&nbsp;: message vert + un <strong>reçu</strong> s'affiche pour impression.</span></div>
+    </div>
+
+    <!-- Tâche 2 -->
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Enregistrer un nouveau client (recrutement)</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 13px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Encaissement</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Nouvel abonné</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 10px;">Choisissez la nature <strong>RECRUTEMENT</strong>, la formule, et saisissez le <strong>n° de série du décodeur</strong> vendu. Renseignez les infos client obligatoires&nbsp;:</p>
+      <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;"><span style="background:#F4F7F2; border:1px solid #E0E7DC; font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:8px;">Nom, Prénom</span><span style="background:#F4F7F2; border:1px solid #E0E7DC; font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:8px;">Téléphone 1 (10 chiffres)</span><span style="background:#F4F7F2; border:1px solid #E0E7DC; font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:8px;">Téléphone 2 (option)</span><span style="background:#F4F7F2; border:1px solid #E0E7DC; font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:8px;">N° de contrat</span></div>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#FBF6E7; border:1px solid #EFE2BE;"><span style="width:19px;height:19px;border-radius:50%;background:#E2A000;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">!</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Vérifiez bien le <strong>n° de décodeur</strong>&nbsp;! Une erreur ici provoque des problèmes de rapprochement (matching).</span></div>
+    </div>
+
+    <!-- Tâches 3 & 4 en colonnes -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><h3 style="margin:0;font-size:15px;font-weight:800;">Vérifier ses encaissements du jour</h3></div>
+        <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-bottom:11px;"><span style="background:#0E8A4F; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Encaissement</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Consultation</span></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;">Filtrez Date début = Date fin = aujourd'hui → « Afficher ». Comparez le total affiché à votre caisse <strong>avant de fermer la boutique</strong>.</p>
+      </div>
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</span><h3 style="margin:0;font-size:15px;font-weight:800;">Consulter son solde &amp; son stock</h3></div>
+        <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-bottom:9px;"><span style="background:#0E8A4F; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Suivi Solde PDV</span></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0 0 6px;">Encaissements, versements validés et solde restant dû. Pour le stock&nbsp;: <strong>Logistique › Consultation du stock Réseau</strong>, filtré sur votre PDV.</p>
+      </div>
+    </div>
+
+    <!-- Tâche 4 versement -->
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:18px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Effectuer un versement en banque</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 13px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Versement en banque</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 11px;">Après avoir versé l'argent physiquement, gardez le bordereau et saisissez&nbsp;: PDV, montant exact, banque, date, période, libellé, n° de bordereau, et la <strong>photo du bordereau (obligatoire)</strong>.</p>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#EAF1F9; border:1px solid #CFE0F0;"><span style="width:19px;height:19px;border-radius:50%;background:#2B6CB0;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">★</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Le statut <strong>« En attente de validation »</strong> est normal&nbsp;: l'admin doit valider. Un versement non validé ne compte pas — relancez si besoin après 24&nbsp;h.</span></div>
+    </div>
+
+    <!-- Journée type -->
+    <div style="background:#0B2A1B; border-radius:15px; padding:22px 24px;" class="avoid">
+      <div style="font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:14px;">Journée type d'un vendeur</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Matin</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Connexion + vérifier les alertes</span><span>☐ Consulter le stock décodeurs</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">En journée</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Enregistrer chaque paiement</span><span>☐ Logiciel = caisse physique</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Soir</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Liste des encaissements du jour</span><span>☐ Versement si prévu + déconnexion</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHAPITRE 3 — ADMIN ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">03</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 3 · Pilotage système</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">Administrateur</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 22px;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;" class="avoid">
+      <div style="background:#F1F9F4; border:1px solid #DCEEE3; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D;">Votre rôle</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Gérer l'ensemble du système au quotidien.</div></div>
+      <div style="background:#FBF6E7; border:1px solid #EFE2BE; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#8A5E00;">Vos accès</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Complet, sauf la suppression définitive.</div></div>
+    </div>
+
+    <!-- Tâche 1 paramétrage -->
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:13px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Paramétrage initial du système</h3></div>
+      <p style="font-size:13.5px; color:#67746C; margin:0 0 13px;">À configurer une seule fois, dans cet ordre, depuis le module <strong>Paramétrage</strong>&nbsp;:</p>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:9px 16px;">
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">A</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>Localités &amp; secteurs</strong> géographiques</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">B</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>Formules</strong> (code, nom, prix matériel, prix formule)</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">C</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>Entrepôts</strong> (code, nom, capacité)</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">D</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>Banques</strong> (CBAO, Orange Money, Wave…)</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">E</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>PDV</strong> (code, raison sociale, type, secteur, caution)</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">F</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>Utilisateurs</strong> (un compte par personne + rôle)</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">G</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>Objectifs</strong> recrutement + réabo par secteur/PDV</span></div>
+        <div style="display:flex; gap:10px; align-items:flex-start;"><span style="font-family:'IBM Plex Mono',monospace; font-size:11px; font-weight:700; color:#0A6B3D; background:#E7F4EC; border-radius:6px; padding:2px 7px; flex-shrink:0;">H</span><span style="font-size:13px; line-height:1.45; color:#33433A;"><strong>Critères de commission</strong> (R/O min, bonus, %, dates)</span></div>
+      </div>
+    </div>
+
+    <!-- Tâche 2 import -->
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Importer le rapport d'activité quotidien</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 12px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Rapport d'activité</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Importation</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 11px;">Chaque matin, l'opérateur télévisuel vous envoie un fichier Excel. Importez-le&nbsp;: le système valide le format, affiche un résumé (lignes, montant total). Vérifiez que le total correspond, puis <strong>« Confirmer l'importation »</strong>.</p>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#FBEEEC; border:1px solid #F0D2CC;"><span style="width:19px;height:19px;border-radius:50%;background:#D23A2C;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✕</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">N'importez <strong>jamais deux fois</strong> le même rapport. En cas d'erreur, le message indique la ligne à corriger.</span></div>
+    </div>
+
+    <!-- Tâches 3 & 4 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><h3 style="margin:0;font-size:15px;font-weight:800;">Valider les versements</h3></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0 0 9px;">Filtrez sur <strong>« En attente »</strong>. Pour chacun&nbsp;: photo lisible&nbsp;? montant = bordereau&nbsp;? banque et PDV corrects&nbsp;?</p>
+        <div style="display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; gap:8px; align-items:center; font-size:13px; color:#0A6B3D; font-weight:700;"><span style="width:17px;height:17px;border-radius:50%;background:#0E8A4F;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✓</span>OK → « Valider » (solde mis à jour)</div>
+          <div style="display:flex; gap:8px; align-items:center; font-size:13px; color:#A82E22; font-weight:700;"><span style="width:17px;height:17px;border-radius:50%;background:#D23A2C;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">✕</span>Problème → « Rejeter » + motif</div>
+        </div>
+      </div>
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span><h3 style="margin:0;font-size:15px;font-weight:800;">Faire le matching</h3></div>
+        <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-bottom:9px;"><span style="background:#0E8A4F; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Matching</span></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;">Deux colonnes&nbsp;: <strong>rapport opérateur</strong> vs <strong>encaissements saisis</strong>. Les lignes <span style="color:#A82E22; font-weight:700;">rouges</span> = écart. Identifiez la cause (oubli, formule, doublon), corrigez, puis « Marquer comme matché ».</p>
+      </div>
+    </div>
+
+    <!-- Tâches 5 & 6 -->
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:18px;">
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</span><h3 style="margin:0;font-size:15px;font-weight:800;">Gérer les utilisateurs</h3></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0 0 8px;">Créez un compte par personne&nbsp;; l'utilisateur reçoit ses identifiants par email. Au départ d'un employé&nbsp;: <strong>« Désactiver »</strong>.</p>
+        <div style="display:flex; gap:10px; align-items:flex-start; padding:10px 12px; border-radius:9px; background:#FBF6E7; border:1px solid #EFE2BE;"><span style="width:17px;height:17px;border-radius:50%;background:#E2A000;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">!</span><span style="font-size:12.5px;line-height:1.5;color:#243029;">Ne supprimez jamais&nbsp;: conservez l'historique.</span></div>
+      </div>
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">6</span><h3 style="margin:0;font-size:15px;font-weight:800;">Calculer les commissions</h3></div>
+        <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-bottom:9px;"><span style="background:#0E8A4F; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">États Analytiques</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Commissions</span></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;">Sélectionnez année + mois. Le tableau détaille comm. recrutement, formule, réabo, prime M+1, déductions et <strong>commission nette</strong>. Export PDF par partenaire.</p>
+      </div>
+    </div>
+
+    <div style="background:#0B2A1B; border-radius:15px; padding:22px 24px;" class="avoid">
+      <div style="font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:14px;">Journée type d'un admin</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Matin</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Importer le rapport d'activité</span><span>☐ Faire le matching</span><span>☐ Valider les versements</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">En journée</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Répondre aux demandes PDV</span><span>☐ Surveiller les soldes</span><span>☐ Vérifier les alertes stock</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Fin de mois</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Calculer les commissions</span><span>☐ Arrêtés de soldes</span><span>☐ Exporter les rapports</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHAPITRE 4 — MANAGER ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">04</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 4 · Supervision</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">Manager</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 22px;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;" class="avoid">
+      <div style="background:#F1F9F4; border:1px solid #DCEEE3; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D;">Votre rôle</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Superviser les performances et analyser les données.</div></div>
+      <div style="background:#FBF6E7; border:1px solid #EFE2BE; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#8A5E00;">Vos accès</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Lecture + création + modification de tout.</div></div>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <h3 style="margin:0 0 14px;font-size:16.5px;font-weight:800;">Lire le tableau de bord</h3>
+      <div style="font-size:13px; font-weight:800; margin-bottom:8px; color:#1C2B23;">Cartes KPI — le code couleur du R/O (réalisé / objectif)</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:16px;">
+        <div style="border:1px solid #DCEEE3; border-radius:11px; padding:12px 14px; background:#F1F9F4;"><div style="display:flex; align-items:center; gap:7px; margin-bottom:4px;"><span style="width:11px; height:11px; border-radius:50%; background:#0E8A4F;"></span><span style="font-size:13px; font-weight:800; color:#0A6B3D;">Vert · ≥ 90 %</span></div><div style="font-size:12px; color:#48584E;">Excellent</div></div>
+        <div style="border:1px solid #EFE2BE; border-radius:11px; padding:12px 14px; background:#FBF6E7;"><div style="display:flex; align-items:center; gap:7px; margin-bottom:4px;"><span style="width:11px; height:11px; border-radius:50%; background:#E2A000;"></span><span style="font-size:13px; font-weight:800; color:#8A5E00;">Orange · 70–90 %</span></div><div style="font-size:12px; color:#48584E;">Accélérer</div></div>
+        <div style="border:1px solid #F0D2CC; border-radius:11px; padding:12px 14px; background:#FBEEEC;"><div style="display:flex; align-items:center; gap:7px; margin-bottom:4px;"><span style="width:11px; height:11px; border-radius:50%; background:#D23A2C;"></span><span style="font-size:13px; font-weight:800; color:#A82E22;">Rouge · &lt; 70 %</span></div><div style="font-size:12px; color:#48584E;">Action immédiate</div></div>
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px 18px; font-size:13.5px; line-height:1.5; color:#33433A;">
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Courbe verte</strong> = recrutements · <strong>jaune</strong> = réabonnements. Période ajustable (7j à 6 mois).</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Tableau secteurs</strong> = comparez et repérez le retard.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span>Une <strong>chute brutale</strong>&nbsp;? Jour férié ou problème PDV à investiguer.</span></div>
+        <div style="display:flex; gap:8px;"><span style="color:#0E8A4F;">•</span><span><strong>Alertes</strong> (panneau droit) — cliquez pour aller au module concerné.</span></div>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <h3 style="margin:0 0 10px;font-size:15px;font-weight:800;">Suivre les performances PDV</h3>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;">Vue quotidienne&nbsp;: <strong>États Analytiques › Suivi quotidien PDV</strong>. Classement&nbsp;: <strong>Statistiques › Classement PDV &amp; SR</strong>. Utilisez-le en réunion pour motiver et repérer les PDV en difficulté.</p>
+      </div>
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <h3 style="margin:0 0 10px;font-size:15px;font-weight:800;">Analyser les abonnés à risque</h3>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0 0 9px;"><strong>Service Abonnement › Arrivants à échéance</strong>. Filtrez « 7 prochains jours » + « non réabonné ». Assignez un commercial ou envoyez un SMS de masse.</p>
+        <div style="display:flex; gap:9px; align-items:flex-start; padding:10px 12px; border-radius:9px; background:#EAF1F9; border:1px solid #CFE0F0;"><span style="width:17px;height:17px;border-radius:50%;background:#2B6CB0;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">★</span><span style="font-size:12.5px;line-height:1.5;color:#243029;">Un abonné non renouvelé 7 jours après l'échéance est très dur à récupérer — agissez avant&nbsp;!</span></div>
+      </div>
+    </div>
+
+    <div style="background:#0B2A1B; border-radius:15px; padding:22px 24px;" class="avoid">
+      <div style="font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:14px;">Journée type d'un manager</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Matin</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Tableau de bord + alertes</span><span>☐ Contacter les PDV en retard</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Semaine</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Analyse abonnés à risque</span><span>☐ Campagnes SMS de relance</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Fin de mois</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Récap activités + classement</span><span>☐ Suivi objectifs &amp; projection</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHAPITRE 5 — COMPTABLE ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">05</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 5 · Flux financiers</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">Comptable</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 22px;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;" class="avoid">
+      <div style="background:#F1F9F4; border:1px solid #DCEEE3; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D;">Votre rôle</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Gérer tous les flux financiers du réseau.</div></div>
+      <div style="background:#FBF6E7; border:1px solid #EFE2BE; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#8A5E00;">Vos accès</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Module Finances en lecture et modification.</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><h3 style="margin:0;font-size:15px;font-weight:800;">Suivre les soldes PDV</h3></div>
+        <div style="display:flex; align-items:center; gap:5px; flex-wrap:wrap; margin-bottom:9px;"><span style="background:#0E8A4F; color:#fff; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11px; font-weight:700; padding:3px 8px; border-radius:6px;">Suivi Solde PDV</span></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;">Encaissements, versements validés et <strong>solde restant dû</strong>. Un solde élevé plusieurs jours = risque financier → contactez le PDV. Exportez en Excel chaque semaine.</p>
+      </div>
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><h3 style="margin:0;font-size:15px;font-weight:800;">Valider les versements</h3></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;">Même procédure que l'admin (ch.&nbsp;3). En plus&nbsp;: <strong>rapprochez avec le relevé bancaire réel</strong> — vérifiez que l'argent est bien sur le compte.</p>
+      </div>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Arrêté de soldes (clôture mensuelle)</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 12px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Opérations</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Arrêtés de soldes PDV</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 11px;">Le dernier jour du mois. <strong>Avant</strong>&nbsp;: assurez-vous qu'aucun versement n'est « En attente ». Créez un nouvel arrêté → les soldes sont <strong>figés</strong> et un PDF est généré pour signature.</p>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#FBF6E7; border:1px solid #EFE2BE;"><span style="width:19px;height:19px;border-radius:50%;background:#E2A000;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">!</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Recouvrement&nbsp;: <strong>États Analytiques › Recouvrement</strong>. Un taux &lt; 80 % nécessite une action.</span></div>
+    </div>
+
+    <div style="background:#0B2A1B; border-radius:15px; padding:22px 24px;" class="avoid">
+      <div style="font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:14px;">Journée type d'un comptable</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Quotidien</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Valider les versements</span><span>☐ Vérifier les soldes anormaux</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Hebdo</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Rapprochement banques/relevés</span><span>☐ Export rapport soldes</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Mensuel</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Arrêté de soldes</span><span>☐ Recouvrement + bilan dépenses</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHAPITRE 6 — LOGISTICIEN ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">06</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 6 · Matériel &amp; stocks</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">Logisticien</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 22px;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;" class="avoid">
+      <div style="background:#F1F9F4; border:1px solid #DCEEE3; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D;">Votre rôle</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Gérer tous les stocks de matériel physique.</div></div>
+      <div style="background:#FBF6E7; border:1px solid #EFE2BE; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#8A5E00;">Vos accès</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Logistique SAT &amp; G11, Accessoires, VAD.</div></div>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Réceptionner du matériel (approvisionnement)</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 12px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Logistique</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Approvisionnement Entrepôt</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 10px;"><strong>Avant&nbsp;:</strong> comptez physiquement et vérifiez que la quantité = bon de livraison. Renseignez date, n° bon, entrepôt, type, quantité. Pour les décodeurs, importez le fichier Excel des numéros de série.</p>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#F1F9F4; border:1px solid #D6E8DD;"><span style="width:19px;height:19px;border-radius:50%;background:#0E8A4F;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✓</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Chaque décodeur devient <strong>traçable par son n° de série</strong> tout au long de sa vie.</span></div>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Livrer du matériel à un PDV</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 12px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Logistique</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Livraison</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 11px;">Type « Entrepôt vers PDV », sélectionnez l'entrepôt source et le PDV destination. Ajoutez les décodeurs (saisie, scan ou import Excel), vérifiez la liste « À livrer », puis <strong>« Valider la livraison »</strong>.</p>
+      <div style="display:flex; align-items:center; gap:9px; padding:11px 14px; border-radius:10px; background:#F4F7F2;"><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#8A5E00; background:#FBF6E7; padding:3px 8px; border-radius:6px;">EN_STOCK_ENTREPÔT</span><span style="color:#0E8A4F; font-weight:800;">→</span><span style="font-family:'IBM Plex Mono',monospace; font-size:12px; font-weight:700; color:#0A6B3D; background:#E7F4EC; padding:3px 8px; border-radius:6px;">EN_STOCK_PDV</span><span style="font-size:12.5px; color:#67746C; margin-left:auto;">Le PDV doit confirmer la réception.</span></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px;">
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><h3 style="margin:0;font-size:15px;font-weight:800;">Rechercher un décodeur</h3></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;"><strong>Logistique › Recherche Décodeur</strong>&nbsp;: tapez le n° de série. Vous voyez où il est, depuis quand, et tous ses mouvements passés.</p>
+      </div>
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span><h3 style="margin:0;font-size:15px;font-weight:800;">Décodeurs immobilisés</h3></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0;"><strong>Logistique › Décodeurs non sortis depuis 3 mois</strong>. Investiguez&nbsp;: défectueux&nbsp;? PDV inactif&nbsp;? oubli&nbsp;?</p>
+      </div>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:18px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">5</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Gérer les accessoires</h3></div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:160px; background:#F4F7F2; border-radius:10px; padding:11px 13px;"><div style="font-size:12.5px; font-weight:800; color:#1C2B23; margin-bottom:2px;">Approvisionner</div><div style="font-size:12px; color:#67746C;">Gestion Accessoires › Approvisionnement</div></div>
+        <div style="flex:1; min-width:160px; background:#F4F7F2; border-radius:10px; padding:11px 13px;"><div style="font-size:12.5px; font-weight:800; color:#1C2B23; margin-bottom:2px;">Livrer</div><div style="font-size:12px; color:#67746C;">Gestion Accessoires › Livraison</div></div>
+        <div style="flex:1; min-width:160px; background:#F4F7F2; border-radius:10px; padding:11px 13px;"><div style="font-size:12.5px; font-weight:800; color:#1C2B23; margin-bottom:2px;">Retour défectueux</div><div style="font-size:12px; color:#67746C;">PDV, type, quantité, photo du défaut</div></div>
+      </div>
+    </div>
+
+    <div style="background:#0B2A1B; border-radius:15px; padding:22px 24px;" class="avoid">
+      <div style="font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:14px;">Journée type d'un logisticien</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Matin</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Alertes stock faible</span><span>☐ Commandes PDV en attente</span><span>☐ Livraisons à confirmer</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">En journée</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Traiter les livraisons PDV</span><span>☐ Enregistrer les réceptions</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Hebdo</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Vérif. stock entrepôt/réseau</span><span>☐ Immobilisés + retours défectueux</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHAPITRE 7 — COMMERCIAL ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">07</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 7 · Rétention client</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">Commercial / Conseiller</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 22px;"></div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px;" class="avoid">
+      <div style="background:#F1F9F4; border:1px solid #DCEEE3; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D;">Votre rôle</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Rétention des abonnés et suivi commercial.</div></div>
+      <div style="background:#FBF6E7; border:1px solid #EFE2BE; border-radius:12px; padding:14px 16px;"><div style="font-size:11px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#8A5E00;">Vos accès</div><div style="font-size:14px; margin-top:5px; color:#243029; line-height:1.45;">Service Abonnement, Suivi Commercial, États.</div></div>
+    </div>
+
+    <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px; margin-bottom:15px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:11px; margin-bottom:6px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><h3 style="margin:0;font-size:16.5px;font-weight:800;">Traiter les abonnés à échéance</h3></div>
+      <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 12px;"><span style="background:#0E8A4F; color:#fff; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Service Abonnement</span><span style="color:#0E8A4F; font-weight:800;">›</span><span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:3px 9px; border-radius:7px;">Arrivants à échéance</span></div>
+      <p style="font-size:14px; line-height:1.6; color:#33433A; margin:0 0 11px;">Filtrez « 7 prochains jours » + « non réabonné ». Pour chaque client&nbsp;: appelez, notez si le client vient (avec date), s'il a renouvelé ailleurs, ou son motif de départ. Cochez plusieurs clients → <strong>« Envoyer SMS »</strong> en masse.</p>
+      <div style="display:flex; gap:10px; align-items:flex-start; padding:11px 14px; border-radius:10px; background:#EAF1F9; border:1px solid #CFE0F0;"><span style="width:19px;height:19px;border-radius:50%;background:#2B6CB0;color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">★</span><span style="font-size:13.5px;line-height:1.55;color:#243029;">Vous pouvez aussi importer la liste de l'opérateur&nbsp;: <strong>« Importer Excel »</strong> (N° abonné, nom, prénoms, téléphone).</span></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:18px;">
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><h3 style="margin:0;font-size:15px;font-weight:800;">Accueillir les nouveaux abonnés</h3></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0 0 8px;"><strong>Service Abonnement › Bienvenue aux nouveaux abonnés</strong>. Dans les 3 jours&nbsp;: appelez, vérifiez que le décodeur marche, expliquez l'abonnement, puis mettez à jour le statut.</p>
+        <div style="display:flex; gap:9px; align-items:flex-start; padding:10px 12px; border-radius:9px; background:#F1F9F4; border:1px solid #D6E8DD;"><span style="width:17px;height:17px;border-radius:50%;background:#0E8A4F;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">✓</span><span style="font-size:12.5px;line-height:1.5;color:#243029;">Un bon accueil = meilleure fidélité.</span></div>
+      </div>
+      <div style="border:1px solid #E6EAE3; border-radius:14px; padding:18px 20px;" class="avoid">
+        <div style="display:flex; align-items:center; gap:11px; margin-bottom:10px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><h3 style="margin:0;font-size:15px;font-weight:800;">Consulter ses performances</h3></div>
+        <p style="font-size:13.5px; line-height:1.55; color:#33433A; margin:0 0 8px;"><strong>Suivi Commercial › Performances CC</strong>. Vos KPI&nbsp;: clients traités, conservés, <strong>taux de rétention</strong>, ARPU, productivité.</p>
+        <div style="display:flex; gap:9px; align-items:flex-start; padding:10px 12px; border-radius:9px; background:#FBF6E7; border:1px solid #EFE2BE;"><span style="width:17px;height:17px;border-radius:50%;background:#E2A000;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">!</span><span style="font-size:12.5px;line-height:1.5;color:#243029;">Objectif&nbsp;: rétention &gt; 75 %. Les meilleurs atteignent 85 %+.</span></div>
+      </div>
+    </div>
+
+    <div style="background:#0B2A1B; border-radius:15px; padding:22px 24px;" class="avoid">
+      <div style="font-size:11px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:14px;">Journée type d'un commercial</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px;">
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Matin</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Liste des abonnés à contacter</span><span>☐ SMS de rappel en masse</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">En journée</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Appeler les clients un par un</span><span>☐ MAJ commentaires + accueil</span></div></div>
+        <div><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:9px;">Soir</div><div style="display:flex; flex-direction:column; gap:7px; font-size:12.5px; color:#A9CDB6; line-height:1.4;"><span>☐ Consulter ses performances</span><span>☐ Planifier les rappels de demain</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CHAPITRE 8 — FAQ ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:60px 66px;">
+    <div style="display:flex; align-items:center; gap:16px;" class="avoid">
+      <div style="width:54px; height:54px; border-radius:14px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:21px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">08</div>
+      <div><div style="font-size:11px; font-weight:800; letter-spacing:.14em; text-transform:uppercase; color:#0E8A4F;">Chapitre 8 · Dépannage</div><h2 style="margin:3px 0 0; font-size:26px; font-weight:800; letter-spacing:-0.01em;">FAQ &amp; résolution de problèmes</h2></div>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:16px 0 22px;"></div>
+
+    <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D; margin-bottom:11px;">Questions vendeurs</div>
+    <div style="display:flex; flex-direction:column; gap:9px; margin-bottom:22px;">
+      <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 16px;" class="avoid"><div style="font-size:13.5px; font-weight:800; color:#1C2B23; margin-bottom:4px;">Client introuvable dans la recherche&nbsp;?</div><div style="font-size:13px; line-height:1.55; color:#48584E;">Vérifiez le numéro complet (sans espace), essayez par décodeur ou téléphone. Si inconnu&nbsp;→ traitez en <strong>recrutement</strong>.</div></div>
+      <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 16px;" class="avoid"><div style="font-size:13.5px; font-weight:800; color:#1C2B23; margin-bottom:4px;">Erreur dans un encaissement&nbsp;?</div><div style="font-size:13px; line-height:1.55; color:#48584E;">Ne touchez à rien&nbsp;! Contactez l'admin immédiatement — lui seul peut corriger.</div></div>
+      <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 16px;" class="avoid"><div style="font-size:13.5px; font-weight:800; color:#1C2B23; margin-bottom:4px;">Versement « En attente » = normal&nbsp;?</div><div style="font-size:13px; line-height:1.55; color:#48584E;">Oui&nbsp;! L'admin doit valider. Toujours « En attente » après 24&nbsp;h&nbsp;→ relancez-le.</div></div>
+      <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 16px;" class="avoid"><div style="font-size:13.5px; font-weight:800; color:#1C2B23; margin-bottom:4px;">Compte bloqué&nbsp;? Page blanche&nbsp;?</div><div style="font-size:13px; line-height:1.55; color:#48584E;">Bloqué&nbsp;: attendez 15&nbsp;min ou voyez l'admin. Page blanche&nbsp;: F5, vérifiez internet, essayez Chrome.</div></div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:22px 26px;">
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D; margin-bottom:11px;">Questions admins</div>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 15px;" class="avoid"><div style="font-size:13px; font-weight:800; color:#1C2B23; margin-bottom:4px;">Import du rapport échoue&nbsp;?</div><div style="font-size:12.5px; line-height:1.5; color:#48584E;">Ouvrez l'Excel, lisez le message (ligne/colonne), corrigez, réimportez.</div></div>
+          <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 15px;" class="avoid"><div style="font-size:13px; font-weight:800; color:#1C2B23; margin-bottom:4px;">PDV dit avoir versé mais rien dans le système&nbsp;?</div><div style="font-size:12.5px; line-height:1.5; color:#48584E;">Filtrez les versements sur ce PDV. Absent = non saisi&nbsp;→ qu'il le saisisse avec le bordereau.</div></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:#0A6B3D; margin-bottom:11px;">Questions logisticiens</div>
+        <div style="display:flex; flex-direction:column; gap:9px;">
+          <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 15px;" class="avoid"><div style="font-size:13px; font-weight:800; color:#1C2B23; margin-bottom:4px;">N° de série rejeté&nbsp;?</div><div style="font-size:12.5px; line-height:1.5; color:#48584E;">Il existe déjà (cherchez-le), ou confusion 0/O dans le numéro.</div></div>
+          <div style="border:1px solid #E6EAE3; border-radius:11px; padding:13px 15px;" class="avoid"><div style="font-size:13px; font-weight:800; color:#1C2B23; margin-bottom:4px;">Écart stock physique / logiciel&nbsp;?</div><div style="font-size:12.5px; line-height:1.5; color:#48584E;">Recomptez, comparez un par un, puis admin pour « Mise à jour stock » avec motif documenté.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:22px; border:1px solid #E6EAE3; border-radius:13px; overflow:hidden;" class="avoid">
+      <div style="background:#F4F7F2; padding:11px 16px; font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:#1C2B23;">Messages d'erreur courants</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr;">
+        <div style="padding:11px 16px; border-top:1px solid #EDEFE9; font-size:12.5px; color:#48584E;"><strong style="color:#A82E22;">« Accès refusé »</strong> — pas les droits pour cette page.</div>
+        <div style="padding:11px 16px; border-top:1px solid #EDEFE9; font-size:12.5px; color:#48584E;"><strong style="color:#A82E22;">« Session expirée »</strong> — inactivité, reconnectez-vous.</div>
+        <div style="padding:11px 16px; border-top:1px solid #EDEFE9; font-size:12.5px; color:#48584E;"><strong style="color:#A82E22;">« Champ obligatoire »</strong> — un champ * entouré de rouge.</div>
+        <div style="padding:11px 16px; border-top:1px solid #EDEFE9; font-size:12.5px; color:#48584E;"><strong style="color:#A82E22;">« Format incorrect »</strong> — suivez le format affiché.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AIDE-MÉMOIRE — VENDEUR ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:52px 58px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:13px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">V</div>
+        <div><div style="font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F;">Fiche aide-mémoire</div><h2 style="margin:1px 0 0; font-size:23px; font-weight:800; letter-spacing:-0.01em;">Vendeur / Opérateur PDV</h2></div>
+      </div>
+      <span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:9px;">Accès : mon PDV</span>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:13px 0 20px;"></div>
+
+    <div style="display:grid; grid-template-columns:1.12fr 1fr; gap:22px; align-items:start;">
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#0A6B3D; margin-bottom:12px;">Mes tâches essentielles</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</span><div><div style="font-size:13.5px; font-weight:800;">Réabonnement</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Opérations › Encaissement → chercher le client, formule, mode de paiement, encaisser.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</span><div><div style="font-size:13.5px; font-weight:800;">Nouveau client (recrutement)</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">› Nouvel abonné → nature RECRUTEMENT + n° décodeur + infos client.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</span><div><div style="font-size:13.5px; font-weight:800;">Encaissements du jour</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Encaissement › Consultation → comparer au cash de la caisse.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</span><div><div style="font-size:13.5px; font-weight:800;">Versement en banque</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">› Versement en banque → montant + <strong>photo du bordereau (obligatoire)</strong>.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">5</span><div><div style="font-size:13.5px; font-weight:800;">Mon solde &amp; mon stock</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Suivi Solde PDV · Consultation du stock Réseau.</div></div></div>
+        </div>
+      </div>
+      <figure style="margin:0;"><div style="border:1px solid #E6EAE3; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(16,40,28,0.08);"><img src="screens/02-s.png" alt="Écran Encaissement" style="display:block; width:100%; height:auto;"></div><figcaption style="font-size:11px; color:#67746C; margin-top:7px; text-align:center;">L'écran Encaissement avec calcul automatique de la monnaie.</figcaption></figure>
+    </div>
+
+    <div style="margin-top:22px; background:#0B2A1B; border-radius:13px; padding:16px 20px;" class="avoid">
+      <div style="font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:10px;">À retenir</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; font-size:12.5px; color:#D9E7DE; line-height:1.4;">
+        <div><span style="color:#E2402F; font-weight:800;">●</span> Monnaie en <strong style="color:#fff;">rouge</strong> = client n'a pas assez payé.</div>
+        <div><span style="color:#F2B600; font-weight:800;">●</span> Toujours vérifier le <strong style="color:#fff;">n° de décodeur</strong>.</div>
+        <div><span style="color:#10A05B; font-weight:800;">●</span> Versement « en attente » = <strong style="color:#fff;">normal</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AIDE-MÉMOIRE — ADMIN ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:52px 58px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:13px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">A</div>
+        <div><div style="font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F;">Fiche aide-mémoire</div><h2 style="margin:1px 0 0; font-size:23px; font-weight:800; letter-spacing:-0.01em;">Administrateur</h2></div>
+      </div>
+      <span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:9px;">Accès : complet</span>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:13px 0 20px;"></div>
+
+    <div style="display:grid; grid-template-columns:1.12fr 1fr; gap:22px; align-items:start;">
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#0A6B3D; margin-bottom:12px;">Mes tâches essentielles</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</span><div><div style="font-size:13.5px; font-weight:800;">Importer le rapport (chaque matin)</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Opérations › Rapport d'activité › Importation → vérifier le total, confirmer.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</span><div><div style="font-size:13.5px; font-weight:800;">Faire le matching</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">› Matching → corriger les lignes <span style="color:#A82E22; font-weight:700;">rouges</span> (écarts).</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</span><div><div style="font-size:13.5px; font-weight:800;">Valider les versements</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">› Versement › En attente → vérifier la photo, valider ou rejeter + motif.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</span><div><div style="font-size:13.5px; font-weight:800;">Gérer les utilisateurs</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Paramétrage › Utilisateurs → créer / désactiver (jamais supprimer).</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">5</span><div><div style="font-size:13.5px; font-weight:800;">Calculer les commissions</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">États Analytiques › Commissions → année + mois, export PDF.</div></div></div>
+        </div>
+      </div>
+      <figure style="margin:0;"><div style="border:1px solid #E6EAE3; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(16,40,28,0.08);"><img src="screens/06-s.png" alt="Écran Matching" style="display:block; width:100%; height:auto;"></div><figcaption style="font-size:11px; color:#67746C; margin-top:7px; text-align:center;">Le matching compare rapport opérateur et encaissements.</figcaption></figure>
+    </div>
+
+    <div style="margin-top:22px; background:#0B2A1B; border-radius:13px; padding:16px 20px;" class="avoid">
+      <div style="font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:10px;">À retenir</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; font-size:12.5px; color:#D9E7DE; line-height:1.4;">
+        <div><span style="color:#E2402F; font-weight:800;">●</span> Jamais <strong style="color:#fff;">deux fois</strong> le même rapport.</div>
+        <div><span style="color:#F2B600; font-weight:800;">●</span> Désactiver, <strong style="color:#fff;">jamais supprimer</strong>.</div>
+        <div><span style="color:#10A05B; font-weight:800;">●</span> Matching <strong style="color:#fff;">chaque jour</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AIDE-MÉMOIRE — MANAGER ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:52px 58px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:13px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">M</div>
+        <div><div style="font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F;">Fiche aide-mémoire</div><h2 style="margin:1px 0 0; font-size:23px; font-weight:800; letter-spacing:-0.01em;">Manager</h2></div>
+      </div>
+      <span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:9px;">Accès : supervision</span>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:13px 0 20px;"></div>
+
+    <div style="display:grid; grid-template-columns:1.12fr 1fr; gap:22px; align-items:start;">
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#0A6B3D; margin-bottom:12px;">Mes réflexes quotidiens</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</span><div><div style="font-size:13.5px; font-weight:800;">Lire le tableau de bord</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">KPI vert ≥90% · orange 70-90% · rouge &lt;70%. Surveiller courbes &amp; alertes.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</span><div><div style="font-size:13.5px; font-weight:800;">Suivre les performances PDV</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">États Analytiques › Suivi quotidien PDV.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</span><div><div style="font-size:13.5px; font-weight:800;">Classement PDV &amp; SR</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Statistiques › Classement → en réunion d'équipe.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</span><div><div style="font-size:13.5px; font-weight:800;">Abonnés à risque</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Service Abonnement › Arrivants à échéance → assigner / SMS.</div></div></div>
+        </div>
+      </div>
+      <figure style="margin:0;"><div style="border:1px solid #E6EAE3; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(16,40,28,0.08);"><img src="screens/01-s.png" alt="Tableau de bord" style="display:block; width:100%; height:auto;"></div><figcaption style="font-size:11px; color:#67746C; margin-top:7px; text-align:center;">Le tableau de bord : KPI, courbes et alertes.</figcaption></figure>
+    </div>
+
+    <div style="margin-top:22px; background:#0B2A1B; border-radius:13px; padding:16px 20px;" class="avoid">
+      <div style="font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:10px;">À retenir</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; font-size:12.5px; color:#D9E7DE; line-height:1.4;">
+        <div><span style="color:#E2402F; font-weight:800;">●</span> R/O <strong style="color:#fff;">&lt; 70 %</strong> = action immédiate.</div>
+        <div><span style="color:#F2B600; font-weight:800;">●</span> Agir <strong style="color:#fff;">avant</strong> l'échéance.</div>
+        <div><span style="color:#10A05B; font-weight:800;">●</span> Le classement <strong style="color:#fff;">motive</strong> les équipes.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AIDE-MÉMOIRE — COMPTABLE ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:52px 58px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:13px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">C</div>
+        <div><div style="font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F;">Fiche aide-mémoire</div><h2 style="margin:1px 0 0; font-size:23px; font-weight:800; letter-spacing:-0.01em;">Comptable</h2></div>
+      </div>
+      <span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:9px;">Accès : finances</span>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:13px 0 20px;"></div>
+
+    <div style="display:grid; grid-template-columns:1.12fr 1fr; gap:22px; align-items:start;">
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#0A6B3D; margin-bottom:12px;">Mes tâches essentielles</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</span><div><div style="font-size:13.5px; font-weight:800;">Suivre les soldes PDV</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Opérations › Suivi Solde PDV → export Excel hebdo, repérer les soldes élevés.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</span><div><div style="font-size:13.5px; font-weight:800;">Valider &amp; rapprocher</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Valider les versements + rapprocher avec le relevé bancaire réel.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</span><div><div style="font-size:13.5px; font-weight:800;">Arrêté de soldes (fin de mois)</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Opérations › Arrêtés de soldes PDV → soldes figés, PDF à signer.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</span><div><div style="font-size:13.5px; font-weight:800;">Recouvrement</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">États Analytiques › Recouvrement → taux &lt; 80 % = action.</div></div></div>
+        </div>
+      </div>
+      <figure style="margin:0;"><div style="border:1px solid #E6EAE3; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(16,40,28,0.08);"><img src="screens/05-s.png" alt="Versements en banque" style="display:block; width:100%; height:auto;"></div><figcaption style="font-size:11px; color:#67746C; margin-top:7px; text-align:center;">Validation des versements en banque.</figcaption></figure>
+    </div>
+
+    <div style="margin-top:22px; background:#0B2A1B; border-radius:13px; padding:16px 20px;" class="avoid">
+      <div style="font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:10px;">À retenir</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; font-size:12.5px; color:#D9E7DE; line-height:1.4;">
+        <div><span style="color:#F2B600; font-weight:800;">●</span> Aucun versement « en attente » <strong style="color:#fff;">avant l'arrêté</strong>.</div>
+        <div><span style="color:#10A05B; font-weight:800;">●</span> Vérifier l'argent <strong style="color:#fff;">réellement sur le compte</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AIDE-MÉMOIRE — LOGISTICIEN ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:52px 58px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:13px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">L</div>
+        <div><div style="font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F;">Fiche aide-mémoire</div><h2 style="margin:1px 0 0; font-size:23px; font-weight:800; letter-spacing:-0.01em;">Logisticien</h2></div>
+      </div>
+      <span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:9px;">Accès : stocks</span>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:13px 0 20px;"></div>
+
+    <div style="display:grid; grid-template-columns:1.12fr 1fr; gap:22px; align-items:start;">
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#0A6B3D; margin-bottom:12px;">Mes tâches essentielles</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</span><div><div style="font-size:13.5px; font-weight:800;">Réceptionner (approvisionnement)</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Logistique › Approvisionnement → compter avant, importer les n° de série.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</span><div><div style="font-size:13.5px; font-weight:800;">Livrer à un PDV</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">› Livraison → Entrepôt vers PDV, valider la livraison.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</span><div><div style="font-size:13.5px; font-weight:800;">Rechercher un décodeur</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">› Recherche Décodeur → localisation + historique des mouvements.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">4</span><div><div style="font-size:13.5px; font-weight:800;">Immobilisés &amp; accessoires</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Décodeurs non sortis &gt; 3 mois · Gestion Accessoires (appro, livraison, retours).</div></div></div>
+        </div>
+      </div>
+      <figure style="margin:0;"><div style="border:1px solid #E6EAE3; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(16,40,28,0.08);"><img src="screens/07-s.png" alt="Stock réseau" style="display:block; width:100%; height:auto;"></div><figcaption style="font-size:11px; color:#67746C; margin-top:7px; text-align:center;">Consultation du stock réseau par PDV.</figcaption></figure>
+    </div>
+
+    <div style="margin-top:22px; background:#0B2A1B; border-radius:13px; padding:16px 20px;" class="avoid">
+      <div style="font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:10px;">À retenir</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; font-size:12.5px; color:#D9E7DE; line-height:1.4;">
+        <div><span style="color:#10A05B; font-weight:800;">●</span> Chaque décodeur <strong style="color:#fff;">traçable</strong> par n° série.</div>
+        <div><span style="color:#F2B600; font-weight:800;">●</span> Le PDV doit <strong style="color:#fff;">confirmer</strong> la réception.</div>
+        <div><span style="color:#E2402F; font-weight:800;">●</span> Écart de stock = <strong style="color:#fff;">recompter</strong>.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== AIDE-MÉMOIRE — COMMERCIAL ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto 30px; background:#fff; border-radius:5px; box-shadow:0 2px 14px rgba(16,40,28,0.10); padding:52px 58px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;" class="avoid">
+      <div style="display:flex; align-items:center; gap:13px;">
+        <div style="width:46px; height:46px; border-radius:12px; background:linear-gradient(135deg,#0E8A4F,#0A6B3D); color:#fff; display:flex; align-items:center; justify-content:center; font-size:18px; font-weight:800; flex-shrink:0; font-family:'IBM Plex Mono',monospace;">CC</div>
+        <div><div style="font-size:10.5px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#0E8A4F;">Fiche aide-mémoire</div><h2 style="margin:1px 0 0; font-size:23px; font-weight:800; letter-spacing:-0.01em;">Commercial / Conseiller</h2></div>
+      </div>
+      <span style="background:#E7F4EC; color:#0A6B3D; font-size:11.5px; font-weight:700; padding:6px 12px; border-radius:9px;">Accès : rétention</span>
+    </div>
+    <div style="height:3px; border-radius:2px; background:linear-gradient(90deg,#0E8A4F 0 33.33%,#E2A000 33.33% 66.66%,#D23A2C 66.66% 100%); margin:13px 0 20px;"></div>
+
+    <div style="display:grid; grid-template-columns:1.12fr 1fr; gap:22px; align-items:start;">
+      <div>
+        <div style="font-size:12px; font-weight:800; text-transform:uppercase; letter-spacing:.07em; color:#0A6B3D; margin-bottom:12px;">Mes tâches essentielles</div>
+        <div style="display:flex; flex-direction:column; gap:12px;">
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">1</span><div><div style="font-size:13.5px; font-weight:800;">Traiter les échéances</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Service Abonnement › Arrivants à échéance → appeler, SMS en masse.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">2</span><div><div style="font-size:13.5px; font-weight:800;">Accueillir les nouveaux (J+3)</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">› Bienvenue aux nouveaux abonnés → vérifier décodeur, mettre à jour le statut.</div></div></div>
+          <div style="display:flex; gap:11px; align-items:flex-start;"><span style="width:22px;height:22px;border-radius:7px;background:#0E8A4F;color:#fff;font-weight:800;font-size:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;">3</span><div><div style="font-size:13.5px; font-weight:800;">Suivre ses performances</div><div style="font-size:12.5px; color:#48584E; line-height:1.45;">Suivi Commercial › Performances CC → taux de rétention, ARPU.</div></div></div>
+        </div>
+      </div>
+      <figure style="margin:0;"><div style="border:1px solid #E6EAE3; border-radius:12px; overflow:hidden; box-shadow:0 2px 10px rgba(16,40,28,0.08);"><img src="screens/echeances.png" alt="Arrivants à échéance" style="display:block; width:100%; height:auto;"></div><figcaption style="font-size:11px; color:#67746C; margin-top:7px; text-align:center;">La liste des abonnés arrivant à échéance.</figcaption></figure>
+    </div>
+
+    <div style="margin-top:22px; background:#0B2A1B; border-radius:13px; padding:16px 20px;" class="avoid">
+      <div style="font-size:10.5px; font-weight:800; letter-spacing:.12em; text-transform:uppercase; color:#E2A000; margin-bottom:10px;">À retenir</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; font-size:12.5px; color:#D9E7DE; line-height:1.4;">
+        <div><span style="color:#10A05B; font-weight:800;">●</span> Objectif rétention <strong style="color:#fff;">&gt; 75 %</strong>.</div>
+        <div><span style="color:#F2B600; font-weight:800;">●</span> Un bon accueil = <strong style="color:#fff;">fidélité</strong>.</div>
+        <div><span style="color:#E2402F; font-weight:800;">●</span> Agir <strong style="color:#fff;">avant</strong> l'échéance.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CLÔTURE — RÈGLES D'OR ===================== -->
+  <section class="page" style="max-width:816px; margin:0 auto; background:#0B2A1B; border-radius:5px; box-shadow:0 4px 22px rgba(11,30,18,0.28); padding:60px 66px; position:relative; overflow:hidden;">
+    <div style="position:absolute; right:-130px; top:-90px; width:480px; height:480px; border-radius:50%; background:radial-gradient(circle, rgba(226,160,0,0.16), transparent 62%);"></div>
+    <div style="position:relative;">
+      <div style="width:64px; height:5px; border-radius:3px; display:flex; overflow:hidden; margin-bottom:24px;"><div style="flex:1; background:#0E8A4F;"></div><div style="flex:1; background:#E2A000;"></div><div style="flex:1; background:#D23A2C;"></div></div>
+      <div style="font-size:11px; font-weight:800; letter-spacing:.16em; text-transform:uppercase; color:#E2A000; margin-bottom:10px;">Pour tous les profils</div>
+      <h2 style="margin:0 0 26px; font-size:32px; font-weight:800; color:#fff; letter-spacing:-0.015em;">Les règles d'or</h2>
+
+      <div style="display:flex; flex-direction:column; gap:12px; margin-bottom:34px;">
+        <div style="display:flex; gap:13px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:15px 18px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">1</span><span style="font-size:14.5px; color:#E6F0E9; line-height:1.4;">Ne jamais partager son mot de passe&nbsp;; se déconnecter sur un poste partagé.</span></div>
+        <div style="display:flex; gap:13px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:15px 18px;"><span style="width:26px;height:26px;border-radius:8px;background:#E2A000;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">2</span><span style="font-size:14.5px; color:#E6F0E9; line-height:1.4;">En cas de doute, demander à son responsable — ne jamais deviner.</span></div>
+        <div style="display:flex; gap:13px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:15px 18px;"><span style="width:26px;height:26px;border-radius:8px;background:#D23A2C;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">3</span><span style="font-size:14.5px; color:#E6F0E9; line-height:1.4;">Pas de « tests » en production&nbsp;: chaque saisie est une opération réelle.</span></div>
+        <div style="display:flex; gap:13px; align-items:center; background:rgba(255,255,255,0.05); border-radius:12px; padding:15px 18px;"><span style="width:26px;height:26px;border-radius:8px;background:#0E8A4F;color:#fff;font-size:13px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;">4</span><span style="font-size:14.5px; color:#E6F0E9; line-height:1.4;">Une erreur signalée tôt est toujours plus facile à corriger.</span></div>
+      </div>
+
+      <div style="border-top:1px solid rgba(255,255,255,0.12); padding-top:24px;">
+        <div style="font-size:11px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:#7FB394; margin-bottom:12px;">Qui contacter&nbsp;?</div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="background:rgba(255,255,255,0.04); border-radius:11px; padding:14px 16px;"><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:3px;">Vendeur / PDV</div><div style="font-size:13px; color:#A9CDB6; line-height:1.45;">Problème de connexion ou d'encaissement → votre <strong>Admin</strong>.</div></div>
+          <div style="background:rgba(255,255,255,0.04); border-radius:11px; padding:14px 16px;"><div style="font-size:13px; font-weight:800; color:#fff; margin-bottom:3px;">Admin</div><div style="font-size:13px; color:#A9CDB6; line-height:1.45;">Bug technique → <strong>Support SENDISTRI</strong>.</div></div>
+        </div>
+      </div>
+
+      <div style="display:flex; align-items:center; gap:13px; margin-top:36px; padding-top:24px; border-top:1px solid rgba(255,255,255,0.12);">
+        <svg width="40" height="40" viewBox="0 0 48 48"><defs><linearGradient id="cl" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#10A05B"/><stop offset="1" stop-color="#0A6B3D"/></linearGradient></defs><rect width="48" height="48" rx="13" fill="url(#cl)"/><polygon points="24 12 26.7 18.2 33.4 18.6 28.2 23 29.9 29.6 24 26 18.1 29.6 19.8 23 14.6 18.6 21.3 18.2 24 12" fill="#fff"/><rect x="11" y="40.5" width="8.6" height="3" rx="1.5" fill="#10A05B"/><rect x="19.7" y="40.5" width="8.6" height="3" rx="1.5" fill="#F2B600"/><rect x="28.4" y="40.5" width="8.6" height="3" rx="1.5" fill="#E2402F"/></svg>
+        <div style="flex:1;"><div style="font-size:15px; font-weight:800; color:#fff; letter-spacing:.03em;">SENDISTRI</div><div style="font-size:12.5px; color:#5E8169;">Manuel de Formation Utilisateurs · v1.0 · Juin 2026</div></div>
+        <div style="font-size:12.5px; color:#5E8169;">Dakar, Sénégal</div>
+      </div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals(){
+    return { doPrint: () => window.print() };
+  }
+}
+</script>
+</body>
+</html>
