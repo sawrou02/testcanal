@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: sendistri-db
+    environment:
+      POSTGRES_DB: sendistri
+      POSTGRES_USER: sendistri
+      POSTGRES_PASSWORD: sendistri
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U sendistri -d sendistri']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sendistri-api
+    ports:
+      - '3000:3000'
+    environment:
+      DATABASE_URL: postgresql://sendistri:sendistri@postgres:5432/sendistri
+      JWT_SECRET: sendistri-jwt-secret-change-in-production
+      PORT: 3000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    command: >
+      sh -c "(npx prisma migrate deploy || npx prisma db push) &&
+             npx ts-node prisma/seed.ts &&
+             npm run start:dev"
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sendistri-web
+    ports:
+      - '5173:5173'
+    environment:
+      VITE_API_URL: http://localhost:3000
+    depends_on:
+      - api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+
+volumes:
+  postgres_data:

@@ -1,0 +1,343 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  MANAGER
+  COMPTABLE
+  LOGISTICIEN
+  COMMERCIAL
+  VENDEUR
+}
+
+enum Statut {
+  ACTIF
+  INACTIF
+}
+
+enum PDVType {
+  BOUTIQUE_PROPRE
+  SOUS_RESEAU
+  AGENCE_PRINCIPALE
+  VAD
+  APPORTEUR
+}
+
+enum AbonneStatut {
+  ACTIF
+  ECHU
+  SUSPENDU
+  RESILIE
+}
+
+enum DecodeurType {
+  Z4
+  GLOBAZ
+  G11
+}
+
+enum DecodeurStatut {
+  EN_STOCK_ENTREPOT
+  EN_STOCK_PDV
+  VENDU
+  IMMOBILISE
+  DEFECTUEUX
+}
+
+enum NatureEncaissement {
+  RECRUTEMENT
+  REABONNEMENT
+  MIGRATION
+}
+
+enum ModePaiement {
+  ESPECE
+  WAVE
+  ORANGE_MONEY
+  CHEQUE
+  VIREMENT
+}
+
+enum VersementStatut {
+  ENATTENTE
+  VALIDE
+  REJETE
+}
+
+enum BanqueType {
+  BANQUE
+  MOBILE_MONEY
+  WAVE
+}
+
+enum StatutMatching {
+  EN_ATTENTE
+  MATCHE
+  ECART
+}
+
+enum EntrepotType {
+  PRINCIPAL
+  SECONDAIRE
+}
+
+enum MouvementType {
+  EN_ENTREPOT_PDV
+  PDV_PDV
+  ENTREPOT_ENTREPOT
+  PDV_ENTREPOT
+}
+
+enum NotificationType {
+  WARN
+  OK
+  URGENT
+}
+
+model User {
+  id           String   @id @default(cuid())
+  nom          String
+  prenom       String
+  email        String   @unique
+  passwordHash String
+  role         Role
+  pdvId        String?
+  statut       Statut   @default(ACTIF)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  pdv               PDV?             @relation(fields: [pdvId], references: [id])
+  encaissements     Encaissement[]
+  versementsValides Versement[]      @relation("ValideParVersement")
+  retraitsValides   Retrait[]        @relation("ValideParRetrait")
+  rapports          RapportActivite[]
+  auditLogs         AuditLog[]
+}
+
+model Secteur {
+  id        String     @id @default(cuid())
+  nom       String
+  localites Localite[]
+  pdvs      PDV[]
+}
+
+model Localite {
+  id        String  @id @default(cuid())
+  nom       String
+  secteurId String
+  secteur   Secteur @relation(fields: [secteurId], references: [id])
+  pdvs      PDV[]
+}
+
+model PDV {
+  id           String   @id @default(cuid())
+  code         String   @unique
+  raisonSociale String
+  type         PDVType
+  secteurId    String
+  localiteId   String
+  caution      Float    @default(0)
+  soldeActuel  Float    @default(0)
+  statut       Statut   @default(ACTIF)
+  createdAt    DateTime @default(now())
+
+  secteur       Secteur        @relation(fields: [secteurId], references: [id])
+  localite      Localite       @relation(fields: [localiteId], references: [id])
+  users         User[]
+  abonnes       Abonne[]
+  encaissements Encaissement[]
+  versements    Versement[]
+  retraits      Retrait[]
+  decodeurs     Decodeur[]
+}
+
+model Formule {
+  id            String   @id @default(cuid())
+  code          String   @unique
+  nomCommercial String
+  prixMateriel  Float
+  prixFormule   Float
+  statut        Statut   @default(ACTIF)
+
+  abonnes       Abonne[]
+  encaissements Encaissement[]
+}
+
+model Abonne {
+  id           String       @id @default(cuid())
+  numAbonne    String       @unique
+  nom          String
+  prenom       String
+  tel1         String
+  tel2         String?
+  formuleId    String
+  decodeurId   String?
+  pdvId        String
+  dateEcheance DateTime
+  statut       AbonneStatut @default(ACTIF)
+  canalReabo   String?
+
+  formule       Formule        @relation(fields: [formuleId], references: [id])
+  pdv           PDV            @relation(fields: [pdvId], references: [id])
+  decodeur      Decodeur?      @relation(fields: [decodeurId], references: [id])
+  encaissements Encaissement[]
+}
+
+model Decodeur {
+  id          String         @id @default(cuid())
+  numSerie    String         @unique
+  type        DecodeurType
+  statut      DecodeurStatut @default(EN_STOCK_ENTREPOT)
+  entrepotId  String?
+  pdvId       String?
+  dateEntree  DateTime       @default(now())
+
+  entrepot Entrepot? @relation(fields: [entrepotId], references: [id])
+  pdv      PDV?      @relation(fields: [pdvId], references: [id])
+  abonnes  Abonne[]
+}
+
+model Encaissement {
+  id           String             @id @default(cuid())
+  abonneId     String
+  pdvId        String
+  userId       String
+  nature       NatureEncaissement
+  formuleId    String
+  nbMois       Int
+  montantTotal Float
+  montantRecu  Float
+  monnaie      String             @default("XOF")
+  modePaiement ModePaiement
+  options      Json               @default("{}")
+  date         DateTime
+  recuNumero   String
+  createdAt    DateTime           @default(now())
+
+  abonne  Abonne  @relation(fields: [abonneId], references: [id])
+  pdv     PDV     @relation(fields: [pdvId], references: [id])
+  user    User    @relation(fields: [userId], references: [id])
+  formule Formule @relation(fields: [formuleId], references: [id])
+}
+
+model Banque {
+  id          String     @id @default(cuid())
+  nom         String
+  numCompte   String
+  type        BanqueType
+  soldeActuel Float      @default(0)
+}
+
+model Versement {
+  id            String          @id @default(cuid())
+  pdvId         String
+  montant       Float
+  banqueId      String
+  dateVersement DateTime
+  periode       String
+  libelle       String
+  numBordereau  String
+  photoBordereau String?
+  statut        VersementStatut @default(ENATTENTE)
+  motifRejet    String?
+  valideParId   String?
+  createdAt     DateTime        @default(now())
+
+  pdv        PDV   @relation(fields: [pdvId], references: [id])
+  validePar  User? @relation("ValideParVersement", fields: [valideParId], references: [id])
+}
+
+model Retrait {
+  id            String          @id @default(cuid())
+  pdvId         String
+  montant       Float
+  banqueId      String
+  dateVersement DateTime
+  periode       String
+  libelle       String
+  numBordereau  String
+  photoBordereau String?
+  statut        VersementStatut @default(ENATTENTE)
+  motifRejet    String?
+  valideParId   String?
+  createdAt     DateTime        @default(now())
+
+  pdv       PDV   @relation(fields: [pdvId], references: [id])
+  validePar User? @relation("ValideParRetrait", fields: [valideParId], references: [id])
+}
+
+model RapportActivite {
+  id              String         @id @default(cuid())
+  date            DateTime
+  fichierImporte  String
+  montantTotal    Float
+  sat             Float
+  fibre           Float
+  rex             Float
+  nbReabo         Int
+  caReabo         Float
+  nbRecru         Int
+  caFormule       Float
+  caCreatZ4       Float
+  caCreatGZ       Float
+  caCreatG11      Float
+  caPayech        Float
+  caAccessoires   Float
+  statutMatching  StatutMatching @default(EN_ATTENTE)
+  importeParId    String
+  importeLe       DateTime
+  createdAt       DateTime       @default(now())
+
+  importePar User @relation(fields: [importeParId], references: [id])
+}
+
+model Entrepot {
+  id        String       @id @default(cuid())
+  code      String       @unique
+  nom       String
+  type      EntrepotType
+  capacite  Int
+  statut    Statut       @default(ACTIF)
+
+  decodeurs Decodeur[]
+}
+
+model MouvementStock {
+  id              String        @id @default(cuid())
+  type            MouvementType
+  materiel        String
+  sourceId        String
+  destinationId   String
+  quantite        Int
+  numBonLivraison String
+  date            DateTime
+  statut          Statut        @default(ACTIF)
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  userId    String
+  action    String
+  module    String
+  ip        String
+  timestamp DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  type      NotificationType
+  message   String
+  lien      String?
+  lu        Boolean          @default(false)
+  dismissed Boolean          @default(false)
+  createdAt DateTime         @default(now())
+}

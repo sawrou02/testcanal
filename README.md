@@ -1,25 +1,108 @@
-# CODING AGENTS: READ THIS FIRST
+# SENDISTRI — ERP de distribution télécom
 
-This is a **handoff bundle** from Claude Design (claude.ai/design).
+Application web de gestion commerciale pour un distributeur télécom au Sénégal
+(abonnements TV/internet, décodeurs, kits, accessoires) via un réseau de points de
+vente (PDV) et de vendeurs à domicile (VAD).
 
-A user mocked up designs in HTML/CSS/JS using an AI design tool, then exported this bundle so a coding agent can implement the designs for real.
+Interface en français, montants en FCFA, mode clair/sombre, vue mobile terrain pour
+l'encaissement. 14 modules métier, multi-rôles (RBAC).
 
-## What you should do — IMPORTANT
+> Construit à partir du prototype de design `project/SENDISTRI.dc.html`. Le prompt de
+> spécification complet est dans `project/PROMPT-Claude-Code-SENDISTRI.md`.
 
-**Read the chat transcripts first.** There are 1 chat transcript(s) in `chats/`. The transcripts show the full back-and-forth between the user and the design assistant — they tell you **what the user actually wants** and **where they landed** after iterating. Don't skip them. The final HTML files are the output, but the chat is where the intent lives.
+## Stack
 
-**Read `project/SENDISTRI.dc.html` in full.** The user had this file open when they triggered the handoff, so it's almost certainly the primary design they want built. Read it top to bottom — don't skim. Then **follow its imports**: open every file it pulls in (shared components, CSS, scripts) so you understand how the pieces fit together before you start implementing.
+| Couche | Technologies |
+|--------|--------------|
+| Frontend | React 18, TypeScript, Vite, React Router, Tailwind CSS, Zustand, TanStack Query, Axios |
+| Backend | NestJS, TypeScript, Prisma, PostgreSQL, Passport JWT |
+| Infra | Docker Compose (Postgres + API + Web) |
 
-**If anything is ambiguous, ask the user to confirm before you start implementing.** It's much cheaper to clarify scope up front than to build the wrong thing.
+## Démarrage rapide (Docker)
 
-## About the design files
+```bash
+docker-compose up
+```
 
-The design medium is **HTML/CSS/JS** — these are prototypes, not production code. Your job is to **recreate them pixel-perfectly** in whatever technology makes sense for the target codebase (React, Vue, native, whatever fits). Match the visual output; don't copy the prototype's internal structure unless it happens to fit.
+- Frontend : http://localhost:5173
+- API : http://localhost:3000/api
+- Postgres : localhost:5432 (`sendistri` / `sendistri`)
 
-**Don't render these files in a browser or take screenshots unless the user asks you to.** Everything you need — dimensions, colors, layout rules — is spelled out in the source. Read the HTML and CSS directly; a screenshot won't tell you anything they don't.
+Au démarrage, l'API applique le schéma Prisma puis exécute le seed (données
+sénégalaises réalistes).
 
-## Bundle contents
+## Démarrage manuel (dev)
 
-- `README.md` — this file
-- `chats/` — conversation transcripts (read these!)
-- `project/` — the `SENDISTRI1` project files (HTML prototypes, assets, components)
+### Backend
+
+```bash
+cd backend
+cp .env.example .env          # ajuster DATABASE_URL si besoin
+npm install
+npx prisma generate
+npx prisma db push            # ou: npx prisma migrate dev
+npx ts-node prisma/seed.ts    # données de démonstration
+npm run start:dev             # http://localhost:3000
+```
+
+### Frontend
+
+```bash
+cd frontend
+npm install
+npm run dev                   # http://localhost:5173
+```
+
+Définir `VITE_API_URL` (défaut `http://localhost:3000`) si l'API tourne ailleurs.
+
+## Comptes de démonstration
+
+Tous les comptes utilisent le mot de passe **`Demo123!`**.
+
+| Rôle | Email |
+|------|-------|
+| Super Admin | `superadmin@sendistri.sn` |
+| Admin | `admin@sendistri.sn` |
+| Manager | `manager@sendistri.sn` |
+| Comptable | `comptable@sendistri.sn` |
+| Logisticien | `logisticien@sendistri.sn` |
+| Commercial | `commercial@sendistri.sn` |
+| Vendeur | `vendeur@sendistri.sn` |
+
+Le menu latéral est filtré dynamiquement selon le rôle.
+
+## Identité visuelle
+
+Couleurs du drapeau sénégalais : vert primaire `#0E8A4F`, jaune/or `#E2A000`, rouge
+`#D23A2C`, sidebar vert très foncé `#0B2A1B`. Polices : Manrope (interface),
+IBM Plex Mono (montants/codes).
+
+## Structure du projet
+
+```
+.
+├── docker-compose.yml
+├── backend/          # API NestJS + Prisma
+│   ├── prisma/       # schema.prisma + seed.ts
+│   └── src/          # modules: auth, users, dashboard, ...
+├── frontend/         # App React + Vite
+│   └── src/
+│       ├── components/  # ui, layout, dashboard
+│       ├── pages/
+│       ├── store/       # auth (Zustand)
+│       └── router/
+└── project/          # prototype de design d'origine (référence)
+```
+
+## État d'avancement
+
+- [x] **Étape 1 — Socle** : Docker, schéma Prisma (20 modèles), auth JWT + RBAC,
+      layout (sidebar 14 modules + header + thème), login, tableau de bord, seed.
+- [ ] Étape 2 — Référentiels (Paramétrage)
+- [ ] Étape 3 — Cœur métier (Encaissement + reçu, vue mobile, Suivi Solde PDV)
+- [ ] Étape 4 — Finances (Versements, Retraits, Arrêtés)
+- [ ] Étape 5 — Rapports & contrôle (Import, Matching, Commissions)
+- [ ] Étape 6 — Service Abonnement
+- [ ] Étape 7 — Logistique (SAT, G11, Accessoires, VAD)
+- [ ] Étape 8 — Analytique (États, Suivi Commercial, Statistiques)
+- [ ] Étape 9 — Finitions (exports, audit, tests, polish)
