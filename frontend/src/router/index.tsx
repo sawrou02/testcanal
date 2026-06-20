@@ -189,6 +189,24 @@ export const router = createBrowserRouter([
       { path: 'app/vad-livraison', element: <VadLivraisonPage title="Livraison stock VAD" /> },
       { path: 'app/vad-vente-kit', element: <VadVenteKitPage /> },
 
+      // --- A) Vues Suivi Commercial branchées sur données réelles ---
+      { path: 'app/poids-boutiques', element: <CaPdvPage title="Poids des boutiques" /> },
+      { path: 'app/liste-echus-com', element: <EchusPage /> },
+      { path: 'app/dn-pdv', element: <PdvListePage /> },
+      { path: 'app/stats-bienvenue', element: <BienvenuePage /> },
+      { path: 'app/objectif-journalier', element: <ObjectifsPage /> },
+
+      // --- A) Vues États Analytiques branchées sur données réelles ---
+      { path: 'app/ana-recouvrement', element: <SuiviSoldePage /> },
+      { path: 'app/ana-quotidien-pdv', element: <CaPdvPage title="Suivi quotidien PDV" /> },
+      { path: 'app/ana-quotidien-users', element: <RecrutementUserPage title="Suivi quotidien USERS" /> },
+      { path: 'app/ana-suivi-recrut', element: <RecrutementUserPage title="Suivi Recrutement" /> },
+      { path: 'app/ana-suivi-reabo', element: <CaPdvPage title="Suivi Réabonnement" /> },
+      { path: 'app/ana-objectifs-dist', element: <ObjectifsPage /> },
+      { path: 'app/ana-objectifs-pdv', element: <ObjectifsPage /> },
+      { path: 'app/ana-recap-objectif', element: <ObjectifsPage /> },
+      { path: 'app/ana-recap-activites', element: <RapportActivitePage /> },
+
       { path: 'app/:pageId', element: <GenericTablePage /> },
     ],
   },
