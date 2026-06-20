@@ -160,6 +160,7 @@ model PDV {
   stocksAccessoire StockAccessoire[]
   ventesAccessoire VenteAccessoire[]
   retoursAccessoire RetourDefectueux[]
+  ventesKit         VenteKit[]
 }
 
 model Formule {
@@ -414,4 +415,15 @@ model RetourDefectueux {
 
   accessoire Accessoire @relation(fields: [accessoireId], references: [id])
   pdv        PDV        @relation(fields: [pdvId], references: [id])
+}
+
+model VenteKit {
+  id           String       @id @default(cuid())
+  vadPdvId     String
+  decodeurType DecodeurType
+  clientNom    String
+  montant      Float
+  date         DateTime     @default(now())
+
+  vadPdv PDV @relation(fields: [vadPdvId], references: [id])
 }

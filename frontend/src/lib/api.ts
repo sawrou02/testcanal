@@ -926,3 +926,70 @@ export const creerRetour = async (body: {
   const res = await apiClient.post<RetourRow>('/accessoires/retours', body)
   return res.data
 }
+
+// ---------- Gestion des VAD ----------
+export interface VadAgentRow {
+  id: string
+  code: string
+  raisonSociale: string
+  secteur: string
+  stockDecodeurs: number
+  kitsVendus: number
+  caKits: number
+}
+export interface VadStats {
+  nbAgents: number
+  decodeursAttribues: number
+  kitsVendusMois: number
+  caKitsMois: number
+}
+export interface VadStockRow {
+  id: string
+  numSerie: string
+  type: string
+  statut: string
+  pdv: { raisonSociale: string } | null
+}
+export interface VenteKitRow {
+  id: string
+  date: string
+  decodeurType: string
+  clientNom: string
+  montant: number
+  vadPdv: { raisonSociale: string }
+}
+export const vadAgents = async (): Promise<VadAgentRow[]> => {
+  const res = await apiClient.get<VadAgentRow[]>('/vad/agents')
+  return Array.isArray(res.data) ? res.data : []
+}
+export const vadStats = async (): Promise<VadStats> => {
+  const res = await apiClient.get<VadStats>('/vad/stats')
+  return res.data
+}
+export const vadStock = async (vadId?: string): Promise<VadStockRow[]> => {
+  const res = await apiClient.get<VadStockRow[]>('/vad/stock', {
+    params: vadId ? { vadId } : undefined,
+  })
+  return Array.isArray(res.data) ? res.data : []
+}
+export const vadVentes = async (): Promise<VenteKitRow[]> => {
+  const res = await apiClient.get<VenteKitRow[]>('/vad/ventes')
+  return Array.isArray(res.data) ? res.data : []
+}
+export const vadLivraison = async (body: {
+  vadPdvId: string
+  type: string
+  quantite: number
+}): Promise<{ livres: number }> => {
+  const res = await apiClient.post<{ livres: number }>('/vad/livraison', body)
+  return res.data
+}
+export const vadVenteKit = async (body: {
+  vadPdvId: string
+  decodeurType: string
+  clientNom: string
+  montant: number
+}): Promise<VenteKitRow> => {
+  const res = await apiClient.post<VenteKitRow>('/vad/vente-kit', body)
+  return res.data
+}

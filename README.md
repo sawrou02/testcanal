@@ -128,5 +128,6 @@ IBM Plex Mono (montants/codes).
       pour dashboard/analytics/commissions).
 - [x] **Modules complémentaires** : Dépenses internes, Objectifs Distributeur/PDV
       (suivi cible vs réalisé), Gestion Accessoires complète (catalogue,
-      approvisionnement, livraison réseau, ventes, retours défectueux) — nouveaux
-      modèles Prisma + données seed réelles.
+      approvisionnement, livraison réseau, ventes, retours défectueux), et
+      Gestion des VAD (agents, stock décodeurs, livraison/attribution, vente kit)
+      — nouveaux modèles Prisma + données seed réelles.

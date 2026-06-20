@@ -20,6 +20,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { DepensesModule } from './depenses/depenses.module';
 import { ObjectifsModule } from './objectifs/objectifs.module';
 import { AccessoiresModule } from './accessoires/accessoires.module';
+import { VadModule } from './vad/vad.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AccessoiresModule } from './accessoires/accessoires.module';
     DepensesModule,
     ObjectifsModule,
     AccessoiresModule,
+    VadModule,
   ],
   providers: [
     {

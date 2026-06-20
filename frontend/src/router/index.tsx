@@ -43,6 +43,9 @@ import AccessoiresCataloguePage from '../pages/accessoires/CataloguePage'
 import AccessoiresLivraisonPage from '../pages/accessoires/LivraisonPage'
 import AccessoiresVentesPage from '../pages/accessoires/VentesPage'
 import AccessoiresRetoursPage from '../pages/accessoires/RetoursPage'
+import VadConsultationPage from '../pages/vad/ConsultationPage'
+import VadLivraisonPage from '../pages/vad/LivraisonPage'
+import VadVenteKitPage from '../pages/vad/VenteKitPage'
 
 function ProtectedRoute() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -179,6 +182,12 @@ export const router = createBrowserRouter([
         element: <AccessoiresVentesPage title="Versement PDV / Ventes accessoires" />,
       },
       { path: 'app/acc-retour-defectueux', element: <AccessoiresRetoursPage /> },
+
+      // --- Gestion des VAD ---
+      { path: 'app/vad-consultation', element: <VadConsultationPage /> },
+      { path: 'app/vad-init-stock', element: <VadLivraisonPage title="Initialisation stock VAD" /> },
+      { path: 'app/vad-livraison', element: <VadLivraisonPage title="Livraison stock VAD" /> },
+      { path: 'app/vad-vente-kit', element: <VadVenteKitPage /> },
 
       { path: 'app/:pageId', element: <GenericTablePage /> },
     ],

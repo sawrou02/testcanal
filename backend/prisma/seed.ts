@@ -1860,6 +1860,38 @@ async function main() {
   }
   console.log('Dépenses created');
 
+  // ---------- Gestion des VAD ----------
+  const vadPdvs = await prisma.pDV.findMany({ where: { type: 'VAD' }, select: { id: true } });
+  if (vadPdvs.length > 0) {
+    const vad1 = vadPdvs[0].id;
+    // assign some warehouse decoders to the first VAD agent so its stock is visible
+    const dispo = await prisma.decodeur.findMany({
+      where: { statut: 'EN_STOCK_ENTREPOT' },
+      take: 8,
+      select: { id: true },
+    });
+    if (dispo.length > 0) {
+      await prisma.decodeur.updateMany({
+        where: { id: { in: dispo.map((d) => d.id) } },
+        data: { statut: 'EN_STOCK_PDV', pdvId: vad1, entrepotId: null },
+      });
+    }
+    const kitTypes: DecodeurType[] = [DecodeurType.Z4, DecodeurType.GLOBAZ, DecodeurType.G11];
+    const clients = ['Awa Ndiaye', 'Cheikh Fall', 'Mariama Sow', 'Ibrahima Ba', 'Khadija Diop'];
+    for (let i = 0; i < 5; i++) {
+      const data = {
+        id: `vkit-${String(i + 1).padStart(3, '0')}`,
+        vadPdvId: vadPdvs[i % vadPdvs.length].id,
+        decodeurType: kitTypes[i % kitTypes.length],
+        clientNom: clients[i % clients.length],
+        montant: 25000 + i * 5000,
+        date: new Date(curYear, curMonth, Math.min(1 + ((i * 4) % 27), curToday)),
+      };
+      await prisma.venteKit.upsert({ where: { id: data.id }, update: data, create: data });
+    }
+    console.log('Ventes Kit VAD created');
+  }
+
   console.log('Seed completed successfully!');
   console.log('');
   console.log('Test accounts (password: Demo123!):');
