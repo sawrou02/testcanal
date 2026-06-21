@@ -1,4 +1,5 @@
 import { cn } from '../../lib/utils'
+import { Icon } from '../ui/Icon'
 
 interface KpiCardProps {
   label: string
@@ -42,7 +43,9 @@ export function KpiCard({ label, value, delta, deltaLabel, color = 'green', icon
           </p>
         </div>
         {icon && (
-          <span className="text-2xl shrink-0">{icon}</span>
+          <span className={cn('shrink-0 w-9 h-9 rounded-lg flex items-center justify-center', colors.badge)}>
+            <Icon name={icon} size={18} />
+          </span>
         )}
       </div>
       <div className="mt-3 flex items-center gap-2">

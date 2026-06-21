@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { BrandStar } from '../ui/BrandStar'
+import { Icon } from '../ui/Icon'
 import { useAuthStore } from '../../store/authStore'
 import { getRoleLabel, cn } from '../../lib/utils'
 import type { NavSection } from '../../types'
@@ -9,7 +10,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'dashboard',
     label: 'Tableau de bord',
-    icon: '⊞',
+    icon: 'grid',
     items: [],
     defaultOpen: true,
     singleLink: true,
@@ -17,7 +18,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'parametrage',
     label: 'Paramétrage',
-    icon: '⚙',
+    icon: 'sliders',
     items: [
       { id: 'formules', label: 'Formules' },
       { id: 'entrepot', label: 'Entrepôts' },
@@ -38,7 +39,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'operations',
     label: 'Opérations',
-    icon: '◈',
+    icon: 'receipt',
     badge: 3,
     defaultOpen: true,
     items: [
@@ -59,7 +60,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'gestion-credit',
     label: 'Gestion Crédit',
-    icon: '₣',
+    icon: 'card',
     items: [
       { id: 'suivi-credit', label: 'Suivi Crédit' },
       { id: 'rapport-dette', label: 'Rapport Dette' },
@@ -68,7 +69,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'service-abonnement',
     label: 'Service Abonnement',
-    icon: '◉',
+    icon: 'users',
     badge: 12,
     items: [
       { id: 'periode-recrutement', label: 'Période Recrutement' },
@@ -82,7 +83,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'suivi-commercial',
     label: 'Suivi Commercial',
-    icon: '📊',
+    icon: 'trend',
     items: [
       { id: 'objectif-journalier', label: 'Objectif Journalier' },
       { id: 'retour-rpe', label: 'Retour RPE' },
@@ -103,7 +104,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'logistique-sat',
     label: 'Logistique SAT',
-    icon: '📦',
+    icon: 'package',
     badge: 5,
     items: [
       { id: 'commandes', label: 'Commandes' },
@@ -125,7 +126,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'logistique-g11',
     label: 'Logistique G11',
-    icon: '📡',
+    icon: 'package',
     items: [
       { id: 'g11-inventaire-entrepot', label: 'Inventaire Entrepôt' },
       { id: 'g11-inventaire-pdv', label: 'Inventaire PDV' },
@@ -139,7 +140,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'gestion-accessoires',
     label: 'Gestion Accessoires',
-    icon: '🔧',
+    icon: 'layers',
     items: [
       { id: 'acc-appro-entrepot', label: 'Appro Entrepôt' },
       { id: 'acc-consultation-entrepot', label: 'Consultation Entrepôt' },
@@ -154,7 +155,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'gestion-vad',
     label: 'Gestion des VAD',
-    icon: '🤝',
+    icon: 'pin',
     items: [
       { id: 'vad-init-stock', label: 'Init Stock' },
       { id: 'vad-livraison', label: 'Livraison' },
@@ -165,7 +166,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'etats-analytiques',
     label: 'États Analytiques',
-    icon: '📈',
+    icon: 'bar',
     items: [
       { id: 'ana-materiels', label: 'Matériels' },
       { id: 'ana-recap-activites', label: 'Récap Activités' },
@@ -186,7 +187,7 @@ const NAV_SECTIONS: NavSection[] = [
   {
     id: 'statistiques',
     label: 'Statistiques',
-    icon: '📉',
+    icon: 'pie',
     items: [
       { id: 'stat-objectif-pdv', label: 'Objectif PDV' },
       { id: 'stat-classement', label: 'Classement' },
@@ -247,7 +248,7 @@ export function Sidebar() {
                     : 'text-green-200/70 hover:bg-white/10 hover:text-white',
                 )}
               >
-                <span className="text-base w-5 text-center">{section.icon}</span>
+                <span className="w-5 flex items-center justify-center"><Icon name={section.icon} size={18} /></span>
                 <span>{section.label}</span>
               </Link>
             )
@@ -264,7 +265,7 @@ export function Sidebar() {
                   'text-green-200/70 hover:bg-white/10 hover:text-white',
                 )}
               >
-                <span className="text-base w-5 text-center shrink-0">{section.icon}</span>
+                <span className="w-5 flex items-center justify-center shrink-0"><Icon name={section.icon} size={18} /></span>
                 <span className="flex-1 text-left">{section.label}</span>
                 {section.badge ? (
                   <span className="bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">

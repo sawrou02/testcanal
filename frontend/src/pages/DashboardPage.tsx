@@ -36,7 +36,7 @@ export default function DashboardPage() {
               delta={0}
               deltaLabel="ce mois"
               color="green"
-              icon="💰"
+              icon="card"
             />
             <KpiCard
               label="Recrutements"
@@ -44,7 +44,7 @@ export default function DashboardPage() {
               delta={0}
               deltaLabel="ce mois"
               color="blue"
-              icon="👤"
+              icon="users"
             />
             <KpiCard
               label="Réabonnements"
@@ -52,7 +52,7 @@ export default function DashboardPage() {
               delta={0}
               deltaLabel="ce mois"
               color="gold"
-              icon="🔄"
+              icon="trend"
             />
             <KpiCard
               label="Stock décodeurs"
@@ -60,7 +60,7 @@ export default function DashboardPage() {
               delta={0}
               deltaLabel="disponibles"
               color="red"
-              icon="📡"
+              icon="package"
             />
           </>
         )}
