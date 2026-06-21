@@ -40,10 +40,19 @@ cd backend
 cp .env.example .env          # ajuster DATABASE_URL si besoin
 npm install
 npx prisma generate
-npx prisma db push            # ou: npx prisma migrate dev
-npx ts-node prisma/seed.ts    # données de démonstration
+npx prisma migrate deploy     # crée le schéma à partir des migrations
+npx prisma db seed            # seed PROPRE : comptes de connexion uniquement
 npm run start:dev             # http://localhost:3000
 ```
+
+> **Seed propre par défaut** : la base ne contient **aucune donnée fictive**, seulement
+> les 7 comptes de connexion. Tu saisis tes vraies données via l'interface.
+>
+> Pour (re)mettre des **données de démonstration** sénégalaises (PDV, abonnés,
+> encaissements, etc.) : `npm run seed:demo`.
+>
+> Pour repartir d'une base vide à tout moment : `npx prisma migrate reset` (supprime
+> tout, recrée le schéma, relance le seed propre).
 
 ### Frontend
 

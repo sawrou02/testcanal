@@ -1,0 +1,1958 @@
+import { PrismaClient, PDVType, AbonneStatut, NatureEncaissement, ModePaiement, VersementStatut, BanqueType, StatutMatching, NotificationType, EntrepotType, DecodeurType, DecodeurStatut, MouvementType } from '@prisma/client';
+import * as bcrypt from 'bcrypt';
+
+const prisma = new PrismaClient();
+
+async function main() {
+  console.log('Starting seed...');
+
+  // ============================================================
+  // SECTEURS
+  // ============================================================
+  const secteurDakarCentre = await prisma.secteur.upsert({
+    where: { id: 'sect-dakar-centre' },
+    update: {},
+    create: { id: 'sect-dakar-centre', nom: 'Dakar Centre' },
+  });
+
+  const secteurDakarBanlieue = await prisma.secteur.upsert({
+    where: { id: 'sect-dakar-banlieue' },
+    update: {},
+    create: { id: 'sect-dakar-banlieue', nom: 'Dakar Banlieue' },
+  });
+
+  const secteurThies = await prisma.secteur.upsert({
+    where: { id: 'sect-thies' },
+    update: {},
+    create: { id: 'sect-thies', nom: 'Thiès' },
+  });
+
+  const secteurPetiteCote = await prisma.secteur.upsert({
+    where: { id: 'sect-petite-cote' },
+    update: {},
+    create: { id: 'sect-petite-cote', nom: 'Petite Côte' },
+  });
+
+  const secteurNord = await prisma.secteur.upsert({
+    where: { id: 'sect-nord' },
+    update: {},
+    create: { id: 'sect-nord', nom: 'Nord' },
+  });
+
+  const secteurSudCasamance = await prisma.secteur.upsert({
+    where: { id: 'sect-sud-casamance' },
+    update: {},
+    create: { id: 'sect-sud-casamance', nom: 'Sud-Casamance' },
+  });
+
+  console.log('Secteurs created');
+
+  // ============================================================
+  // LOCALITES (2 per secteur = 12 total)
+  // ============================================================
+  const locPlateau = await prisma.localite.upsert({
+    where: { id: 'loc-plateau' },
+    update: {},
+    create: { id: 'loc-plateau', nom: 'Plateau', secteurId: secteurDakarCentre.id },
+  });
+
+  const locMedina = await prisma.localite.upsert({
+    where: { id: 'loc-medina' },
+    update: {},
+    create: { id: 'loc-medina', nom: 'Médina', secteurId: secteurDakarCentre.id },
+  });
+
+  const locPikine = await prisma.localite.upsert({
+    where: { id: 'loc-pikine' },
+    update: {},
+    create: { id: 'loc-pikine', nom: 'Pikine', secteurId: secteurDakarBanlieue.id },
+  });
+
+  const locGuediawaye = await prisma.localite.upsert({
+    where: { id: 'loc-guediawaye' },
+    update: {},
+    create: { id: 'loc-guediawaye', nom: 'Guédiawaye', secteurId: secteurDakarBanlieue.id },
+  });
+
+  const locThiesVille = await prisma.localite.upsert({
+    where: { id: 'loc-thies-ville' },
+    update: {},
+    create: { id: 'loc-thies-ville', nom: 'Thiès Ville', secteurId: secteurThies.id },
+  });
+
+  const locMbour = await prisma.localite.upsert({
+    where: { id: 'loc-mbour' },
+    update: {},
+    create: { id: 'loc-mbour', nom: 'Mbour', secteurId: secteurThies.id },
+  });
+
+  const locSaly = await prisma.localite.upsert({
+    where: { id: 'loc-saly' },
+    update: {},
+    create: { id: 'loc-saly', nom: 'Saly', secteurId: secteurPetiteCote.id },
+  });
+
+  const locJoal = await prisma.localite.upsert({
+    where: { id: 'loc-joal' },
+    update: {},
+    create: { id: 'loc-joal', nom: 'Joal', secteurId: secteurPetiteCote.id },
+  });
+
+  const locSaintLouis = await prisma.localite.upsert({
+    where: { id: 'loc-saint-louis' },
+    update: {},
+    create: { id: 'loc-saint-louis', nom: 'Saint-Louis', secteurId: secteurNord.id },
+  });
+
+  const locLouga = await prisma.localite.upsert({
+    where: { id: 'loc-louga' },
+    update: {},
+    create: { id: 'loc-louga', nom: 'Louga', secteurId: secteurNord.id },
+  });
+
+  const locZiguinchor = await prisma.localite.upsert({
+    where: { id: 'loc-ziguinchor' },
+    update: {},
+    create: { id: 'loc-ziguinchor', nom: 'Ziguinchor', secteurId: secteurSudCasamance.id },
+  });
+
+  const locBignona = await prisma.localite.upsert({
+    where: { id: 'loc-bignona' },
+    update: {},
+    create: { id: 'loc-bignona', nom: 'Bignona', secteurId: secteurSudCasamance.id },
+  });
+
+  console.log('Localités created');
+
+  // ============================================================
+  // FORMULES
+  // ============================================================
+  const formuleAccess = await prisma.formule.upsert({
+    where: { code: 'ACCESS' },
+    update: {},
+    create: {
+      id: 'form-access',
+      code: 'ACCESS',
+      nomCommercial: 'ACCESS',
+      prixMateriel: 5000,
+      prixFormule: 1500,
+    },
+  });
+
+  const formuleEvasion = await prisma.formule.upsert({
+    where: { code: 'EVASION' },
+    update: {},
+    create: {
+      id: 'form-evasion',
+      code: 'EVASION',
+      nomCommercial: 'EVASION',
+      prixMateriel: 10000,
+      prixFormule: 3000,
+    },
+  });
+
+  const formuleEvasionPlus = await prisma.formule.upsert({
+    where: { code: 'EVASION_PLUS' },
+    update: {},
+    create: {
+      id: 'form-evasion-plus',
+      code: 'EVASION_PLUS',
+      nomCommercial: 'EVASION+',
+      prixMateriel: 15000,
+      prixFormule: 4500,
+    },
+  });
+
+  const formuleToutCanal = await prisma.formule.upsert({
+    where: { code: 'TOUT_CANAL' },
+    update: {},
+    create: {
+      id: 'form-tout-canal',
+      code: 'TOUT_CANAL',
+      nomCommercial: 'TOUT CANAL',
+      prixMateriel: 20000,
+      prixFormule: 6000,
+    },
+  });
+
+  const formulePrestige = await prisma.formule.upsert({
+    where: { code: 'PRESTIGE' },
+    update: {},
+    create: {
+      id: 'form-prestige',
+      code: 'PRESTIGE',
+      nomCommercial: 'PRESTIGE',
+      prixMateriel: 30000,
+      prixFormule: 9000,
+    },
+  });
+
+  console.log('Formules created');
+
+  // ============================================================
+  // PDVs (12 total, spread across types)
+  // ============================================================
+  const pdv1 = await prisma.pDV.upsert({
+    where: { code: 'PDV-DKC-001' },
+    update: {},
+    create: {
+      id: 'pdv-001',
+      code: 'PDV-DKC-001',
+      raisonSociale: 'Boutique Centrale Dakar',
+      type: PDVType.BOUTIQUE_PROPRE,
+      secteurId: secteurDakarCentre.id,
+      localiteId: locPlateau.id,
+      caution: 500000,
+      soldeActuel: 250000,
+    },
+  });
+
+  const pdv2 = await prisma.pDV.upsert({
+    where: { code: 'PDV-DKC-002' },
+    update: {},
+    create: {
+      id: 'pdv-002',
+      code: 'PDV-DKC-002',
+      raisonSociale: 'Agence Médina',
+      type: PDVType.AGENCE_PRINCIPALE,
+      secteurId: secteurDakarCentre.id,
+      localiteId: locMedina.id,
+      caution: 300000,
+      soldeActuel: 120000,
+    },
+  });
+
+  const pdv3 = await prisma.pDV.upsert({
+    where: { code: 'PDV-DKB-001' },
+    update: {},
+    create: {
+      id: 'pdv-003',
+      code: 'PDV-DKB-001',
+      raisonSociale: 'Réseau Pikine Nord',
+      type: PDVType.SOUS_RESEAU,
+      secteurId: secteurDakarBanlieue.id,
+      localiteId: locPikine.id,
+      caution: 200000,
+      soldeActuel: 80000,
+    },
+  });
+
+  const pdv4 = await prisma.pDV.upsert({
+    where: { code: 'PDV-DKB-002' },
+    update: {},
+    create: {
+      id: 'pdv-004',
+      code: 'PDV-DKB-002',
+      raisonSociale: 'Point Vente Guédiawaye',
+      type: PDVType.VAD,
+      secteurId: secteurDakarBanlieue.id,
+      localiteId: locGuediawaye.id,
+      caution: 150000,
+      soldeActuel: 60000,
+    },
+  });
+
+  const pdv5 = await prisma.pDV.upsert({
+    where: { code: 'PDV-THS-001' },
+    update: {},
+    create: {
+      id: 'pdv-005',
+      code: 'PDV-THS-001',
+      raisonSociale: 'Boutique Thiès Centre',
+      type: PDVType.BOUTIQUE_PROPRE,
+      secteurId: secteurThies.id,
+      localiteId: locThiesVille.id,
+      caution: 400000,
+      soldeActuel: 180000,
+    },
+  });
+
+  const pdv6 = await prisma.pDV.upsert({
+    where: { code: 'PDV-THS-002' },
+    update: {},
+    create: {
+      id: 'pdv-006',
+      code: 'PDV-THS-002',
+      raisonSociale: 'Apporteur Mbour',
+      type: PDVType.APPORTEUR,
+      secteurId: secteurThies.id,
+      localiteId: locMbour.id,
+      caution: 100000,
+      soldeActuel: 40000,
+    },
+  });
+
+  const pdv7 = await prisma.pDV.upsert({
+    where: { code: 'PDV-PC-001' },
+    update: {},
+    create: {
+      id: 'pdv-007',
+      code: 'PDV-PC-001',
+      raisonSociale: 'Boutique Saly Portudal',
+      type: PDVType.BOUTIQUE_PROPRE,
+      secteurId: secteurPetiteCote.id,
+      localiteId: locSaly.id,
+      caution: 350000,
+      soldeActuel: 160000,
+    },
+  });
+
+  const pdv8 = await prisma.pDV.upsert({
+    where: { code: 'PDV-PC-002' },
+    update: {},
+    create: {
+      id: 'pdv-008',
+      code: 'PDV-PC-002',
+      raisonSociale: 'Réseau Joal Fadiouth',
+      type: PDVType.SOUS_RESEAU,
+      secteurId: secteurPetiteCote.id,
+      localiteId: locJoal.id,
+      caution: 120000,
+      soldeActuel: 50000,
+    },
+  });
+
+  const pdv9 = await prisma.pDV.upsert({
+    where: { code: 'PDV-NRD-001' },
+    update: {},
+    create: {
+      id: 'pdv-009',
+      code: 'PDV-NRD-001',
+      raisonSociale: 'Agence Saint-Louis',
+      type: PDVType.AGENCE_PRINCIPALE,
+      secteurId: secteurNord.id,
+      localiteId: locSaintLouis.id,
+      caution: 450000,
+      soldeActuel: 200000,
+    },
+  });
+
+  const pdv10 = await prisma.pDV.upsert({
+    where: { code: 'PDV-NRD-002' },
+    update: {},
+    create: {
+      id: 'pdv-010',
+      code: 'PDV-NRD-002',
+      raisonSociale: 'Point Vente Louga',
+      type: PDVType.VAD,
+      secteurId: secteurNord.id,
+      localiteId: locLouga.id,
+      caution: 80000,
+      soldeActuel: 35000,
+    },
+  });
+
+  const pdv11 = await prisma.pDV.upsert({
+    where: { code: 'PDV-CAS-001' },
+    update: {},
+    create: {
+      id: 'pdv-011',
+      code: 'PDV-CAS-001',
+      raisonSociale: 'Boutique Ziguinchor',
+      type: PDVType.BOUTIQUE_PROPRE,
+      secteurId: secteurSudCasamance.id,
+      localiteId: locZiguinchor.id,
+      caution: 300000,
+      soldeActuel: 130000,
+    },
+  });
+
+  const pdv12 = await prisma.pDV.upsert({
+    where: { code: 'PDV-CAS-002' },
+    update: {},
+    create: {
+      id: 'pdv-012',
+      code: 'PDV-CAS-002',
+      raisonSociale: 'Apporteur Bignona',
+      type: PDVType.APPORTEUR,
+      secteurId: secteurSudCasamance.id,
+      localiteId: locBignona.id,
+      caution: 70000,
+      soldeActuel: 28000,
+    },
+  });
+
+  console.log('PDVs created');
+
+  // ============================================================
+  // BANQUES (5 total)
+  // ============================================================
+  const banque1 = await prisma.banque.upsert({
+    where: { id: 'bank-001' },
+    update: {},
+    create: {
+      id: 'bank-001',
+      nom: 'CBAO Sénégal',
+      numCompte: 'SN011 00100 10000123456 78',
+      type: BanqueType.BANQUE,
+      soldeActuel: 15000000,
+    },
+  });
+
+  const banque2 = await prisma.banque.upsert({
+    where: { id: 'bank-002' },
+    update: {},
+    create: {
+      id: 'bank-002',
+      nom: 'Ecobank Sénégal',
+      numCompte: 'SN021 00200 20000234567 89',
+      type: BanqueType.BANQUE,
+      soldeActuel: 8500000,
+    },
+  });
+
+  const banque3 = await prisma.banque.upsert({
+    where: { id: 'bank-003' },
+    update: {},
+    create: {
+      id: 'bank-003',
+      nom: 'Wave Sénégal',
+      numCompte: 'WAVE-SENDISTRI-001',
+      type: BanqueType.WAVE,
+      soldeActuel: 3200000,
+    },
+  });
+
+  const banque4 = await prisma.banque.upsert({
+    where: { id: 'bank-004' },
+    update: {},
+    create: {
+      id: 'bank-004',
+      nom: 'Orange Money',
+      numCompte: 'OM-SENDISTRI-001',
+      type: BanqueType.MOBILE_MONEY,
+      soldeActuel: 1800000,
+    },
+  });
+
+  const banque5 = await prisma.banque.upsert({
+    where: { id: 'bank-005' },
+    update: {},
+    create: {
+      id: 'bank-005',
+      nom: 'BIS Banque',
+      numCompte: 'SN031 00300 30000345678 90',
+      type: BanqueType.BANQUE,
+      soldeActuel: 22000000,
+    },
+  });
+
+  console.log('Banques created');
+
+  // ============================================================
+  // USERS (7 total, one per role)
+  // ============================================================
+  const passwordHash = await bcrypt.hash('Demo123!', 10);
+
+  const userSuperAdmin = await prisma.user.upsert({
+    where: { email: 'superadmin@sendistri.sn' },
+    update: {},
+    create: {
+      id: 'user-super-admin',
+      nom: 'Diallo',
+      prenom: 'Mamadou',
+      email: 'superadmin@sendistri.sn',
+      passwordHash,
+      role: 'SUPER_ADMIN',
+      statut: 'ACTIF',
+    },
+  });
+
+  const userAdmin = await prisma.user.upsert({
+    where: { email: 'admin@sendistri.sn' },
+    update: {},
+    create: {
+      id: 'user-admin',
+      nom: 'Ndiaye',
+      prenom: 'Fatou',
+      email: 'admin@sendistri.sn',
+      passwordHash,
+      role: 'ADMIN',
+      statut: 'ACTIF',
+    },
+  });
+
+  const userManager = await prisma.user.upsert({
+    where: { email: 'manager@sendistri.sn' },
+    update: {},
+    create: {
+      id: 'user-manager',
+      nom: 'Sow',
+      prenom: 'Ibrahima',
+      email: 'manager@sendistri.sn',
+      passwordHash,
+      role: 'MANAGER',
+      pdvId: pdv1.id,
+      statut: 'ACTIF',
+    },
+  });
+
+  const userComptable = await prisma.user.upsert({
+    where: { email: 'comptable@sendistri.sn' },
+    update: {},
+    create: {
+      id: 'user-comptable',
+      nom: 'Ba',
+      prenom: 'Aminata',
+      email: 'comptable@sendistri.sn',
+      passwordHash,
+      role: 'COMPTABLE',
+      statut: 'ACTIF',
+    },
+  });
+
+  const userLogisticien = await prisma.user.upsert({
+    where: { email: 'logisticien@sendistri.sn' },
+    update: {},
+    create: {
+      id: 'user-logisticien',
+      nom: 'Cisse',
+      prenom: 'Ousmane',
+      email: 'logisticien@sendistri.sn',
+      passwordHash,
+      role: 'LOGISTICIEN',
+      statut: 'ACTIF',
+    },
+  });
+
+  const userCommercial = await prisma.user.upsert({
+    where: { email: 'commercial@sendistri.sn' },
+    update: {},
+    create: {
+      id: 'user-commercial',
+      nom: 'Sarr',
+      prenom: 'Mariama',
+      email: 'commercial@sendistri.sn',
+      passwordHash,
+      role: 'COMMERCIAL',
+      pdvId: pdv2.id,
+      statut: 'ACTIF',
+    },
+  });
+
+  const userVendeur = await prisma.user.upsert({
+    where: { email: 'vendeur@sendistri.sn' },
+    update: {},
+    create: {
+      id: 'user-vendeur',
+      nom: 'Fall',
+      prenom: 'Cheikh',
+      email: 'vendeur@sendistri.sn',
+      passwordHash,
+      role: 'VENDEUR',
+      pdvId: pdv1.id,
+      statut: 'ACTIF',
+    },
+  });
+
+  console.log('Users created');
+
+  // ============================================================
+  // ABONNES (15 total with realistic Senegalese names)
+  // ============================================================
+  const abonne1 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-001' },
+    update: {},
+    create: {
+      id: 'abn-001',
+      numAbonne: 'ABN-2024-001',
+      nom: 'Diallo',
+      prenom: 'Moussa',
+      tel1: '77 123 45 67',
+      tel2: '70 987 65 43',
+      formuleId: formuleAccess.id,
+      pdvId: pdv1.id,
+      dateEcheance: new Date('2025-03-31'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne2 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-002' },
+    update: {},
+    create: {
+      id: 'abn-002',
+      numAbonne: 'ABN-2024-002',
+      nom: 'Ndiaye',
+      prenom: 'Aissatou',
+      tel1: '76 234 56 78',
+      formuleId: formuleEvasion.id,
+      pdvId: pdv1.id,
+      dateEcheance: new Date('2025-06-30'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'WAVE',
+    },
+  });
+
+  const abonne3 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-003' },
+    update: {},
+    create: {
+      id: 'abn-003',
+      numAbonne: 'ABN-2024-003',
+      nom: 'Sow',
+      prenom: 'Abdoulaye',
+      tel1: '78 345 67 89',
+      formuleId: formuleEvasionPlus.id,
+      pdvId: pdv2.id,
+      dateEcheance: new Date('2025-02-28'),
+      statut: AbonneStatut.ECHU,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne4 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-004' },
+    update: {},
+    create: {
+      id: 'abn-004',
+      numAbonne: 'ABN-2024-004',
+      nom: 'Ba',
+      prenom: 'Rokhaya',
+      tel1: '77 456 78 90',
+      formuleId: formuleToutCanal.id,
+      pdvId: pdv3.id,
+      dateEcheance: new Date('2025-12-31'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'ORANGE_MONEY',
+    },
+  });
+
+  const abonne5 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-005' },
+    update: {},
+    create: {
+      id: 'abn-005',
+      numAbonne: 'ABN-2024-005',
+      nom: 'Cisse',
+      prenom: 'Seydou',
+      tel1: '70 567 89 01',
+      formuleId: formulePrestige.id,
+      pdvId: pdv3.id,
+      dateEcheance: new Date('2025-09-30'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne6 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-006' },
+    update: {},
+    create: {
+      id: 'abn-006',
+      numAbonne: 'ABN-2024-006',
+      nom: 'Sarr',
+      prenom: 'Mame Diarra',
+      tel1: '76 678 90 12',
+      formuleId: formuleAccess.id,
+      pdvId: pdv4.id,
+      dateEcheance: new Date('2025-04-30'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne7 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-007' },
+    update: {},
+    create: {
+      id: 'abn-007',
+      numAbonne: 'ABN-2024-007',
+      nom: 'Fall',
+      prenom: 'Pape',
+      tel1: '78 789 01 23',
+      formuleId: formuleEvasion.id,
+      pdvId: pdv5.id,
+      dateEcheance: new Date('2025-07-31'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'WAVE',
+    },
+  });
+
+  const abonne8 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-008' },
+    update: {},
+    create: {
+      id: 'abn-008',
+      numAbonne: 'ABN-2024-008',
+      nom: 'Toure',
+      prenom: 'Khadija',
+      tel1: '77 890 12 34',
+      formuleId: formuleEvasionPlus.id,
+      pdvId: pdv5.id,
+      dateEcheance: new Date('2024-12-31'),
+      statut: AbonneStatut.SUSPENDU,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne9 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-009' },
+    update: {},
+    create: {
+      id: 'abn-009',
+      numAbonne: 'ABN-2024-009',
+      nom: 'Diop',
+      prenom: 'Malick',
+      tel1: '70 901 23 45',
+      formuleId: formuleToutCanal.id,
+      pdvId: pdv6.id,
+      dateEcheance: new Date('2025-08-31'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne10 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-010' },
+    update: {},
+    create: {
+      id: 'abn-010',
+      numAbonne: 'ABN-2024-010',
+      nom: 'Gueye',
+      prenom: 'Ndéye',
+      tel1: '76 012 34 56',
+      formuleId: formuleAccess.id,
+      pdvId: pdv7.id,
+      dateEcheance: new Date('2025-05-31'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'ORANGE_MONEY',
+    },
+  });
+
+  const abonne11 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-011' },
+    update: {},
+    create: {
+      id: 'abn-011',
+      numAbonne: 'ABN-2024-011',
+      nom: 'Mbaye',
+      prenom: 'Birame',
+      tel1: '78 123 45 60',
+      formuleId: formulePrestige.id,
+      pdvId: pdv8.id,
+      dateEcheance: new Date('2026-01-31'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne12 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-012' },
+    update: {},
+    create: {
+      id: 'abn-012',
+      numAbonne: 'ABN-2024-012',
+      nom: 'Sy',
+      prenom: 'Oumar',
+      tel1: '77 234 56 01',
+      formuleId: formuleEvasion.id,
+      pdvId: pdv9.id,
+      dateEcheance: new Date('2025-10-31'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'WAVE',
+    },
+  });
+
+  const abonne13 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-013' },
+    update: {},
+    create: {
+      id: 'abn-013',
+      numAbonne: 'ABN-2024-013',
+      nom: 'Kane',
+      prenom: 'Adja',
+      tel1: '70 345 67 02',
+      formuleId: formuleEvasionPlus.id,
+      pdvId: pdv10.id,
+      dateEcheance: new Date('2025-11-30'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'PDV',
+    },
+  });
+
+  const abonne14 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-014' },
+    update: {},
+    create: {
+      id: 'abn-014',
+      numAbonne: 'ABN-2024-014',
+      nom: 'Diouf',
+      prenom: 'Serigne',
+      tel1: '76 456 78 03',
+      formuleId: formuleToutCanal.id,
+      pdvId: pdv11.id,
+      dateEcheance: new Date('2025-06-30'),
+      statut: AbonneStatut.ACTIF,
+      canalReabo: 'ORANGE_MONEY',
+    },
+  });
+
+  const abonne15 = await prisma.abonne.upsert({
+    where: { numAbonne: 'ABN-2024-015' },
+    update: {},
+    create: {
+      id: 'abn-015',
+      numAbonne: 'ABN-2024-015',
+      nom: 'Badji',
+      prenom: 'Celestine',
+      tel1: '78 567 89 04',
+      formuleId: formuleAccess.id,
+      pdvId: pdv12.id,
+      dateEcheance: new Date('2024-11-30'),
+      statut: AbonneStatut.RESILIE,
+      canalReabo: 'PDV',
+    },
+  });
+
+  console.log('Abonnés created');
+
+  // ============================================================
+  // ENCAISSEMENTS (20 total)
+  // ============================================================
+  const encaissementsData = [
+    {
+      id: 'enc-001',
+      abonneId: abonne1.id,
+      pdvId: pdv1.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleAccess.id,
+      nbMois: 3,
+      montantTotal: 4500,
+      montantRecu: 4500,
+      modePaiement: ModePaiement.ESPECE,
+      date: new Date('2024-01-15'),
+      recuNumero: 'REC-2024-001',
+    },
+    {
+      id: 'enc-002',
+      abonneId: abonne2.id,
+      pdvId: pdv1.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.RECRUTEMENT,
+      formuleId: formuleEvasion.id,
+      nbMois: 6,
+      montantTotal: 28000,
+      montantRecu: 28000,
+      modePaiement: ModePaiement.WAVE,
+      date: new Date('2024-01-20'),
+      recuNumero: 'REC-2024-002',
+    },
+    {
+      id: 'enc-003',
+      abonneId: abonne3.id,
+      pdvId: pdv2.id,
+      userId: userCommercial.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleEvasionPlus.id,
+      nbMois: 1,
+      montantTotal: 4500,
+      montantRecu: 4500,
+      modePaiement: ModePaiement.ORANGE_MONEY,
+      date: new Date('2024-02-01'),
+      recuNumero: 'REC-2024-003',
+    },
+    {
+      id: 'enc-004',
+      abonneId: abonne4.id,
+      pdvId: pdv3.id,
+      userId: userManager.id,
+      nature: NatureEncaissement.RECRUTEMENT,
+      formuleId: formuleToutCanal.id,
+      nbMois: 12,
+      montantTotal: 92000,
+      montantRecu: 92000,
+      modePaiement: ModePaiement.CHEQUE,
+      date: new Date('2024-02-10'),
+      recuNumero: 'REC-2024-004',
+    },
+    {
+      id: 'enc-005',
+      abonneId: abonne5.id,
+      pdvId: pdv3.id,
+      userId: userManager.id,
+      nature: NatureEncaissement.RECRUTEMENT,
+      formuleId: formulePrestige.id,
+      nbMois: 6,
+      montantTotal: 84000,
+      montantRecu: 84000,
+      modePaiement: ModePaiement.VIREMENT,
+      date: new Date('2024-03-05'),
+      recuNumero: 'REC-2024-005',
+    },
+    {
+      id: 'enc-006',
+      abonneId: abonne6.id,
+      pdvId: pdv4.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleAccess.id,
+      nbMois: 3,
+      montantTotal: 4500,
+      montantRecu: 4500,
+      modePaiement: ModePaiement.ESPECE,
+      date: new Date('2024-03-15'),
+      recuNumero: 'REC-2024-006',
+    },
+    {
+      id: 'enc-007',
+      abonneId: abonne7.id,
+      pdvId: pdv5.id,
+      userId: userCommercial.id,
+      nature: NatureEncaissement.MIGRATION,
+      formuleId: formuleEvasion.id,
+      nbMois: 1,
+      montantTotal: 3000,
+      montantRecu: 3000,
+      modePaiement: ModePaiement.WAVE,
+      date: new Date('2024-04-01'),
+      recuNumero: 'REC-2024-007',
+    },
+    {
+      id: 'enc-008',
+      abonneId: abonne8.id,
+      pdvId: pdv5.id,
+      userId: userCommercial.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleEvasionPlus.id,
+      nbMois: 6,
+      montantTotal: 27000,
+      montantRecu: 27000,
+      modePaiement: ModePaiement.ORANGE_MONEY,
+      date: new Date('2024-04-15'),
+      recuNumero: 'REC-2024-008',
+    },
+    {
+      id: 'enc-009',
+      abonneId: abonne9.id,
+      pdvId: pdv6.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.RECRUTEMENT,
+      formuleId: formuleToutCanal.id,
+      nbMois: 3,
+      montantTotal: 38000,
+      montantRecu: 38000,
+      modePaiement: ModePaiement.ESPECE,
+      date: new Date('2024-05-10'),
+      recuNumero: 'REC-2024-009',
+    },
+    {
+      id: 'enc-010',
+      abonneId: abonne10.id,
+      pdvId: pdv7.id,
+      userId: userManager.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleAccess.id,
+      nbMois: 12,
+      montantTotal: 18000,
+      montantRecu: 18000,
+      modePaiement: ModePaiement.CHEQUE,
+      date: new Date('2024-05-20'),
+      recuNumero: 'REC-2024-010',
+    },
+    {
+      id: 'enc-011',
+      abonneId: abonne11.id,
+      pdvId: pdv8.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.RECRUTEMENT,
+      formuleId: formulePrestige.id,
+      nbMois: 12,
+      montantTotal: 138000,
+      montantRecu: 138000,
+      modePaiement: ModePaiement.VIREMENT,
+      date: new Date('2024-06-01'),
+      recuNumero: 'REC-2024-011',
+    },
+    {
+      id: 'enc-012',
+      abonneId: abonne12.id,
+      pdvId: pdv9.id,
+      userId: userCommercial.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleEvasion.id,
+      nbMois: 3,
+      montantTotal: 9000,
+      montantRecu: 9000,
+      modePaiement: ModePaiement.WAVE,
+      date: new Date('2024-06-15'),
+      recuNumero: 'REC-2024-012',
+    },
+    {
+      id: 'enc-013',
+      abonneId: abonne13.id,
+      pdvId: pdv10.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.MIGRATION,
+      formuleId: formuleEvasionPlus.id,
+      nbMois: 1,
+      montantTotal: 4500,
+      montantRecu: 4500,
+      modePaiement: ModePaiement.ESPECE,
+      date: new Date('2024-07-05'),
+      recuNumero: 'REC-2024-013',
+    },
+    {
+      id: 'enc-014',
+      abonneId: abonne14.id,
+      pdvId: pdv11.id,
+      userId: userManager.id,
+      nature: NatureEncaissement.RECRUTEMENT,
+      formuleId: formuleToutCanal.id,
+      nbMois: 6,
+      montantTotal: 56000,
+      montantRecu: 56000,
+      modePaiement: ModePaiement.ORANGE_MONEY,
+      date: new Date('2024-07-20'),
+      recuNumero: 'REC-2024-014',
+    },
+    {
+      id: 'enc-015',
+      abonneId: abonne1.id,
+      pdvId: pdv1.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleAccess.id,
+      nbMois: 6,
+      montantTotal: 9000,
+      montantRecu: 9000,
+      modePaiement: ModePaiement.WAVE,
+      date: new Date('2024-08-01'),
+      recuNumero: 'REC-2024-015',
+    },
+    {
+      id: 'enc-016',
+      abonneId: abonne2.id,
+      pdvId: pdv1.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleEvasion.id,
+      nbMois: 3,
+      montantTotal: 9000,
+      montantRecu: 9000,
+      modePaiement: ModePaiement.ESPECE,
+      date: new Date('2024-08-15'),
+      recuNumero: 'REC-2024-016',
+    },
+    {
+      id: 'enc-017',
+      abonneId: abonne4.id,
+      pdvId: pdv3.id,
+      userId: userManager.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleToutCanal.id,
+      nbMois: 6,
+      montantTotal: 36000,
+      montantRecu: 36000,
+      modePaiement: ModePaiement.CHEQUE,
+      date: new Date('2024-09-10'),
+      recuNumero: 'REC-2024-017',
+    },
+    {
+      id: 'enc-018',
+      abonneId: abonne7.id,
+      pdvId: pdv5.id,
+      userId: userCommercial.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleEvasion.id,
+      nbMois: 6,
+      montantTotal: 18000,
+      montantRecu: 18000,
+      modePaiement: ModePaiement.WAVE,
+      date: new Date('2024-10-01'),
+      recuNumero: 'REC-2024-018',
+    },
+    {
+      id: 'enc-019',
+      abonneId: abonne9.id,
+      pdvId: pdv6.id,
+      userId: userVendeur.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleToutCanal.id,
+      nbMois: 3,
+      montantTotal: 18000,
+      montantRecu: 18000,
+      modePaiement: ModePaiement.ORANGE_MONEY,
+      date: new Date('2024-11-05'),
+      recuNumero: 'REC-2024-019',
+    },
+    {
+      id: 'enc-020',
+      abonneId: abonne12.id,
+      pdvId: pdv9.id,
+      userId: userCommercial.id,
+      nature: NatureEncaissement.REABONNEMENT,
+      formuleId: formuleEvasion.id,
+      nbMois: 6,
+      montantTotal: 18000,
+      montantRecu: 18000,
+      modePaiement: ModePaiement.ESPECE,
+      date: new Date('2024-12-01'),
+      recuNumero: 'REC-2024-020',
+    },
+  ];
+
+  for (const enc of encaissementsData) {
+    await prisma.encaissement.upsert({
+      where: { id: enc.id },
+      update: {},
+      create: enc,
+    });
+  }
+
+  console.log('Encaissements created');
+
+  // ============================================================
+  // VERSEMENTS (10 total)
+  // ============================================================
+  const versementsData = [
+    {
+      id: 'vers-001',
+      pdvId: pdv1.id,
+      montant: 250000,
+      banqueId: banque1.id,
+      dateVersement: new Date('2024-01-31'),
+      periode: 'JANVIER 2024',
+      libelle: 'Versement mensuel janvier',
+      numBordereau: 'BRD-2024-001',
+      statut: VersementStatut.VALIDE,
+      valideParId: userComptable.id,
+    },
+    {
+      id: 'vers-002',
+      pdvId: pdv2.id,
+      montant: 120000,
+      banqueId: banque1.id,
+      dateVersement: new Date('2024-01-31'),
+      periode: 'JANVIER 2024',
+      libelle: 'Versement mensuel janvier',
+      numBordereau: 'BRD-2024-002',
+      statut: VersementStatut.VALIDE,
+      valideParId: userComptable.id,
+    },
+    {
+      id: 'vers-003',
+      pdvId: pdv3.id,
+      montant: 80000,
+      banqueId: banque2.id,
+      dateVersement: new Date('2024-02-29'),
+      periode: 'FEVRIER 2024',
+      libelle: 'Versement mensuel février',
+      numBordereau: 'BRD-2024-003',
+      statut: VersementStatut.VALIDE,
+      valideParId: userComptable.id,
+    },
+    {
+      id: 'vers-004',
+      pdvId: pdv5.id,
+      montant: 180000,
+      banqueId: banque2.id,
+      dateVersement: new Date('2024-03-31'),
+      periode: 'MARS 2024',
+      libelle: 'Versement mensuel mars',
+      numBordereau: 'BRD-2024-004',
+      statut: VersementStatut.VALIDE,
+      valideParId: userComptable.id,
+    },
+    {
+      id: 'vers-005',
+      pdvId: pdv7.id,
+      montant: 160000,
+      banqueId: banque3.id,
+      dateVersement: new Date('2024-04-30'),
+      periode: 'AVRIL 2024',
+      libelle: 'Versement mensuel avril',
+      numBordereau: 'BRD-2024-005',
+      statut: VersementStatut.VALIDE,
+      valideParId: userComptable.id,
+    },
+    {
+      id: 'vers-006',
+      pdvId: pdv9.id,
+      montant: 200000,
+      banqueId: banque1.id,
+      dateVersement: new Date('2024-05-31'),
+      periode: 'MAI 2024',
+      libelle: 'Versement mensuel mai',
+      numBordereau: 'BRD-2024-006',
+      statut: VersementStatut.REJETE,
+      motifRejet: 'Montant ne correspond pas aux encaissements déclarés',
+      valideParId: userComptable.id,
+    },
+    {
+      id: 'vers-007',
+      pdvId: pdv11.id,
+      montant: 130000,
+      banqueId: banque5.id,
+      dateVersement: new Date('2024-06-30'),
+      periode: 'JUIN 2024',
+      libelle: 'Versement mensuel juin',
+      numBordereau: 'BRD-2024-007',
+      statut: VersementStatut.VALIDE,
+      valideParId: userComptable.id,
+    },
+    {
+      id: 'vers-008',
+      pdvId: pdv1.id,
+      montant: 300000,
+      banqueId: banque1.id,
+      dateVersement: new Date('2024-09-30'),
+      periode: 'SEPTEMBRE 2024',
+      libelle: 'Versement mensuel septembre',
+      numBordereau: 'BRD-2024-008',
+      statut: VersementStatut.ENATTENTE,
+    },
+    {
+      id: 'vers-009',
+      pdvId: pdv4.id,
+      montant: 60000,
+      banqueId: banque4.id,
+      dateVersement: new Date('2024-10-31'),
+      periode: 'OCTOBRE 2024',
+      libelle: 'Versement mensuel octobre',
+      numBordereau: 'BRD-2024-009',
+      statut: VersementStatut.ENATTENTE,
+    },
+    {
+      id: 'vers-010',
+      pdvId: pdv6.id,
+      montant: 40000,
+      banqueId: banque3.id,
+      dateVersement: new Date('2024-11-30'),
+      periode: 'NOVEMBRE 2024',
+      libelle: 'Versement mensuel novembre',
+      numBordereau: 'BRD-2024-010',
+      statut: VersementStatut.ENATTENTE,
+    },
+  ];
+
+  for (const vers of versementsData) {
+    await prisma.versement.upsert({
+      where: { id: vers.id },
+      update: {},
+      create: vers,
+    });
+  }
+
+  console.log('Versements created');
+
+  // ============================================================
+  // RAPPORT ACTIVITES (3 total)
+  // ============================================================
+  const rapportsData = [
+    {
+      id: 'rap-001',
+      date: new Date('2024-01-31'),
+      fichierImporte: 'rapport_janvier_2024.xlsx',
+      montantTotal: 2500000,
+      sat: 1800000,
+      fibre: 400000,
+      rex: 300000,
+      nbReabo: 145,
+      caReabo: 580000,
+      nbRecru: 32,
+      caFormule: 960000,
+      caCreatZ4: 320000,
+      caCreatGZ: 180000,
+      caCreatG11: 120000,
+      caPayech: 240000,
+      caAccessoires: 100000,
+      statutMatching: StatutMatching.MATCHE,
+      importeParId: userAdmin.id,
+      importeLe: new Date('2024-02-03'),
+    },
+    {
+      id: 'rap-002',
+      date: new Date('2024-02-29'),
+      fichierImporte: 'rapport_fevrier_2024.xlsx',
+      montantTotal: 2800000,
+      sat: 2000000,
+      fibre: 450000,
+      rex: 350000,
+      nbReabo: 162,
+      caReabo: 648000,
+      nbRecru: 38,
+      caFormule: 1140000,
+      caCreatZ4: 380000,
+      caCreatGZ: 210000,
+      caCreatG11: 140000,
+      caPayech: 285000,
+      caAccessoires: 147000,
+      statutMatching: StatutMatching.ECART,
+      importeParId: userAdmin.id,
+      importeLe: new Date('2024-03-04'),
+    },
+    {
+      id: 'rap-003',
+      date: new Date('2024-03-31'),
+      fichierImporte: 'rapport_mars_2024.xlsx',
+      montantTotal: 3200000,
+      sat: 2200000,
+      fibre: 600000,
+      rex: 400000,
+      nbReabo: 189,
+      caReabo: 756000,
+      nbRecru: 45,
+      caFormule: 1350000,
+      caCreatZ4: 450000,
+      caCreatGZ: 250000,
+      caCreatG11: 160000,
+      caPayech: 338000,
+      caAccessoires: 196000,
+      statutMatching: StatutMatching.EN_ATTENTE,
+      importeParId: userAdmin.id,
+      importeLe: new Date('2024-04-02'),
+    },
+  ];
+
+  for (const rap of rapportsData) {
+    await prisma.rapportActivite.upsert({
+      where: { id: rap.id },
+      update: {},
+      create: rap,
+    });
+  }
+
+  console.log('Rapports created');
+
+  // ============================================================
+  // NOTIFICATIONS (5 total)
+  // ============================================================
+  const notificationsData = [
+    {
+      id: 'notif-001',
+      type: NotificationType.WARN,
+      message: '15 abonnés arrivent à échéance dans les 7 prochains jours',
+      lien: '/abonnes?statut=ECHU',
+      lu: false,
+      dismissed: false,
+    },
+    {
+      id: 'notif-002',
+      type: NotificationType.URGENT,
+      message: 'Versement BRD-2024-009 en attente de validation depuis 5 jours',
+      lien: '/versements?statut=ENATTENTE',
+      lu: false,
+      dismissed: false,
+    },
+    {
+      id: 'notif-003',
+      type: NotificationType.OK,
+      message: 'Rapport activité janvier 2024 validé avec succès',
+      lien: '/rapports/rap-001',
+      lu: true,
+      dismissed: false,
+    },
+    {
+      id: 'notif-004',
+      type: NotificationType.WARN,
+      message: 'Stock décodeurs Z4 en dessous du seuil minimum au PDV Pikine',
+      lien: '/stock/decodeurs',
+      lu: false,
+      dismissed: false,
+    },
+    {
+      id: 'notif-005',
+      type: NotificationType.URGENT,
+      message: 'Versement PDV-NRD-001 rejeté: écart de 25 000 XOF avec le relevé bancaire',
+      lien: '/versements/vers-006',
+      lu: false,
+      dismissed: false,
+    },
+  ];
+
+  for (const notif of notificationsData) {
+    await prisma.notification.upsert({
+      where: { id: notif.id },
+      update: {},
+      create: notif,
+    });
+  }
+
+  console.log('Notifications created');
+
+  // ============================================================
+  // ENTREPOTS (3 total)
+  // ============================================================
+  const entrepot1 = await prisma.entrepot.upsert({
+    where: { id: 'ent-001' },
+    update: {},
+    create: {
+      id: 'ent-001',
+      code: 'ENT-DKR-01',
+      nom: 'Entrepôt Central Dakar',
+      type: EntrepotType.PRINCIPAL,
+      capacite: 5000,
+    },
+  });
+
+  const entrepot2 = await prisma.entrepot.upsert({
+    where: { id: 'ent-002' },
+    update: {},
+    create: {
+      id: 'ent-002',
+      code: 'ENT-THS-01',
+      nom: 'Entrepôt Thiès',
+      type: EntrepotType.SECONDAIRE,
+      capacite: 2000,
+    },
+  });
+
+  const entrepot3 = await prisma.entrepot.upsert({
+    where: { id: 'ent-003' },
+    update: {},
+    create: {
+      id: 'ent-003',
+      code: 'ENT-ZIG-01',
+      nom: 'Entrepôt Sud Ziguinchor',
+      type: EntrepotType.SECONDAIRE,
+      capacite: 1500,
+    },
+  });
+
+  console.log('Entrepôts created');
+
+  // ============================================================
+  // DECODEURS (60 total, distributed across types & statuts)
+  // ============================================================
+  const entrepotIds = [entrepot1.id, entrepot2.id, entrepot3.id];
+  const pdvIds = [
+    pdv1.id, pdv2.id, pdv3.id, pdv4.id, pdv5.id, pdv6.id,
+    pdv7.id, pdv8.id, pdv9.id, pdv10.id, pdv11.id, pdv12.id,
+  ];
+  const decodeurTypes = [DecodeurType.Z4, DecodeurType.GLOBAZ, DecodeurType.G11];
+  const typePrefix: Record<DecodeurType, string> = {
+    [DecodeurType.Z4]: 'Z4',
+    [DecodeurType.GLOBAZ]: 'GZ',
+    [DecodeurType.G11]: 'G11',
+  };
+
+  const now = new Date();
+  const daysAgo = (d: number) => new Date(now.getTime() - d * 24 * 60 * 60 * 1000);
+
+  // Track décodeurs marked VENDU so we can link them to abonnés afterwards.
+  const venduDecodeurIds: string[] = [];
+
+  for (let i = 0; i < 60; i++) {
+    const seq = String(i + 1).padStart(3, '0');
+    const id = `dec-${seq}`;
+    const type = decodeurTypes[i % 3];
+    const numSerie = `${typePrefix[type]}-0088${String(42001 + i)}`;
+
+    // Distribution: 0-23 (40%) EN_STOCK_ENTREPOT, 24-41 (30%) EN_STOCK_PDV,
+    // 42-53 (20%) VENDU, 54-56 (5%) IMMOBILISE, 57-59 (5%) DEFECTUEUX.
+    let statut: DecodeurStatut;
+    let entrepotId: string | null = null;
+    let pdvId: string | null = null;
+    let dateEntree: Date;
+
+    if (i < 24) {
+      statut = DecodeurStatut.EN_STOCK_ENTREPOT;
+      entrepotId = entrepotIds[i % entrepotIds.length];
+      // A handful aged > 90 days so the "immobilisés > 3 mois" view has rows.
+      dateEntree = i < 4 ? daysAgo(120 + i * 10) : daysAgo((i % 20) + 1);
+    } else if (i < 42) {
+      statut = DecodeurStatut.EN_STOCK_PDV;
+      pdvId = pdvIds[i % pdvIds.length];
+      dateEntree = i < 27 ? daysAgo(110 + (i - 24) * 8) : daysAgo((i % 25) + 1);
+    } else if (i < 54) {
+      statut = DecodeurStatut.VENDU;
+      pdvId = pdvIds[i % pdvIds.length];
+      dateEntree = daysAgo((i % 40) + 5);
+      venduDecodeurIds.push(id);
+    } else if (i < 57) {
+      statut = DecodeurStatut.IMMOBILISE;
+      entrepotId = entrepotIds[i % entrepotIds.length];
+      dateEntree = daysAgo(60 + (i - 54) * 5);
+    } else {
+      statut = DecodeurStatut.DEFECTUEUX;
+      entrepotId = entrepotIds[i % entrepotIds.length];
+      dateEntree = daysAgo(45 + (i - 57) * 5);
+    }
+
+    const data = {
+      id,
+      numSerie,
+      type,
+      statut,
+      entrepotId,
+      pdvId,
+      dateEntree,
+    };
+
+    await prisma.decodeur.upsert({
+      where: { id },
+      update: data,
+      create: data,
+    });
+  }
+
+  console.log('Décodeurs created');
+
+  // ============================================================
+  // LINK DECODEURS -> ABONNES (link ~12 abonnés to distinct VENDU décodeurs)
+  // ============================================================
+  const abonnesToLink = [
+    abonne1, abonne2, abonne4, abonne5, abonne6, abonne7,
+    abonne9, abonne10, abonne11, abonne12, abonne13, abonne14,
+  ];
+
+  for (let i = 0; i < abonnesToLink.length && i < venduDecodeurIds.length; i++) {
+    await prisma.abonne.update({
+      where: { id: abonnesToLink[i].id },
+      data: { decodeurId: venduDecodeurIds[i] },
+    });
+  }
+
+  console.log('Décodeurs linked to abonnés');
+
+  // ============================================================
+  // FIX DATEECHEANCE: realistic future spread (AAE / échéances)
+  // ============================================================
+  const inDays = (d: number) => new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
+
+  // ~8 abonnés à échéance dans les 30 prochains jours.
+  const echeanceUpdates: { id: string; date: Date; statut: AbonneStatut }[] = [
+    { id: abonne1.id, date: inDays(3), statut: AbonneStatut.ACTIF },
+    { id: abonne2.id, date: inDays(7), statut: AbonneStatut.ACTIF },
+    { id: abonne4.id, date: inDays(10), statut: AbonneStatut.ACTIF },
+    { id: abonne5.id, date: inDays(14), statut: AbonneStatut.ACTIF },
+    { id: abonne6.id, date: inDays(18), statut: AbonneStatut.ACTIF },
+    { id: abonne7.id, date: inDays(22), statut: AbonneStatut.ACTIF },
+    { id: abonne9.id, date: inDays(26), statut: AbonneStatut.ACTIF },
+    { id: abonne10.id, date: inDays(29), statut: AbonneStatut.ACTIF },
+    // 30-90 days out.
+    { id: abonne11.id, date: inDays(40), statut: AbonneStatut.ACTIF },
+    { id: abonne12.id, date: inDays(55), statut: AbonneStatut.ACTIF },
+    { id: abonne13.id, date: inDays(70), statut: AbonneStatut.ACTIF },
+    { id: abonne14.id, date: inDays(85), statut: AbonneStatut.ACTIF },
+    // Keep at least one ECHU (past).
+    { id: abonne3.id, date: daysAgo(20), statut: AbonneStatut.ECHU },
+  ];
+
+  for (const u of echeanceUpdates) {
+    await prisma.abonne.update({
+      where: { id: u.id },
+      data: { dateEcheance: u.date, statut: u.statut },
+    });
+  }
+
+  console.log('Abonnés dateEcheance updated');
+
+  // ============================================================
+  // MOUVEMENTS STOCK (8 total)
+  // ============================================================
+  const mouvementsData = [
+    {
+      id: 'mvt-001',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Décodeur Z4',
+      sourceId: entrepot1.id,
+      destinationId: pdv1.id,
+      quantite: 30,
+      numBonLivraison: 'BL-2026-001',
+      date: daysAgo(40),
+    },
+    {
+      id: 'mvt-002',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Kit parabole',
+      sourceId: entrepot1.id,
+      destinationId: pdv2.id,
+      quantite: 20,
+      numBonLivraison: 'BL-2026-002',
+      date: daysAgo(35),
+    },
+    {
+      id: 'mvt-003',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Décodeur G11',
+      sourceId: entrepot2.id,
+      destinationId: pdv5.id,
+      quantite: 15,
+      numBonLivraison: 'BL-2026-003',
+      date: daysAgo(30),
+    },
+    {
+      id: 'mvt-004',
+      type: MouvementType.ENTREPOT_ENTREPOT,
+      materiel: 'Décodeur Z4',
+      sourceId: entrepot1.id,
+      destinationId: entrepot2.id,
+      quantite: 50,
+      numBonLivraison: 'BL-2026-004',
+      date: daysAgo(25),
+    },
+    {
+      id: 'mvt-005',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Décodeur G11',
+      sourceId: entrepot3.id,
+      destinationId: pdv11.id,
+      quantite: 12,
+      numBonLivraison: 'BL-2026-005',
+      date: daysAgo(20),
+    },
+    {
+      id: 'mvt-006',
+      type: MouvementType.PDV_PDV,
+      materiel: 'Décodeur Z4',
+      sourceId: pdv1.id,
+      destinationId: pdv3.id,
+      quantite: 10,
+      numBonLivraison: 'BL-2026-006',
+      date: daysAgo(14),
+    },
+    {
+      id: 'mvt-007',
+      type: MouvementType.EN_ENTREPOT_PDV,
+      materiel: 'Kit parabole',
+      sourceId: entrepot2.id,
+      destinationId: pdv6.id,
+      quantite: 18,
+      numBonLivraison: 'BL-2026-007',
+      date: daysAgo(7),
+    },
+    {
+      id: 'mvt-008',
+      type: MouvementType.PDV_ENTREPOT,
+      materiel: 'Décodeur G11',
+      sourceId: pdv5.id,
+      destinationId: entrepot2.id,
+      quantite: 5,
+      numBonLivraison: 'BL-2026-008',
+      date: daysAgo(2),
+    },
+  ];
+
+  for (const mvt of mouvementsData) {
+    await prisma.mouvementStock.upsert({
+      where: { id: mvt.id },
+      update: {},
+      create: mvt,
+    });
+  }
+
+  console.log('Mouvements de stock created');
+
+  // ============================================================
+  // ENCAISSEMENTS DU MOIS COURANT (~40, idempotents enc-cur-001..040)
+  // Garantit que dashboard/stats, analytics/* (période = mois courant)
+  // et commissions affichent des données riches pour le mois en cours.
+  // ============================================================
+  const curRef = new Date();
+  const curYear = curRef.getFullYear();
+  const curMonth = curRef.getMonth();
+  const curToday = curRef.getDate();
+
+  // Arrays of REAL seeded ids only (FKs must resolve).
+  const curPdvs = [
+    pdv1, pdv2, pdv3, pdv4, pdv5, pdv6,
+    pdv7, pdv8, pdv9, pdv10, pdv11, pdv12,
+  ];
+  const curUsers = [userVendeur, userCommercial, userManager];
+  const curAbonnes = [
+    abonne1, abonne2, abonne3, abonne4, abonne5, abonne6, abonne7, abonne8,
+    abonne9, abonne10, abonne11, abonne12, abonne13, abonne14, abonne15,
+  ];
+  const curFormules = [
+    formuleAccess, formuleEvasion, formuleEvasionPlus, formuleToutCanal, formulePrestige,
+  ];
+  // Weighted toward REABONNEMENT and RECRUTEMENT (MIGRATION rarer).
+  const curNatures = [
+    NatureEncaissement.REABONNEMENT,
+    NatureEncaissement.RECRUTEMENT,
+    NatureEncaissement.REABONNEMENT,
+    NatureEncaissement.RECRUTEMENT,
+    NatureEncaissement.REABONNEMENT,
+    NatureEncaissement.MIGRATION,
+    NatureEncaissement.RECRUTEMENT,
+  ];
+  const curModes = [
+    ModePaiement.WAVE,
+    ModePaiement.ORANGE_MONEY,
+    ModePaiement.ESPECE,
+    ModePaiement.CHEQUE,
+  ];
+  const curNbMoisCycle = [1, 1, 1, 3, 6, 12];
+
+  const CUR_COUNT = 40;
+  for (let i = 0; i < CUR_COUNT; i++) {
+    const seq = String(i + 1).padStart(3, '0');
+    const id = `enc-cur-${seq}`;
+
+    // Spread across many distinct days of the current month, clamp to today.
+    let day = ((i * 3) % 28) + 1; // 1..28, varied per index
+    if (day > curToday) day = ((i % curToday) + 1);
+    if (day > curToday) day = curToday; // final safety clamp
+    const date = new Date(curYear, curMonth, day, 10, 0, 0);
+
+    const formule = curFormules[i % curFormules.length];
+    const nbMois = curNbMoisCycle[i % curNbMoisCycle.length];
+    const montantTotal = formule.prixFormule * nbMois;
+    // Occasional overpay (every 7th) to vary montantRecu.
+    const montantRecu = i % 7 === 0 ? montantTotal + 500 : montantTotal;
+
+    const data = {
+      id,
+      abonneId: curAbonnes[i % curAbonnes.length].id,
+      pdvId: curPdvs[i % curPdvs.length].id,
+      userId: curUsers[i % curUsers.length].id,
+      nature: curNatures[i % curNatures.length],
+      formuleId: formule.id,
+      nbMois,
+      montantTotal,
+      montantRecu,
+      monnaie: 'XOF',
+      modePaiement: curModes[i % curModes.length],
+      options: i % 5 === 0 ? { premium: true } : {},
+      date,
+      recuNumero: `RC-CUR-${seq}`,
+    };
+
+    await prisma.encaissement.upsert({
+      where: { id },
+      update: data,
+      create: data,
+    });
+  }
+
+  console.log('Encaissements du mois courant created');
+
+  // ============================================================
+  // VERSEMENTS EN ATTENTE DU MOIS COURANT (KPIs finance "en attente")
+  // ============================================================
+  const curPeriode = `${curYear}-${String(curMonth + 1).padStart(2, '0')}`;
+  const curVersementsData = [
+    {
+      id: 'vers-cur-001',
+      pdvId: pdv1.id,
+      montant: 175000,
+      banqueId: banque1.id,
+      dateVersement: new Date(curYear, curMonth, Math.min(5, curToday), 9, 0, 0),
+      periode: curPeriode,
+      libelle: 'Versement mois courant (en attente)',
+      numBordereau: 'BRD-CUR-001',
+      statut: VersementStatut.ENATTENTE,
+    },
+    {
+      id: 'vers-cur-002',
+      pdvId: pdv5.id,
+      montant: 95000,
+      banqueId: banque3.id,
+      dateVersement: new Date(curYear, curMonth, Math.min(8, curToday), 9, 0, 0),
+      periode: curPeriode,
+      libelle: 'Versement mois courant (en attente)',
+      numBordereau: 'BRD-CUR-002',
+      statut: VersementStatut.ENATTENTE,
+    },
+  ];
+
+  for (const vers of curVersementsData) {
+    await prisma.versement.upsert({
+      where: { id: vers.id },
+      update: vers,
+      create: vers,
+    });
+  }
+
+  console.log('Versements du mois courant created');
+
+  // ---------- Accessoires ----------
+  const accessoiresData = [
+    { id: 'acc-001', code: 'ACC-TEL', nom: 'Télécommande universelle', prixUnitaire: 3500, stockEntrepot: 420 },
+    { id: 'acc-002', code: 'ACC-HDMI', nom: 'Câble HDMI 1.5m', prixUnitaire: 2000, stockEntrepot: 350 },
+    { id: 'acc-003', code: 'ACC-LNB', nom: 'LNB universel', prixUnitaire: 6000, stockEntrepot: 180 },
+    { id: 'acc-004', code: 'ACC-SUP', nom: 'Support mural parabole', prixUnitaire: 8000, stockEntrepot: 95 },
+    { id: 'acc-005', code: 'ACC-CARTE', nom: "Carte d'abonnement", prixUnitaire: 15000, stockEntrepot: 500 },
+    { id: 'acc-006', code: 'ACC-ADAPT', nom: 'Adaptateur secteur', prixUnitaire: 4500, stockEntrepot: 260 },
+  ];
+  for (const a of accessoiresData) {
+    await prisma.accessoire.upsert({ where: { id: a.id }, update: a, create: a });
+  }
+  const accPrix: Record<string, number> = Object.fromEntries(
+    accessoiresData.map((a) => [a.id, a.prixUnitaire]),
+  );
+  console.log('Accessoires created');
+
+  const accPdvIds = [pdv1.id, pdv2.id, pdv3.id, pdv4.id, pdv5.id, pdv6.id];
+  const accIds = accessoiresData.map((a) => a.id);
+  for (let i = 0; i < 10; i++) {
+    const accId = accIds[i % accIds.length];
+    // offset the PDV index so every (accessoire, pdv) pair stays unique
+    const pdvId = accPdvIds[(i + Math.floor(i / accPdvIds.length)) % accPdvIds.length];
+    const data = {
+      id: `sacc-${String(i + 1).padStart(3, '0')}`,
+      accessoireId: accId,
+      pdvId,
+      quantite: 5 + ((i * 7) % 36),
+    };
+    await prisma.stockAccessoire.upsert({
+      where: { accessoireId_pdvId: { accessoireId: accId, pdvId } },
+      update: { quantite: data.quantite },
+      create: data,
+    });
+  }
+  console.log('Stock accessoires réseau created');
+
+  for (let i = 0; i < 12; i++) {
+    const accId = accIds[i % accIds.length];
+    const pdvId = accPdvIds[i % accPdvIds.length];
+    const quantite = 1 + (i % 8);
+    const data = {
+      id: `vacc-${String(i + 1).padStart(3, '0')}`,
+      accessoireId: accId,
+      pdvId,
+      quantite,
+      montant: quantite * accPrix[accId],
+      date: new Date(curYear, curMonth, Math.min(1 + ((i * 2) % 27), curToday)),
+    };
+    await prisma.venteAccessoire.upsert({ where: { id: data.id }, update: data, create: data });
+  }
+  console.log('Ventes accessoires created');
+
+  const retoursData = [
+    { id: 'ret-001', accessoireId: 'acc-003', pdvId: pdv1.id, quantite: 2, motif: 'LNB défectueux', statut: 'EN_ATTENTE' },
+    { id: 'ret-002', accessoireId: 'acc-001', pdvId: pdv3.id, quantite: 1, motif: 'Télécommande HS', statut: 'EN_ATTENTE' },
+    { id: 'ret-003', accessoireId: 'acc-006', pdvId: pdv5.id, quantite: 3, motif: 'Adaptateurs grillés', statut: 'TRAITE' },
+  ];
+  for (const r of retoursData) {
+    await prisma.retourDefectueux.upsert({ where: { id: r.id }, update: r, create: r });
+  }
+  console.log('Retours défectueux created');
+
+  // ---------- Objectifs ----------
+  const objectifsData = [
+    { id: 'obj-001', pdvId: null as string | null, typeObjectif: 'CA', cible: 5000000, periode: curPeriode },
+    { id: 'obj-002', pdvId: null as string | null, typeObjectif: 'RECRUTEMENT', cible: 300, periode: curPeriode },
+    { id: 'obj-003', pdvId: pdv1.id, typeObjectif: 'RECRUTEMENT', cible: 40, periode: curPeriode },
+    { id: 'obj-004', pdvId: pdv1.id, typeObjectif: 'CA', cible: 600000, periode: curPeriode },
+    { id: 'obj-005', pdvId: pdv2.id, typeObjectif: 'REABO', cible: 60, periode: curPeriode },
+    { id: 'obj-006', pdvId: pdv3.id, typeObjectif: 'RECRUTEMENT', cible: 35, periode: curPeriode },
+    { id: 'obj-007', pdvId: pdv4.id, typeObjectif: 'CA', cible: 450000, periode: curPeriode },
+    { id: 'obj-008', pdvId: pdv5.id, typeObjectif: 'REABO', cible: 50, periode: curPeriode },
+  ];
+  for (const o of objectifsData) {
+    await prisma.objectif.upsert({ where: { id: o.id }, update: o, create: o });
+  }
+  console.log('Objectifs created');
+
+  // ---------- Dépenses internes ----------
+  const categories = ['Loyer', 'Carburant', 'Salaires', 'Maintenance', 'Fournitures'];
+  const motifs = [
+    'Loyer agence Dakar', 'Carburant tournée terrain', 'Avance salaire vendeur',
+    'Maintenance véhicule', 'Fournitures de bureau', 'Loyer entrepôt Thiès',
+    'Carburant livraison', 'Réparation groupe électrogène', 'Consommables techniques',
+    'Frais de communication',
+  ];
+  for (let i = 0; i < 10; i++) {
+    const data = {
+      id: `dep-${String(i + 1).padStart(3, '0')}`,
+      date: new Date(curYear, curMonth, Math.min(1 + ((i * 3) % 27), curToday)),
+      categorie: categories[i % categories.length],
+      motif: motifs[i % motifs.length],
+      montant: 50000 + ((i * 37000) % 450000),
+      justificatif: i % 3 === 0 ? `FACT-2026-${100 + i}` : null,
+    };
+    await prisma.depense.upsert({ where: { id: data.id }, update: data, create: data });
+  }
+  console.log('Dépenses created');
+
+  // ---------- Gestion des VAD ----------
+  const vadPdvs = await prisma.pDV.findMany({ where: { type: 'VAD' }, select: { id: true } });
+  if (vadPdvs.length > 0) {
+    const vad1 = vadPdvs[0].id;
+    // assign some warehouse decoders to the first VAD agent so its stock is visible
+    const dispo = await prisma.decodeur.findMany({
+      where: { statut: 'EN_STOCK_ENTREPOT' },
+      take: 8,
+      select: { id: true },
+    });
+    if (dispo.length > 0) {
+      await prisma.decodeur.updateMany({
+        where: { id: { in: dispo.map((d) => d.id) } },
+        data: { statut: 'EN_STOCK_PDV', pdvId: vad1, entrepotId: null },
+      });
+    }
+    const kitTypes: DecodeurType[] = [DecodeurType.Z4, DecodeurType.GLOBAZ, DecodeurType.G11];
+    const clients = ['Awa Ndiaye', 'Cheikh Fall', 'Mariama Sow', 'Ibrahima Ba', 'Khadija Diop'];
+    for (let i = 0; i < 5; i++) {
+      const data = {
+        id: `vkit-${String(i + 1).padStart(3, '0')}`,
+        vadPdvId: vadPdvs[i % vadPdvs.length].id,
+        decodeurType: kitTypes[i % kitTypes.length],
+        clientNom: clients[i % clients.length],
+        montant: 25000 + i * 5000,
+        date: new Date(curYear, curMonth, Math.min(1 + ((i * 4) % 27), curToday)),
+      };
+      await prisma.venteKit.upsert({ where: { id: data.id }, update: data, create: data });
+    }
+    console.log('Ventes Kit VAD created');
+  }
+
+  // ---------- Gestion Crédit ----------
+  const creditPdvs = [pdv1, pdv2, pdv3, pdv4, pdv5, pdv6];
+  for (let i = 0; i < creditPdvs.length; i++) {
+    const plafond = 2000000 + i * 500000;
+    const avoir = i % 2 === 0 ? 150000 : 0;
+    const dette = 300000 + i * 220000;
+    await prisma.credit.upsert({
+      where: { pdvId: creditPdvs[i].id },
+      update: { plafond, avoir, dette },
+      create: { pdvId: creditPdvs[i].id, plafond, avoir, dette },
+    });
+  }
+  console.log('Crédits created');
+
+  // ---------- Arrêtés de soldes ----------
+  const arretesData = [
+    { id: 'arr-001', pdvId: pdv1.id, periode: '2026-05', soldeFige: 1240000, statut: 'SIGNE' },
+    { id: 'arr-002', pdvId: pdv2.id, periode: '2026-05', soldeFige: 880000, statut: 'SIGNE' },
+    { id: 'arr-003', pdvId: pdv3.id, periode: '2026-04', soldeFige: 1560000, statut: 'SIGNE' },
+  ];
+  for (const a of arretesData) {
+    await prisma.arreteSolde.upsert({ where: { id: a.id }, update: a, create: a });
+  }
+  console.log('Arrêtés de soldes created');
+
+  // ---------- Suivi installation ----------
+  const techs = ['Modou Diène', 'Aliou Sané', 'Pape Mbaye'];
+  const instClients = ['Famille Ndiaye', 'Restaurant Teranga', 'Boutique Aïda', 'Cabinet Sow', 'Hôtel Saloum', 'M. Diallo', 'Mme Faye', 'Pharmacie Liberté'];
+  const instStatuts = ['DEMANDEE', 'INSTALLEE', 'INSTALLEE', 'DEMANDEE', 'ANNULEE'];
+  for (let i = 0; i < 8; i++) {
+    const statut = instStatuts[i % instStatuts.length];
+    const data = {
+      id: `inst-${String(i + 1).padStart(3, '0')}`,
+      pdvId: creditPdvs[i % creditPdvs.length].id,
+      clientNom: instClients[i % instClients.length],
+      technicien: techs[i % techs.length],
+      dateDemande: new Date(curYear, curMonth, Math.min(1 + ((i * 3) % 27), curToday)),
+      dateInstallation: statut === 'INSTALLEE' ? new Date(curYear, curMonth, Math.min(2 + ((i * 3) % 26), curToday)) : null,
+      statut,
+    };
+    await prisma.installation.upsert({ where: { id: data.id }, update: data, create: data });
+  }
+  console.log('Installations created');
+
+  console.log('Seed completed successfully!');
+  console.log('');
+  console.log('Test accounts (password: Demo123!):');
+  console.log('  superadmin@sendistri.sn - SUPER_ADMIN');
+  console.log('  admin@sendistri.sn      - ADMIN');
+  console.log('  manager@sendistri.sn    - MANAGER');
+  console.log('  comptable@sendistri.sn  - COMPTABLE');
+  console.log('  logisticien@sendistri.sn - LOGISTICIEN');
+  console.log('  commercial@sendistri.sn - COMMERCIAL');
+  console.log('  vendeur@sendistri.sn    - VENDEUR');
+}
+
+main()
+  .catch((e) => {
+    console.error('Seed error:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
