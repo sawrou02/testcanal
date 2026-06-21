@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { BrandStar } from '../ui/BrandStar'
 import { Icon } from '../ui/Icon'
 import { useAuthStore } from '../../store/authStore'
 import { getRoleLabel, cn } from '../../lib/utils'
+import { versementStats, listImmobilises, listAAE } from '../../lib/api'
 import type { NavSection } from '../../types'
 
 const NAV_SECTIONS: NavSection[] = [
@@ -40,14 +41,13 @@ const NAV_SECTIONS: NavSection[] = [
     id: 'operations',
     label: 'Opérations',
     icon: 'receipt',
-    badge: 3,
     defaultOpen: true,
     items: [
       { id: 'rapport-activite', label: 'Rapport Activité' },
       { id: 'consultation-g11', label: 'Consultation G11' },
       { id: 'encaissement', label: 'Encaissement' },
       { id: 'matching', label: 'Matching' },
-      { id: 'versement-banque', label: 'Versement Banque', badge: 3 },
+      { id: 'versement-banque', label: 'Versement Banque' },
       { id: 'retrait-banque', label: 'Retrait Banque' },
       { id: 'details-bancaires', label: 'Détails Bancaires' },
       { id: 'suivi-solde', label: 'Suivi Solde' },
@@ -70,13 +70,12 @@ const NAV_SECTIONS: NavSection[] = [
     id: 'service-abonnement',
     label: 'Service Abonnement',
     icon: 'users',
-    badge: 12,
     items: [
       { id: 'periode-recrutement', label: 'Période Recrutement' },
       { id: 'bienvenue-abonnes', label: 'Bienvenue Abonnés' },
       { id: 'abonnes-nonqual', label: 'Abonnés Non Qualifiés' },
       { id: 'suivi-mp', label: 'Suivi MP' },
-      { id: 'aae', label: 'AAE', badge: 12 },
+      { id: 'aae', label: 'AAE' },
       { id: 'liste-echus', label: 'Liste Échus' },
     ],
   },
@@ -105,7 +104,6 @@ const NAV_SECTIONS: NavSection[] = [
     id: 'logistique-sat',
     label: 'Logistique SAT',
     icon: 'package',
-    badge: 5,
     items: [
       { id: 'commandes', label: 'Commandes' },
       { id: 'inventaire-entrepot', label: 'Inventaire Entrepôt' },
@@ -114,7 +112,7 @@ const NAV_SECTIONS: NavSection[] = [
       { id: 'consultation-entrepot', label: 'Consultation Entrepôt' },
       { id: 'consultation-reseau', label: 'Consultation Réseau' },
       { id: 'livraison', label: 'Livraison' },
-      { id: 'decodeurs-immobilises', label: 'Décodeurs Immobilisés', badge: 5 },
+      { id: 'decodeurs-immobilises', label: 'Décodeurs Immobilisés' },
       { id: 'recherche-decodeur', label: 'Recherche Décodeur' },
       { id: 'suivi-paraboles', label: 'Suivi Paraboles' },
       { id: 'suivi-decodeurs', label: 'Suivi Décodeurs' },
@@ -203,6 +201,30 @@ export function Sidebar() {
     new Set(NAV_SECTIONS.filter((s) => s.defaultOpen).map((s) => s.id)),
   )
 
+  const [counts, setCounts] = useState<{ versements: number; aae: number; immobilises: number }>({ versements: 0, aae: 0, immobilises: 0 })
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const next = { versements: 0, aae: 0, immobilises: 0 }
+      try { next.versements = (await versementStats()).enAttenteCount } catch { /* ignore */ }
+      try { next.aae = (await listAAE(30)).length } catch { /* ignore */ }
+      try { next.immobilises = (await listImmobilises()).length } catch { /* ignore */ }
+      if (!cancelled) setCounts(next)
+    })()
+    return () => { cancelled = true }
+  }, [])
+
+  const sectionBadge: Record<string, number> = {
+    operations: counts.versements,
+    'service-abonnement': counts.aae,
+    'logistique-sat': counts.immobilises,
+  }
+  const itemBadge: Record<string, number> = {
+    'versement-banque': counts.versements,
+    aae: counts.aae,
+    'decodeurs-immobilises': counts.immobilises,
+  }
+
   const toggleSection = (id: string) => {
     setOpenSections((prev) => {
       const next = new Set(prev)
@@ -267,9 +289,9 @@ export function Sidebar() {
               >
                 <span className="w-5 flex items-center justify-center shrink-0"><Icon name={section.icon} size={18} /></span>
                 <span className="flex-1 text-left">{section.label}</span>
-                {section.badge ? (
+                {sectionBadge[section.id] ? (
                   <span className="bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
-                    {section.badge}
+                    {sectionBadge[section.id]}
                   </span>
                 ) : null}
                 <svg
@@ -299,9 +321,9 @@ export function Sidebar() {
                         )}
                       >
                         <span>{item.label}</span>
-                        {item.badge ? (
+                        {itemBadge[item.id] ? (
                           <span className="bg-danger text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[16px] text-center">
-                            {item.badge}
+                            {itemBadge[item.id]}
                           </span>
                         ) : null}
                       </Link>

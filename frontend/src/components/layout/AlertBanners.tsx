@@ -1,16 +1,12 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { cn } from '../../lib/utils'
+import { versementStats, listImmobilises } from '../../lib/api'
 
 interface AlertBanner {
   id: string
   type: 'warn' | 'danger' | 'info'
   message: string
 }
-
-const defaultAlerts: AlertBanner[] = [
-  { id: '1', type: 'warn', message: '3 versements en attente de validation depuis plus de 5 jours — action requise' },
-  { id: '2', type: 'info', message: 'Rapport du 15/06 importé — matching en cours' },
-]
 
 const typeConfig = {
   warn: 'bg-yellow-50 border-yellow-200 text-yellow-900',
@@ -19,9 +15,45 @@ const typeConfig = {
 }
 
 export function AlertBanners() {
+  const [alerts, setAlerts] = useState<AlertBanner[]>([])
   const [dismissed, setDismissed] = useState<Set<string>>(new Set())
-  const visible = defaultAlerts.filter((a) => !dismissed.has(a.id))
 
+  useEffect(() => {
+    let cancelled = false
+    ;(async () => {
+      const next: AlertBanner[] = []
+      try {
+        const v = await versementStats()
+        if (v.enAttenteCount > 0) {
+          next.push({
+            id: 'versements',
+            type: 'warn',
+            message: `${v.enAttenteCount} versement(s) en attente de validation`,
+          })
+        }
+      } catch {
+        /* ignore */
+      }
+      try {
+        const immob = await listImmobilises()
+        if (immob.length > 0) {
+          next.push({
+            id: 'immobilises',
+            type: 'warn',
+            message: `${immob.length} décodeur(s) immobilisé(s) depuis plus de 3 mois`,
+          })
+        }
+      } catch {
+        /* ignore */
+      }
+      if (!cancelled) setAlerts(next)
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  const visible = alerts.filter((a) => !dismissed.has(a.id))
   if (visible.length === 0) return null
 
   return (
@@ -34,9 +66,7 @@ export function AlertBanners() {
             typeConfig[alert.type],
           )}
         >
-          <span className="shrink-0">
-            {alert.type === 'warn' ? '⚠' : alert.type === 'danger' ? '✕' : 'ℹ'}
-          </span>
+          <span className="shrink-0">{alert.type === 'warn' ? '⚠' : alert.type === 'danger' ? '✕' : 'ℹ'}</span>
           <span className="flex-1">{alert.message}</span>
           <button
             onClick={() => setDismissed((s) => new Set([...s, alert.id]))}
