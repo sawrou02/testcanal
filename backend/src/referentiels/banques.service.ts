@@ -1,3 +1,4 @@
+import { ConflictException } from '@nestjs/common';
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateBanqueDto } from './dto/create-banque.dto';
@@ -22,5 +23,14 @@ export class BanquesService {
       where: { id },
       data: dto as any,
     });
+  }
+
+  async remove(id: string) {
+    try {
+      return await this.prisma.banque.delete({ where: { id } });
+    } catch (e: any) {
+      if (e?.code === 'P2003') throw new ConflictException('Banque utilisée par des opérations, suppression impossible.');
+      throw e;
+    }
   }
 }

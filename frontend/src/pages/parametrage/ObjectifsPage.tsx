@@ -6,6 +6,7 @@ import { DataTable } from '../../components/ui/DataTable'
 import { KpiCard } from '../../components/dashboard/KpiCard'
 import { SkeletonCardGrid } from '../../components/ui/Skeleton'
 import { useToast } from '../../components/ui/Toast'
+import { RowDeleteButton } from '../../components/ui/RowDeleteButton'
 import { useResource } from '../../hooks/useResource'
 import { useAuthStore } from '../../store/authStore'
 import { formatFCFA } from '../../lib/utils'
@@ -138,6 +139,11 @@ export default function ObjectifsPage() {
               { key: 'cible', label: 'Cible', align: 'right', render: (v, row) => ((row as unknown as SuiviObjectifRow).typeObjectif === 'CA' ? formatFCFA(Number(v ?? 0)) : String(v ?? 0)) },
               { key: 'realise', label: 'Réalisé', align: 'right', render: (v, row) => ((row as unknown as SuiviObjectifRow).typeObjectif === 'CA' ? formatFCFA(Number(v ?? 0)) : String(v ?? 0)) },
               { key: 'taux', label: 'Taux', align: 'right', render: (v) => tauxBadge(Number(v ?? 0)) },
+              ...(canMutate
+                ? [{ key: '__del', label: '', render: (_v: unknown, row: Row) => (
+                    <RowDeleteButton path="/objectifs" id={String((row as { id: string }).id)} confirmLabel="Supprimer cet objectif ?" onDone={refetch} />
+                  ) }]
+                : []),
             ]}
           />
         </div>

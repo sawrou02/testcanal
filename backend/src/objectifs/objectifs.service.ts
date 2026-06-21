@@ -86,4 +86,8 @@ export class ObjectifsService {
     }
     return results;
   }
+
+  remove(id: string) {
+    return this.prisma.objectif.delete({ where: { id } });
+  }
 }

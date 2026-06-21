@@ -5,7 +5,8 @@ import { Button } from '../ui/Button'
 import { useToast } from '../ui/Toast'
 import { KpiCard } from '../dashboard/KpiCard'
 import { useResource } from '../../hooks/useResource'
-import { createResource, updateResource, listResource } from '../../lib/api'
+import { createResource, updateResource, deleteResource, listResource } from '../../lib/api'
+import { Icon } from '../ui/Icon'
 import type { KpiCardData } from '../../types'
 
 type Row = Record<string, unknown>
@@ -63,9 +64,10 @@ interface ResourceFormProps {
   submitting: boolean
   onSubmit: (values: Row) => void
   onCancel: () => void
+  onDelete?: () => void
 }
 
-function ResourceForm({ fields, initial, submitting, onSubmit, onCancel }: ResourceFormProps) {
+function ResourceForm({ fields, initial, submitting, onSubmit, onCancel, onDelete }: ResourceFormProps) {
   const [values, setValues] = useState<Row>(initial)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [optionsMap, setOptionsMap] = useState<Record<string, SelectOption[]>>({})
@@ -160,13 +162,27 @@ function ResourceForm({ fields, initial, submitting, onSubmit, onCancel }: Resou
           </div>
         )
       })}
-      <div className="flex items-center justify-end gap-3 pt-2">
-        <Button type="button" variant="secondary" onClick={onCancel} disabled={submitting}>
-          Annuler
-        </Button>
-        <Button type="submit" variant="primary" loading={submitting}>
-          Enregistrer
-        </Button>
+      <div className="flex items-center justify-between gap-3 pt-2">
+        <div>
+          {onDelete && (
+            <button
+              type="button"
+              onClick={onDelete}
+              disabled={submitting}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-danger hover:bg-red-50 px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
+            >
+              <Icon name="trash" size={16} /> Supprimer
+            </button>
+          )}
+        </div>
+        <div className="flex items-center gap-3">
+          <Button type="button" variant="secondary" onClick={onCancel} disabled={submitting}>
+            Annuler
+          </Button>
+          <Button type="submit" variant="primary" loading={submitting}>
+            Enregistrer
+          </Button>
+        </div>
       </div>
     </form>
   )
@@ -221,6 +237,25 @@ export function CrudResourcePage({
       refetch()
     } catch {
       toast.error("Erreur lors de l'enregistrement")
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!editing) return
+    if (!window.confirm('Supprimer / désactiver cet élément ? Cette action retire l’élément de la liste active.')) return
+    setSubmitting(true)
+    try {
+      const base = basePath(apiPath)
+      await deleteResource(base, editing[idField] as string | number)
+      toast.success('Supprimé ✓')
+      setModalOpen(false)
+      setEditing(null)
+      refetch()
+    } catch (err: unknown) {
+      const msg = (err as { response?: { data?: { message?: string } } })?.response?.data?.message
+      toast.error(msg || 'Suppression impossible')
     } finally {
       setSubmitting(false)
     }
@@ -292,6 +327,7 @@ export function CrudResourcePage({
           submitting={submitting}
           onSubmit={handleSubmit}
           onCancel={closeModal}
+          onDelete={editing ? handleDelete : undefined}
         />
       </Modal>
     </div>

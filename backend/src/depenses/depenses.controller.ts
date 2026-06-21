@@ -1,6 +1,8 @@
 import {
   Body,
   Controller,
+  Param,
+  Delete,
   Get,
   Post,
   Query,
@@ -46,5 +48,12 @@ export class DepensesController {
   async create(@Body() dto: CreateDepenseDto, @Req() req: Request) {
     const userId = (req.user as any).userId;
     return this.depensesService.create(dto, userId, getIp(req));
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.COMPTABLE)
+  remove(@Param('id') id: string) {
+    return this.depensesService.remove(id);
   }
 }

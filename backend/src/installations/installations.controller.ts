@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -58,5 +59,12 @@ export class InstallationsController {
   @Roles(...MUT)
   update(@Param('id') id: string, @Body() dto: UpdateInstallationDto, @Req() req: Request) {
     return this.svc.update(id, dto, (req.user as any).userId, getIp(req));
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER, Role.LOGISTICIEN)
+  remove(@Param('id') id: string) {
+    return this.svc.remove(id);
   }
 }

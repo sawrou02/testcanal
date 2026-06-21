@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -37,5 +38,12 @@ export class BanquesController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
   async update(@Param('id') id: string, @Body() dto: UpdateBanqueDto) {
     return this.banquesService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  remove(@Param('id') id: string) {
+    return this.banquesService.remove(id);
   }
 }

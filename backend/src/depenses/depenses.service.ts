@@ -82,4 +82,8 @@ export class DepensesService {
 
     return created;
   }
+
+  remove(id: string) {
+    return this.prisma.depense.delete({ where: { id } });
+  }
 }

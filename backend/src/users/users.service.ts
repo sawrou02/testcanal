@@ -85,4 +85,8 @@ export class UsersService {
       },
     });
   }
+
+  async remove(id: string) {
+    return this.prisma.user.update({ where: { id }, data: { statut: 'INACTIF' as any }, select: { id: true, email: true, statut: true } });
+  }
 }

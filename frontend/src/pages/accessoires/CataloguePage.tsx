@@ -6,6 +6,7 @@ import { DataTable } from '../../components/ui/DataTable'
 import { KpiCard } from '../../components/dashboard/KpiCard'
 import { SkeletonCardGrid } from '../../components/ui/Skeleton'
 import { useToast } from '../../components/ui/Toast'
+import { RowDeleteButton } from '../../components/ui/RowDeleteButton'
 import { useAuthStore } from '../../store/authStore'
 import { formatFCFA } from '../../lib/utils'
 import {
@@ -138,6 +139,15 @@ export default function CataloguePage({ enableAppro = false, title }: Props) {
               { key: 'stockReseauTotal', label: 'Stock réseau', align: 'right' },
               { key: 'venduTotal', label: 'Vendus', align: 'right' },
               { key: 'statut', label: 'Statut', render: (v) => <Badge variant={String(v) === 'ACTIF' ? 'success' : 'neutral'}>{String(v ?? '—')}</Badge> },
+              ...(canMutate
+                ? [{
+                    key: '__del',
+                    label: '',
+                    render: (_v: unknown, row: Row) => (
+                      <RowDeleteButton path="/accessoires" id={String((row as { id: string }).id)} confirmLabel="Désactiver cet accessoire ?" onDone={refetch} />
+                    ),
+                  }]
+                : []),
               ...(enableAppro && canMutate
                 ? [{
                     key: 'actions',

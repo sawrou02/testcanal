@@ -5,6 +5,7 @@ import { DataTable } from '../../components/ui/DataTable'
 import { KpiCard } from '../../components/dashboard/KpiCard'
 import { SkeletonCardGrid } from '../../components/ui/Skeleton'
 import { useToast } from '../../components/ui/Toast'
+import { RowDeleteButton } from '../../components/ui/RowDeleteButton'
 import { useAuthStore } from '../../store/authStore'
 import { formatFCFA, formatDate } from '../../lib/utils'
 import {
@@ -124,6 +125,11 @@ export default function DepensesPage() {
               { key: 'motif', label: 'Motif' },
               { key: 'montant', label: 'Montant', align: 'right', render: (v) => formatFCFA(Number(v ?? 0)) },
               { key: 'justificatif', label: 'Justificatif', render: (v) => (v ? String(v) : '—') },
+              ...(canMutate
+                ? [{ key: '__del', label: '', render: (_v: unknown, row: Row) => (
+                    <RowDeleteButton path="/depenses" id={String((row as { id: string }).id)} confirmLabel="Supprimer cette dépense ?" onDone={refetch} />
+                  ) }]
+                : []),
             ]}
           />
         </div>

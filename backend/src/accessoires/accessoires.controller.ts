@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -108,5 +109,12 @@ export class AccessoiresController {
   @Roles(...MUT)
   retour(@Body() dto: RetourDto, @Req() req: Request) {
     return this.svc.creerRetour(dto, (req.user as any).userId, getIp(req));
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER, Role.LOGISTICIEN)
+  remove(@Param('id') id: string) {
+    return this.svc.remove(id);
   }
 }

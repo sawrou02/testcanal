@@ -6,6 +6,7 @@ import { DataTable } from '../../components/ui/DataTable'
 import { KpiCard } from '../../components/dashboard/KpiCard'
 import { SkeletonCardGrid } from '../../components/ui/Skeleton'
 import { useToast } from '../../components/ui/Toast'
+import { RowDeleteButton } from '../../components/ui/RowDeleteButton'
 import { useResource } from '../../hooks/useResource'
 import { useAuthStore } from '../../store/authStore'
 import { formatDate } from '../../lib/utils'
@@ -138,9 +139,14 @@ export default function InstallationsPage() {
                     label: '',
                     render: (_v: unknown, row: Row) => {
                       const r = row as unknown as InstallationRow
-                      return r.statut === 'DEMANDEE' ? (
-                        <Button variant="secondary" onClick={() => markInstalled(r.id)}>Marquer installé</Button>
-                      ) : null
+                      return (
+                        <div className="flex items-center justify-end gap-1">
+                          {r.statut === 'DEMANDEE' && (
+                            <Button variant="secondary" onClick={() => markInstalled(r.id)}>Marquer installé</Button>
+                          )}
+                          <RowDeleteButton path="/installations" id={r.id} confirmLabel="Supprimer cette installation ?" onDone={refetch} />
+                        </div>
+                      )
                     },
                   }]
                 : []),

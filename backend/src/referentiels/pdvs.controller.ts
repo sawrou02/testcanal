@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -57,5 +58,12 @@ export class PdvsController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER, Role.COMPTABLE)
   async augmenterCaution(@Param('id') id: string, @Body() body: { montant: number }) {
     return this.pdvsService.augmenterCaution(id, Number(body.montant) || 0);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
+  remove(@Param('id') id: string) {
+    return this.pdvsService.remove(id);
   }
 }

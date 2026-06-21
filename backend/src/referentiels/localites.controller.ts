@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -37,5 +38,12 @@ export class LocalitesController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
   async update(@Param('id') id: string, @Body() dto: UpdateLocaliteDto) {
     return this.localitesService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN)
+  remove(@Param('id') id: string) {
+    return this.localitesService.remove(id);
   }
 }

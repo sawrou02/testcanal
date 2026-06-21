@@ -24,4 +24,8 @@ export class EntrepotsService {
       data: dto as any,
     });
   }
+
+  async remove(id: string) {
+    return this.prisma.entrepot.update({ where: { id }, data: { statut: 'INACTIF' as any } });
+  }
 }

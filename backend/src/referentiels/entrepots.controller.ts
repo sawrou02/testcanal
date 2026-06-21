@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -37,5 +38,12 @@ export class EntrepotsController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
   async update(@Param('id') id: string, @Body() dto: UpdateEntrepotDto) {
     return this.entrepotsService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
+  remove(@Param('id') id: string) {
+    return this.entrepotsService.remove(id);
   }
 }

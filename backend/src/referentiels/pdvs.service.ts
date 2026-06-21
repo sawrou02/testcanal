@@ -109,4 +109,8 @@ export class PdvsService {
       data: dto as any,
     });
   }
+
+  async remove(id: string) {
+    return this.prisma.pDV.update({ where: { id }, data: { statut: 'INACTIF' as any } });
+  }
 }

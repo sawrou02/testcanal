@@ -59,4 +59,8 @@ export class InstallationsService {
     await this.audit.log(userId, 'MAJ_INSTALLATION', 'OPERATIONS', ip);
     return updated;
   }
+
+  remove(id: string) {
+    return this.prisma.installation.delete({ where: { id } });
+  }
 }

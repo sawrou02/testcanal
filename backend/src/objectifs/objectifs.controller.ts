@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -43,5 +44,12 @@ export class ObjectifsController {
   @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
   update(@Param('id') id: string, @Body() dto: UpdateObjectifDto) {
     return this.objectifsService.update(id, dto);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
+  remove(@Param('id') id: string) {
+    return this.objectifsService.remove(id);
   }
 }

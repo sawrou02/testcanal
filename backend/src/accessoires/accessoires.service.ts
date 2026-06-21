@@ -177,4 +177,8 @@ export class AccessoiresService {
     await this.audit.log(userId, 'RETOUR_ACCESSOIRE', 'ACCESSOIRES', ip);
     return retour;
   }
+
+  remove(id: string) {
+    return this.prisma.accessoire.update({ where: { id }, data: { statut: 'INACTIF' as any } });
+  }
 }
