@@ -24,6 +24,7 @@ import { VadModule } from './vad/vad.module';
 import { CreditModule } from './credit/credit.module';
 import { ArretesModule } from './arretes/arretes.module';
 import { InstallationsModule } from './installations/installations.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { InstallationsModule } from './installations/installations.module';
     CreditModule,
     ArretesModule,
     InstallationsModule,
+    NotificationsModule,
   ],
   providers: [
     {

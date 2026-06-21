@@ -1107,3 +1107,24 @@ export const bddGlobale = async (): Promise<BddAbonneRow[]> => {
   const res = await apiClient.get<BddAbonneRow[]>('/analytics/bdd-globale')
   return Array.isArray(res.data) ? res.data : []
 }
+
+// ---------- Notifications ----------
+export interface NotificationRow {
+  id: string
+  type: 'WARN' | 'OK' | 'URGENT'
+  message: string
+  lien?: string | null
+  lu: boolean
+  dismissed: boolean
+  createdAt: string
+}
+export const listNotifications = async (): Promise<{ items: NotificationRow[]; unread: number }> => {
+  const res = await apiClient.get<{ items: NotificationRow[]; unread: number }>('/notifications')
+  return res.data ?? { items: [], unread: 0 }
+}
+export const markNotificationsRead = async () => {
+  await apiClient.patch('/notifications/read-all')
+}
+export const dismissNotification = async (id: string) => {
+  await apiClient.patch(`/notifications/${id}/dismiss`)
+}

@@ -1,34 +1,96 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useThemeStore } from '../../hooks/useTheme'
+import { useAuthStore } from '../../store/authStore'
+import {
+  listNotifications,
+  markNotificationsRead,
+  dismissNotification,
+  type NotificationRow,
+} from '../../lib/api'
 
 interface HeaderProps {
   title?: string
 }
 
+const DOT: Record<NotificationRow['type'], string> = {
+  URGENT: 'var(--danger)',
+  WARN: 'var(--gold)',
+  OK: 'var(--primary)',
+}
+
 export function Header({ title = 'Tableau de bord' }: HeaderProps) {
   const { theme, toggleTheme } = useThemeStore()
+  const user = useAuthStore((s) => s.user)
   const [search, setSearch] = useState('')
+
+  const [open, setOpen] = useState(false)
+  const [items, setItems] = useState<NotificationRow[]>([])
+  const [unread, setUnread] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
+
+  const initials = user
+    ? `${(user.prenom?.[0] ?? '').toUpperCase()}${(user.nom?.[0] ?? '').toUpperCase()}` || '?'
+    : '?'
+
+  const load = async () => {
+    try {
+      const { items, unread } = await listNotifications()
+      setItems(items)
+      setUnread(unread)
+    } catch {
+      setItems([])
+      setUnread(0)
+    }
+  }
+
+  useEffect(() => {
+    void load()
+  }, [])
+
+  // close dropdown on outside click
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [])
+
+  const toggle = async () => {
+    const next = !open
+    setOpen(next)
+    if (next && unread > 0) {
+      try {
+        await markNotificationsRead()
+        setUnread(0)
+        setItems((prev) => prev.map((n) => ({ ...n, lu: true })))
+      } catch {
+        /* ignore */
+      }
+    }
+  }
+
+  const remove = async (id: string) => {
+    setItems((prev) => prev.filter((n) => n.id !== id))
+    try {
+      await dismissNotification(id)
+    } catch {
+      void load()
+    }
+  }
 
   return (
     <header
       className="h-16 flex items-center gap-4 px-6 bg-white border-b border-app-border shrink-0"
       style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
     >
-      {/* Breadcrumb/Title */}
       <div className="flex flex-col min-w-0">
         <span className="text-xs text-app-subtle uppercase tracking-wider">SENDISTRI</span>
         <h1 className="text-base font-bold text-app-text truncate">{title}</h1>
       </div>
 
-      {/* Search */}
       <div className="flex-1 max-w-md mx-auto relative">
-        <svg
-          className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-app-subtle"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-        >
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-app-subtle" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.35-4.35" />
         </svg>
@@ -42,7 +104,6 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
         />
       </div>
 
-      {/* Right actions */}
       <div className="flex items-center gap-2 ml-auto">
         {/* Dark mode toggle */}
         <button
@@ -64,19 +125,62 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
         </button>
 
         {/* Notifications */}
-        <button className="relative p-2 rounded-lg text-app-muted hover:bg-gray-100 transition-colors">
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
-            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
-          </svg>
-          <span className="absolute top-1 right-1 w-4 h-4 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-            5
-          </span>
-        </button>
+        <div className="relative" ref={ref}>
+          <button
+            onClick={toggle}
+            title="Notifications"
+            className="relative p-2 rounded-lg text-app-muted hover:bg-gray-100 transition-colors"
+            style={{ color: 'var(--text-muted)' }}
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+            {unread > 0 && (
+              <span className="absolute top-1 right-1 min-w-4 h-4 px-1 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {unread > 9 ? '9+' : unread}
+              </span>
+            )}
+          </button>
 
-        {/* User avatar */}
-        <div className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
-          AF
+          {open && (
+            <div
+              className="absolute right-0 mt-2 w-80 rounded-xl border border-app-border shadow-lg z-50 overflow-hidden"
+              style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            >
+              <div className="px-4 py-3 border-b border-app-border text-sm font-bold text-app-text" style={{ borderColor: 'var(--border)' }}>
+                Notifications
+              </div>
+              <div className="max-h-80 overflow-y-auto">
+                {items.length === 0 ? (
+                  <div className="px-4 py-8 text-center text-sm text-app-muted" style={{ color: 'var(--text-muted)' }}>
+                    Aucune notification
+                  </div>
+                ) : (
+                  items.map((n) => (
+                    <div key={n.id} className="flex items-start gap-3 px-4 py-3 border-b border-app-border last:border-0" style={{ borderColor: 'var(--border)' }}>
+                      <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: DOT[n.type] }} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-app-text" style={{ color: 'var(--text)' }}>{n.message}</p>
+                        <p className="text-xs text-app-subtle mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                          {new Date(n.createdAt).toLocaleString('fr-FR')}
+                        </p>
+                      </div>
+                      <button onClick={() => remove(n.id)} title="Ignorer" className="text-app-subtle hover:text-app-text text-sm shrink-0">×</button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* User avatar (real initials) */}
+        <div
+          className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold"
+          title={user ? `${user.prenom} ${user.nom}` : ''}
+        >
+          {initials}
         </div>
       </div>
     </header>
