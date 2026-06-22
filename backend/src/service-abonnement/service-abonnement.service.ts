@@ -128,21 +128,87 @@ export class ServiceAbonnementService {
    * Suivi M+ des abonnés actifs. `niveau` = 'M+' + nombre de mois (arrondi au
    * supérieur) avant échéance, borné dans [1, 6].
    */
-  async getSuiviMp() {
-    const now = new Date();
-    const rows = await this.prisma.abonne.findMany({
-      where: { statut: 'ACTIF' as any },
-      include: FORMULE_PDV_INCLUDE,
-      orderBy: { dateEcheance: 'asc' },
-    });
+  /**
+   * Suivi M+ (cohorte de réabonnement) : pour un mois de recrutement et un
+   * niveau M+N, mesure le réabonnement par date de recrutement, avec le taux
+   * de conversion et la répartition par canal (Réseau / Mobile Money).
+   */
+  async getSuiviMp(mois?: number, annee?: number, type = 'M+1', pdvId?: string) {
+    const now = new Date()
+    const m = mois && mois >= 1 && mois <= 12 ? mois - 1 : now.getMonth()
+    const y = annee && annee > 2000 ? annee : now.getFullYear()
+    const start = new Date(y, m, 1)
+    const end = new Date(y, m + 1, 1)
 
-    return rows.map((a) => {
-      const daysUntil =
-        (a.dateEcheance.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
-      const months = Math.ceil(daysUntil / 30);
-      const cappedMonths = Math.min(Math.max(months, 1), 6);
-      return { ...a, niveau: 'M+' + cappedMonths };
-    });
+    // Recrutements du mois choisi (option: filtré par PDV)
+    const recruits = await this.prisma.encaissement.findMany({
+      where: { nature: 'RECRUTEMENT' as any, date: { gte: start, lt: end }, ...(pdvId ? { pdvId } : {}) },
+      select: { abonneId: true, date: true },
+    })
+
+    const N = type === 'M+3' ? 3 : type === 'M+2' ? 2 : 1
+    const dayKey = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+
+    // Cohortes par jour de recrutement
+    const cohorts = new Map<string, { date: Date; abonnes: Set<string> }>()
+    for (const r of recruits) {
+      const k = dayKey(new Date(r.date))
+      if (!cohorts.has(k)) cohorts.set(k, { date: new Date(r.date), abonnes: new Set() })
+      cohorts.get(k)!.abonnes.add(r.abonneId)
+    }
+
+    // Réabonnements de ces abonnés (canal via mode de paiement)
+    const allIds = recruits.map((r) => r.abonneId)
+    const reabos = allIds.length
+      ? await this.prisma.encaissement.findMany({
+          where: { nature: 'REABONNEMENT' as any, abonneId: { in: allIds } },
+          select: { abonneId: true, modePaiement: true },
+        })
+      : []
+    const reaboMode = new Map<string, string>()
+    for (const r of reabos) if (!reaboMode.has(r.abonneId)) reaboMode.set(r.abonneId, r.modePaiement as any)
+
+    const rows = Array.from(cohorts.entries())
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([k, c]) => {
+        const ech = new Date(c.date); ech.setMonth(ech.getMonth() + N)
+        let realise = 0, reseau = 0, mobileMoney = 0
+        for (const id of c.abonnes) {
+          const mode = reaboMode.get(id)
+          if (!mode) continue
+          realise++
+          if (mode === 'WAVE' || mode === 'ORANGE_MONEY') mobileMoney++
+          else reseau++
+        }
+        const nbreRecrut = c.abonnes.size
+        return {
+          date: k,
+          echeance: dayKey(ech),
+          nbreRecrut,
+          realise,
+          taux: nbreRecrut ? Math.round((realise / nbreRecrut) * 1000) / 10 : 0,
+          reseau,
+          mobileMoney,
+          reste: nbreRecrut - realise,
+        }
+      })
+
+    const sum = (f: (r: (typeof rows)[number]) => number) => rows.reduce((a, r) => a + f(r), 0)
+    const totRecrut = sum((r) => r.nbreRecrut)
+    const totRealise = sum((r) => r.realise)
+    return {
+      periode: `${String(m + 1).padStart(2, '0')}/${y}`,
+      type,
+      rows,
+      totaux: {
+        nbreRecrut: totRecrut,
+        realise: totRealise,
+        reseau: sum((r) => r.reseau),
+        mobileMoney: sum((r) => r.mobileMoney),
+        reste: sum((r) => r.reste),
+        taux: totRecrut ? Math.round((totRealise / totRecrut) * 1000) / 10 : 0,
+      },
+    }
   }
 
   /**

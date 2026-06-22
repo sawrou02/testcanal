@@ -49,8 +49,18 @@ export class ServiceAbonnementController {
   }
 
   @Get('suivi-mp')
-  async getSuiviMp() {
-    return this.service.getSuiviMp();
+  async getSuiviMp(
+    @Query('mois') mois?: string,
+    @Query('annee') annee?: string,
+    @Query('type') type?: string,
+    @Query('pdvId') pdvId?: string,
+  ) {
+    return this.service.getSuiviMp(
+      mois ? parseInt(mois, 10) : undefined,
+      annee ? parseInt(annee, 10) : undefined,
+      type || 'M+1',
+      pdvId || undefined,
+    );
   }
 
   @Get('bienvenue')

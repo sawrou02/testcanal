@@ -1185,3 +1185,15 @@ export const updateRetourRpe = async (id: string, body: Partial<RetourRpeRow>): 
   const res = await apiClient.patch<RetourRpeRow>(`/retour-rpe/${id}`, body)
   return res.data
 }
+
+// ---------- Suivi M+ (cohorte réabonnement) ----------
+export interface SuiviMpReport {
+  periode: string
+  type: string
+  rows: { date: string; echeance: string; nbreRecrut: number; realise: number; taux: number; reseau: number; mobileMoney: number; reste: number }[]
+  totaux: { nbreRecrut: number; realise: number; reseau: number; mobileMoney: number; reste: number; taux: number }
+}
+export const suiviMpReport = async (params: { mois?: number; annee?: number; type?: string; pdvId?: string }): Promise<SuiviMpReport> => {
+  const res = await apiClient.get<SuiviMpReport>('/service-abonnement/suivi-mp', { params })
+  return res.data
+}
