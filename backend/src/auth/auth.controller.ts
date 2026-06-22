@@ -2,10 +2,10 @@ import { Controller, Post, Body, Get, UseGuards, Request, HttpCode } from '@nest
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { JwtAuthGuard } from './jwt-auth.guard';
-import { IsEmail, IsString } from 'class-validator';
+import { IsString } from 'class-validator';
 
 class LoginDto {
-  @IsEmail()
+  @IsString()
   email: string;
 
   @IsString()

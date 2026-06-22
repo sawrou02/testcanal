@@ -119,14 +119,16 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-app-text mb-1.5">
-                Adresse e-mail
+                Identifiant
               </label>
               <input
-                type="email"
+                type="text"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                placeholder="votre@email.sn"
+                autoCapitalize="none"
+                autoCorrect="off"
+                placeholder="Votre identifiant"
                 className="w-full px-4 py-3 rounded-lg border border-app-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
               />
             </div>

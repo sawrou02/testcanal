@@ -24,7 +24,7 @@ export default function ComptesPdvPage() {
       columns={[
         { key: 'nom', label: 'Nom' },
         { key: 'prenom', label: 'Prénom' },
-        { key: 'email', label: 'Email' },
+        { key: 'email', label: 'Identifiant' },
         { key: 'role', label: 'Rôle', render: (v) => getRoleLabel(String(v ?? '')) },
         {
           key: 'pdv',
@@ -43,8 +43,8 @@ export default function ComptesPdvPage() {
       formFields={[
         { name: 'prenom', label: 'Prénom', type: 'text', required: true },
         { name: 'nom', label: 'Nom', type: 'text', required: true },
-        { name: 'email', label: 'Email', type: 'text', required: true },
-        { name: 'password', label: 'Mot de passe', type: 'text' },
+        { name: 'email', label: 'Identifiant (nom de connexion)', type: 'text', required: true },
+        { name: 'password', label: 'Mot de passe', type: 'text', required: true },
         {
           name: 'role',
           label: 'Rôle',
