@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { cn } from '../../lib/utils'
+import { ExportButtons } from './ExportButtons'
 
 interface Column<T> {
   key: string
@@ -19,6 +20,9 @@ interface DataTableProps<T extends Record<string, unknown>> {
   loading?: boolean
   emptyMessage?: string
   totalsRow?: Partial<T>
+  exportable?: boolean
+  exportTitle?: string
+  exportPeriode?: string
 }
 
 export function DataTable<T extends Record<string, unknown>>({
@@ -32,6 +36,9 @@ export function DataTable<T extends Record<string, unknown>>({
   loading = false,
   emptyMessage = 'Aucune donnée disponible',
   totalsRow,
+  exportable = true,
+  exportTitle = 'Export SENDISTRI',
+  exportPeriode,
 }: DataTableProps<T>) {
   const [page, setPage] = useState(1)
   const [pageSize, setPageSize] = useState(initialPageSize)
@@ -95,17 +102,27 @@ export function DataTable<T extends Record<string, unknown>>({
             />
           </div>
         )}
-        <div className="flex items-center gap-2 text-sm text-app-muted ml-auto">
-          <span>Lignes par page:</span>
-          <select
-            value={pageSize}
-            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
-            className="border border-app-border rounded px-2 py-1 bg-white text-app-text"
-          >
-            {pageSizeOptions.map((s) => (
-              <option key={s} value={s}>{s}</option>
-            ))}
-          </select>
+        <div className="flex items-center gap-3 text-sm text-app-muted ml-auto">
+          {exportable && (
+            <ExportButtons
+              title={exportTitle}
+              periode={exportPeriode}
+              columns={columns.map((c) => ({ key: c.key, label: c.label, align: c.align }))}
+              rows={filtered as Record<string, unknown>[]}
+            />
+          )}
+          <div className="flex items-center gap-2">
+            <span>Lignes par page:</span>
+            <select
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
+              className="border border-app-border rounded px-2 py-1 bg-white text-app-text"
+            >
+              {pageSizeOptions.map((s) => (
+                <option key={s} value={s}>{s}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 

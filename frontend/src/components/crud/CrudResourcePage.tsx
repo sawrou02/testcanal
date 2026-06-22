@@ -312,6 +312,7 @@ export function CrudResourcePage({
           rows={data}
           loading={loading}
           searchable
+          exportTitle={title}
           onRowClick={canMutate ? openEdit : undefined}
         />
       </div>
