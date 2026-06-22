@@ -52,6 +52,7 @@ import AugmentationCautionPage from '../pages/operations/AugmentationCautionPage
 import InstallationsPage from '../pages/operations/InstallationsPage'
 import ReaboMomoPage from '../pages/analytique/ReaboMomoPage'
 import BddGlobalePage from '../pages/analytique/BddGlobalePage'
+import RetourRpePage from '../pages/commercial/RetourRpePage'
 
 function ProtectedRoute() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
@@ -224,6 +225,8 @@ export const router = createBrowserRouter([
       // --- B) Vues réelles supplémentaires ---
       { path: 'app/reabo-momo', element: <ReaboMomoPage /> },
       { path: 'app/bdd-globale', element: <BddGlobalePage /> },
+
+      { path: 'app/retour-rpe', element: <RetourRpePage /> },
 
       { path: 'app/:pageId', element: <GenericTablePage /> },
     ],

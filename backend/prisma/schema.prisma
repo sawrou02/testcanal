@@ -464,3 +464,24 @@ model Installation {
 
   pdv PDV @relation(fields: [pdvId], references: [id])
 }
+
+model RetourRpe {
+  id           String   @id @default(cuid())
+  numAbonne    String
+  nom          String
+  prenom       String
+  tel          String?
+  formule      String?
+  pdv          String?
+  agent        String?
+  joint        String   @default("")
+  installation String   @default("")
+  satisfaction String   @default("")
+  mycanal      String   @default("")
+  netflix      String   @default("")
+  progrFidel   String   @default("")
+  score        Int?
+  commentaire  String?
+  statut       String   @default("EN_COURS")
+  date         DateTime @default(now())
+}

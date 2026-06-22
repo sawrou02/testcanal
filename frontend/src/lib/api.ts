@@ -1128,3 +1128,60 @@ export const markNotificationsRead = async () => {
 export const dismissNotification = async (id: string) => {
   await apiClient.patch(`/notifications/${id}/dismiss`)
 }
+
+// ---------- Recherche globale ----------
+export interface SearchResults {
+  abonnes: { id: string; numAbonne: string; nom: string; prenom: string }[]
+  pdvs: { id: string; code: string; raisonSociale: string }[]
+  decodeurs: { id: string; numSerie: string; type: string; statut: string }[]
+}
+export const searchGlobal = async (q: string): Promise<SearchResults> => {
+  const res = await apiClient.get<SearchResults>('/search', { params: { q } })
+  return res.data ?? { abonnes: [], pdvs: [], decodeurs: [] }
+}
+
+// ---------- Synthèse tableau de bord ----------
+export interface SyntheseData {
+  recouvrement: { creditRestant: number; avoir: number; encours: number; commMateriel: number; commFormule: number; commReabo: number }
+  vente: { nbAbo: number; caRecru: number; nbMigration: number; rapport: string }
+  reabo: { parcActif: number; nbReabo: number; caReabo: number; echus: number }
+  logistique: { z4Stock: number; z4Reseau: number; z4Defectueux: number; globazStock: number; globazReseau: number; g11Stock: number; g11Reseau: number }
+}
+export const getSynthese = async (): Promise<SyntheseData> => {
+  const res = await apiClient.get<SyntheseData>('/dashboard/synthese')
+  return res.data
+}
+
+// ---------- Retour client RPE ----------
+export interface RetourRpeRow {
+  id: string
+  numAbonne: string
+  nom: string
+  prenom: string
+  tel?: string
+  formule?: string
+  pdv?: string
+  agent?: string
+  joint: string
+  installation: string
+  satisfaction: string
+  mycanal: string
+  netflix: string
+  progrFidel: string
+  score?: number
+  commentaire?: string
+  statut: string
+  date: string
+}
+export const listRetourRpe = async (): Promise<RetourRpeRow[]> => {
+  const res = await apiClient.get<RetourRpeRow[]>('/retour-rpe')
+  return Array.isArray(res.data) ? res.data : []
+}
+export const createRetourRpe = async (body: Partial<RetourRpeRow>): Promise<RetourRpeRow> => {
+  const res = await apiClient.post<RetourRpeRow>('/retour-rpe', body)
+  return res.data
+}
+export const updateRetourRpe = async (id: string, body: Partial<RetourRpeRow>): Promise<RetourRpeRow> => {
+  const res = await apiClient.patch<RetourRpeRow>(`/retour-rpe/${id}`, body)
+  return res.data
+}

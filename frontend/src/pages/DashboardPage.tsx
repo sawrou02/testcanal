@@ -2,6 +2,7 @@ import { KpiCard } from '../components/dashboard/KpiCard'
 import { ActivityChart } from '../components/dashboard/ActivityChart'
 import { SectorTable } from '../components/dashboard/SectorTable'
 import { AlertsPanel } from '../components/dashboard/AlertsPanel'
+import { SyntheseCards } from '../components/dashboard/SyntheseCards'
 import { SkeletonCardGrid } from '../components/ui/Skeleton'
 import { useResourceItem } from '../hooks/useResource'
 import type { DashboardStats } from '../lib/api'
@@ -65,6 +66,9 @@ export default function DashboardPage() {
           </>
         )}
       </div>
+
+      {/* Synthèse (Recouvrement / Vente / Réabonnement / Logistique) */}
+      <SyntheseCards />
 
       {/* Activity Chart */}
       <ActivityChart data={stats?.activite30j ?? []} loading={loading} />

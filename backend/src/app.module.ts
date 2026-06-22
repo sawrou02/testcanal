@@ -25,6 +25,8 @@ import { CreditModule } from './credit/credit.module';
 import { ArretesModule } from './arretes/arretes.module';
 import { InstallationsModule } from './installations/installations.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { SearchModule } from './search/search.module';
+import { RetourRpeModule } from './retour-rpe/retour-rpe.module';
 
 @Module({
   imports: [
@@ -53,6 +55,8 @@ import { NotificationsModule } from './notifications/notifications.module';
     ArretesModule,
     InstallationsModule,
     NotificationsModule,
+    SearchModule,
+    RetourRpeModule,
   ],
   providers: [
     {

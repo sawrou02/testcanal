@@ -1,11 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useThemeStore } from '../../hooks/useTheme'
 import { useAuthStore } from '../../store/authStore'
 import {
   listNotifications,
   markNotificationsRead,
   dismissNotification,
+  searchGlobal,
   type NotificationRow,
+  type SearchResults,
 } from '../../lib/api'
 
 interface HeaderProps {
@@ -22,6 +25,30 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
   const { theme, toggleTheme } = useThemeStore()
   const user = useAuthStore((s) => s.user)
   const [search, setSearch] = useState('')
+  const navigate = useNavigate()
+  const [results, setResults] = useState<SearchResults | null>(null)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const searchRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const q = search.trim()
+    if (q.length < 2) { setResults(null); return }
+    const t = setTimeout(() => {
+      searchGlobal(q).then((r) => { setResults(r); setSearchOpen(true) }).catch(() => setResults(null))
+    }, 250)
+    return () => clearTimeout(t)
+  }, [search])
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) setSearchOpen(false)
+    }
+    document.addEventListener('mousedown', onClick)
+    return () => document.removeEventListener('mousedown', onClick)
+  }, [])
+
+  const goSearch = (path: string) => { setSearch(''); setResults(null); setSearchOpen(false); navigate(path) }
+  const totalResults = results ? results.abonnes.length + results.pdvs.length + results.decodeurs.length : 0
 
   const [open, setOpen] = useState(false)
   const [items, setItems] = useState<NotificationRow[]>([])
@@ -89,19 +116,61 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
         <h1 className="text-base font-bold text-app-text truncate">{title}</h1>
       </div>
 
-      <div className="flex-1 max-w-md mx-auto relative">
+      <div className="flex-1 max-w-md mx-auto relative" ref={searchRef}>
         <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-app-subtle" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <circle cx="11" cy="11" r="8" />
           <path d="m21 21-4.35-4.35" />
         </svg>
         <input
           type="text"
-          placeholder="Rechercher dans SENDISTRI..."
+          placeholder="Rechercher un abonné, PDV, décodeur..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
+          onFocus={() => results && setSearchOpen(true)}
           className="w-full pl-9 pr-4 py-2 text-sm rounded-lg border border-app-border bg-app-bg focus:outline-none focus:ring-2 focus:ring-primary/20 text-app-text placeholder-app-subtle"
           style={{ background: 'var(--app-bg)', borderColor: 'var(--border)', color: 'var(--text)' }}
         />
+        {searchOpen && results && (
+          <div className="absolute left-0 right-0 mt-2 rounded-xl border border-app-border shadow-lg z-50 overflow-hidden max-h-96 overflow-y-auto"
+               style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
+            {totalResults === 0 ? (
+              <div className="px-4 py-6 text-center text-sm text-app-muted" style={{ color: 'var(--text-muted)' }}>Aucun résultat</div>
+            ) : (
+              <>
+                {results.abonnes.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-app-subtle" style={{ color: 'var(--text-muted)' }}>Abonnés</div>
+                    {results.abonnes.map((a) => (
+                      <button key={a.id} onClick={() => goSearch('/app/bdd-globale')} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm" style={{ color: 'var(--text)' }}>
+                        <span className="font-mono">{a.numAbonne}</span> — {a.prenom} {a.nom}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {results.pdvs.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-app-subtle" style={{ color: 'var(--text-muted)' }}>Points de vente</div>
+                    {results.pdvs.map((p) => (
+                      <button key={p.id} onClick={() => goSearch('/app/pdv-liste')} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm" style={{ color: 'var(--text)' }}>
+                        <span className="font-mono">{p.code}</span> — {p.raisonSociale}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                {results.decodeurs.length > 0 && (
+                  <div>
+                    <div className="px-4 pt-3 pb-1 text-[11px] font-bold uppercase tracking-wide text-app-subtle" style={{ color: 'var(--text-muted)' }}>Décodeurs</div>
+                    {results.decodeurs.map((d) => (
+                      <button key={d.id} onClick={() => goSearch('/app/recherche-decodeur')} className="w-full text-left px-4 py-2 hover:bg-gray-50 text-sm" style={{ color: 'var(--text)' }}>
+                        <span className="font-mono">{d.numSerie}</span> — {d.type} · {d.statut}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="flex items-center gap-2 ml-auto">

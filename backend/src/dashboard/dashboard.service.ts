@@ -137,4 +137,55 @@ export class DashboardService {
       soldesParSecteur,
     };
   }
+
+  /** Cartes de synthèse (style OGECPRO) : Recouvrement / Vente / Réabonnement / Logistique. */
+  async getSynthese() {
+    const now = new Date();
+    const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const mEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const period = { gte: mStart, lt: mEnd };
+
+    const [
+      creditAgg, nbRecru, caRecruAgg, nbReabo, caReaboAgg, nbMigration,
+      parcActif, echus, decsByTypeStatut,
+    ] = await Promise.all([
+      this.prisma.credit.aggregate({ _sum: { plafond: true, avoir: true, dette: true } }),
+      this.prisma.encaissement.count({ where: { nature: 'RECRUTEMENT' as any, date: period } }),
+      this.prisma.encaissement.aggregate({ _sum: { montantTotal: true }, where: { nature: 'RECRUTEMENT' as any, date: period } }),
+      this.prisma.encaissement.count({ where: { nature: 'REABONNEMENT' as any, date: period } }),
+      this.prisma.encaissement.aggregate({ _sum: { montantTotal: true }, where: { nature: 'REABONNEMENT' as any, date: period } }),
+      this.prisma.encaissement.count({ where: { nature: 'MIGRATION' as any, date: period } }),
+      this.prisma.abonne.count({ where: { statut: 'ACTIF' as any } }),
+      this.prisma.abonne.count({ where: { statut: 'ECHU' as any } }),
+      this.prisma.decodeur.groupBy({ by: ['type', 'statut'], _count: { _all: true } }),
+    ]);
+
+    const dec = (type: string, statut: string) =>
+      decsByTypeStatut.find((d) => d.type === (type as any) && d.statut === (statut as any))?._count._all || 0;
+
+    const caRecru = caRecruAgg._sum.montantTotal || 0;
+    const caReabo = caReaboAgg._sum.montantTotal || 0;
+
+    return {
+      recouvrement: {
+        creditRestant: (creditAgg._sum.plafond || 0) + (creditAgg._sum.avoir || 0) - (creditAgg._sum.dette || 0),
+        avoir: creditAgg._sum.avoir || 0,
+        encours: creditAgg._sum.dette || 0,
+        commMateriel: nbRecru * 3500,
+        commFormule: Math.round(caRecru * 0.1),
+        commReabo: Math.round(caReabo * 0.1),
+      },
+      vente: { nbAbo: nbRecru, caRecru, nbMigration, rapport: now.toISOString().slice(0, 10) },
+      reabo: { parcActif, nbReabo, caReabo, echus },
+      logistique: {
+        z4Stock: dec('Z4', 'EN_STOCK_ENTREPOT'),
+        z4Reseau: dec('Z4', 'EN_STOCK_PDV'),
+        z4Defectueux: dec('Z4', 'DEFECTUEUX'),
+        globazStock: dec('GLOBAZ', 'EN_STOCK_ENTREPOT'),
+        globazReseau: dec('GLOBAZ', 'EN_STOCK_PDV'),
+        g11Stock: dec('G11', 'EN_STOCK_ENTREPOT'),
+        g11Reseau: dec('G11', 'EN_STOCK_PDV'),
+      },
+    };
+  }
 }
