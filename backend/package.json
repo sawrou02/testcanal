@@ -16,6 +16,7 @@
     "prisma:push": "prisma db push",
     "prisma:seed": "ts-node prisma/seed.ts",
     "seed:demo": "ts-node prisma/seed.demo.ts",
+    "backup": "ts-node scripts/backup.ts",
     "db:setup": "prisma db push && ts-node prisma/seed.ts"
   },
   "dependencies": {
@@ -24,6 +25,7 @@
     "@nestjs/jwt": "^10.2.0",
     "@nestjs/passport": "^10.0.3",
     "@nestjs/platform-express": "^10.0.0",
+    "@nestjs/schedule": "^4.1.2",
     "@nestjs/swagger": "^7.4.2",
     "@nestjs/throttler": "^6.5.0",
     "@prisma/client": "^5.10.2",

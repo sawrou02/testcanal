@@ -11,7 +11,9 @@ export class SearchController {
   async search(@Query('q') q?: string) {
     const term = (q ?? '').trim();
     if (term.length < 2) return { abonnes: [], pdvs: [], decodeurs: [] };
-    const like = { contains: term, mode: 'insensitive' as const };
+    // SQLite : `contains` est déjà insensible à la casse (ASCII) ; `mode` n'est
+    // pas supporté par ce connecteur, on l'omet donc.
+    const like = { contains: term };
     const [abonnes, pdvs, decodeurs] = await Promise.all([
       this.prisma.abonne.findMany({
         where: { OR: [{ numAbonne: like }, { nom: like }, { prenom: like }, { tel1: like }] },

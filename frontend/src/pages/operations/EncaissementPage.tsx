@@ -135,7 +135,11 @@ export default function EncaissementPage() {
       })
       setReceipt(created)
       setReceiptOpen(true)
-      toast.success('Encaissement enregistré ✓')
+      toast.success(
+        created.nouvelleEcheance
+          ? `Encaissement enregistré ✓ — abonné actif jusqu'au ${formatDate(created.nouvelleEcheance)}`
+          : 'Encaissement enregistré ✓',
+      )
     } catch {
       toast.error("Erreur lors de l'enregistrement")
     } finally {

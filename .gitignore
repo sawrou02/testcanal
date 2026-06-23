@@ -17,6 +17,9 @@ build/
 # Prisma
 backend/prisma/*.db
 
+# Sauvegardes automatiques de la base
+backend/backups/
+
 # Logs
 *.log
 npm-debug.log*

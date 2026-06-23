@@ -130,11 +130,41 @@ export interface Encaissement {
   pdv: { raisonSociale: string }
   formule: { code: string; nomCommercial: string }
   user: { prenom: string; nom: string }
+  nouvelleEcheance?: string
 }
 
 export const searchAbonnes = async (q: string): Promise<Abonne[]> => {
   const res = await apiClient.get<Abonne[]>('/abonnes', { params: { q } })
   return Array.isArray(res.data) ? res.data : []
+}
+
+export interface AbonneInput {
+  numAbonne?: string
+  nom: string
+  prenom: string
+  tel1: string
+  tel2?: string
+  formuleId: string
+  pdvId: string
+  dateEcheance?: string
+  statut?: string
+}
+
+export const createAbonne = async (body: AbonneInput): Promise<Abonne> => {
+  const res = await apiClient.post<Abonne>('/abonnes', body)
+  return res.data
+}
+
+export const updateAbonne = async (
+  id: string,
+  body: Partial<AbonneInput>,
+): Promise<Abonne> => {
+  const res = await apiClient.patch<Abonne>(`/abonnes/${id}`, body)
+  return res.data
+}
+
+export const deleteAbonne = async (id: string): Promise<void> => {
+  await apiClient.delete(`/abonnes/${id}`)
 }
 
 export const createEncaissement = async (

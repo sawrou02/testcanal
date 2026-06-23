@@ -26,6 +26,13 @@ function parseOptions<T extends { options: string }>(rec: T): Omit<T, 'options'>
   return { ...rec, options: parsed };
 }
 
+/** Ajoute `n` mois à une date (gère le passage d'année). */
+function addMonths(base: Date, n: number): Date {
+  const d = new Date(base);
+  d.setMonth(d.getMonth() + n);
+  return d;
+}
+
 @Injectable()
 export class EncaissementsService {
   constructor(private prisma: PrismaService) {}
@@ -49,7 +56,7 @@ export class EncaissementsService {
 
     const abonne = await this.prisma.abonne.findUnique({
       where: { id: dto.abonneId },
-      select: { numAbonne: true },
+      select: { numAbonne: true, dateEcheance: true },
     });
 
     const now = new Date();
@@ -59,30 +66,59 @@ export class EncaissementsService {
     const unique = Date.now().toString(36).slice(-4).toUpperCase();
     const recuNumero = `RC-${ref}-${dd}${mm}-${unique}`;
 
-    const record = await this.prisma.encaissement.create({
-      data: {
-        abonneId: dto.abonneId,
-        pdvId: dto.pdvId,
-        userId,
-        nature: dto.nature as any,
-        formuleId: dto.formuleId,
-        nbMois: dto.nbMois,
-        montantTotal,
-        montantRecu: dto.montantRecu,
-        modePaiement: dto.modePaiement as any,
-        options: JSON.stringify(options),
-        date: now,
-        recuNumero,
-      },
-      include: ENCAISSEMENT_INCLUDE,
-    });
+    // ----- Réabonnement intelligent (Niveau 1) -----
+    // On prolonge l'échéance à partir de la date la plus tardive entre
+    // aujourd'hui et l'échéance actuelle (un client encore actif ne perd pas
+    // les jours restants ; un client échu repart d'aujourd'hui).
+    const baseEcheance =
+      abonne && abonne.dateEcheance > now ? new Date(abonne.dateEcheance) : new Date(now);
+    const nouvelleEcheance = addMonths(baseEcheance, dto.nbMois);
 
-    await this.prisma.pDV.update({
-      where: { id: dto.pdvId },
-      data: { soldeActuel: { increment: montantTotal } },
-    });
+    // Mise à jour de l'abonné : nouvelle échéance + réactivation. Le canal de
+    // réabonnement n'est renseigné que pour un vrai réabonnement.
+    const abonneUpdate: {
+      dateEcheance: Date;
+      statut: string;
+      canalReabo?: string;
+    } = {
+      dateEcheance: nouvelleEcheance,
+      statut: 'ACTIF',
+    };
+    if (dto.nature === 'REABONNEMENT') {
+      abonneUpdate.canalReabo = dto.modePaiement;
+    }
 
-    return { ...parseOptions(record), monnaieRendue };
+    // Tout est écrit en une seule transaction : soit tout réussit, soit rien
+    // (pas d'encaissement enregistré sans mise à jour de l'abonné et du PDV).
+    const [record] = await this.prisma.$transaction([
+      this.prisma.encaissement.create({
+        data: {
+          abonneId: dto.abonneId,
+          pdvId: dto.pdvId,
+          userId,
+          nature: dto.nature as any,
+          formuleId: dto.formuleId,
+          nbMois: dto.nbMois,
+          montantTotal,
+          montantRecu: dto.montantRecu,
+          modePaiement: dto.modePaiement as any,
+          options: JSON.stringify(options),
+          date: now,
+          recuNumero,
+        },
+        include: ENCAISSEMENT_INCLUDE,
+      }),
+      this.prisma.pDV.update({
+        where: { id: dto.pdvId },
+        data: { soldeActuel: { increment: montantTotal } },
+      }),
+      this.prisma.abonne.update({
+        where: { id: dto.abonneId },
+        data: abonneUpdate as any,
+      }),
+    ]);
+
+    return { ...parseOptions(record), monnaieRendue, nouvelleEcheance };
   }
 
   async findAll(pdvId?: string) {
