@@ -1,4 +1,18 @@
-import { PrismaClient, PDVType, AbonneStatut, NatureEncaissement, ModePaiement, VersementStatut, BanqueType, StatutMatching, NotificationType, EntrepotType, DecodeurType, DecodeurStatut, MouvementType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
+
+// SQLite ne supporte pas les enum Prisma : valeurs reproduites en constantes.
+const PDVType = { BOUTIQUE_PROPRE: 'BOUTIQUE_PROPRE', SOUS_RESEAU: 'SOUS_RESEAU', AGENCE_PRINCIPALE: 'AGENCE_PRINCIPALE', VAD: 'VAD', APPORTEUR: 'APPORTEUR' } as const;
+const AbonneStatut = { ACTIF: 'ACTIF', ECHU: 'ECHU', SUSPENDU: 'SUSPENDU', RESILIE: 'RESILIE' } as const;
+const NatureEncaissement = { RECRUTEMENT: 'RECRUTEMENT', REABONNEMENT: 'REABONNEMENT', MIGRATION: 'MIGRATION' } as const;
+const ModePaiement = { ESPECE: 'ESPECE', WAVE: 'WAVE', ORANGE_MONEY: 'ORANGE_MONEY', CHEQUE: 'CHEQUE', VIREMENT: 'VIREMENT' } as const;
+const VersementStatut = { ENATTENTE: 'ENATTENTE', VALIDE: 'VALIDE', REJETE: 'REJETE' } as const;
+const BanqueType = { BANQUE: 'BANQUE', MOBILE_MONEY: 'MOBILE_MONEY', WAVE: 'WAVE' } as const;
+const StatutMatching = { EN_ATTENTE: 'EN_ATTENTE', MATCHE: 'MATCHE', ECART: 'ECART' } as const;
+const NotificationType = { WARN: 'WARN', OK: 'OK', URGENT: 'URGENT' } as const;
+const EntrepotType = { PRINCIPAL: 'PRINCIPAL', SECONDAIRE: 'SECONDAIRE' } as const;
+const DecodeurType = { Z4: 'Z4', GLOBAZ: 'GLOBAZ', G11: 'G11' } as const;
+const DecodeurStatut = { EN_STOCK_ENTREPOT: 'EN_STOCK_ENTREPOT', EN_STOCK_PDV: 'EN_STOCK_PDV', VENDU: 'VENDU', IMMOBILISE: 'IMMOBILISE', DEFECTUEUX: 'DEFECTUEUX' } as const;
+const MouvementType = { EN_ENTREPOT_PDV: 'EN_ENTREPOT_PDV', PDV_PDV: 'PDV_PDV', ENTREPOT_ENTREPOT: 'ENTREPOT_ENTREPOT', PDV_ENTREPOT: 'PDV_ENTREPOT' } as const;
 import * as bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
@@ -1423,7 +1437,7 @@ async function main() {
     pdv7.id, pdv8.id, pdv9.id, pdv10.id, pdv11.id, pdv12.id,
   ];
   const decodeurTypes = [DecodeurType.Z4, DecodeurType.GLOBAZ, DecodeurType.G11];
-  const typePrefix: Record<DecodeurType, string> = {
+  const typePrefix: Record<string, string> = {
     [DecodeurType.Z4]: 'Z4',
     [DecodeurType.GLOBAZ]: 'GZ',
     [DecodeurType.G11]: 'G11',
@@ -1443,7 +1457,7 @@ async function main() {
 
     // Distribution: 0-23 (40%) EN_STOCK_ENTREPOT, 24-41 (30%) EN_STOCK_PDV,
     // 42-53 (20%) VENDU, 54-56 (5%) IMMOBILISE, 57-59 (5%) DEFECTUEUX.
-    let statut: DecodeurStatut;
+    let statut: string;
     let entrepotId: string | null = null;
     let pdvId: string | null = null;
     let dateEntree: Date;
@@ -1514,7 +1528,7 @@ async function main() {
   const inDays = (d: number) => new Date(now.getTime() + d * 24 * 60 * 60 * 1000);
 
   // ~8 abonnés à échéance dans les 30 prochains jours.
-  const echeanceUpdates: { id: string; date: Date; statut: AbonneStatut }[] = [
+  const echeanceUpdates: { id: string; date: Date; statut: string }[] = [
     { id: abonne1.id, date: inDays(3), statut: AbonneStatut.ACTIF },
     { id: abonne2.id, date: inDays(7), statut: AbonneStatut.ACTIF },
     { id: abonne4.id, date: inDays(10), statut: AbonneStatut.ACTIF },
@@ -1707,7 +1721,7 @@ async function main() {
       montantRecu,
       monnaie: 'XOF',
       modePaiement: curModes[i % curModes.length],
-      options: i % 5 === 0 ? { premium: true } : {},
+      options: JSON.stringify(i % 5 === 0 ? { premium: true } : {}),
       date,
       recuNumero: `RC-CUR-${seq}`,
     };
@@ -1876,7 +1890,7 @@ async function main() {
         data: { statut: 'EN_STOCK_PDV', pdvId: vad1, entrepotId: null },
       });
     }
-    const kitTypes: DecodeurType[] = [DecodeurType.Z4, DecodeurType.GLOBAZ, DecodeurType.G11];
+    const kitTypes: string[] = [DecodeurType.Z4, DecodeurType.GLOBAZ, DecodeurType.G11];
     const clients = ['Awa Ndiaye', 'Cheikh Fall', 'Mariama Sow', 'Ibrahima Ba', 'Khadija Diop'];
     for (let i = 0; i < 5; i++) {
       const data = {

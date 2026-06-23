@@ -12,6 +12,20 @@ const ENCAISSEMENT_INCLUDE = {
   user: { select: { prenom: true, nom: true } },
 };
 
+/**
+ * `options` est stocké en TEXTE (JSON sérialisé) car SQLite n'a pas de type
+ * Json natif. On le re-parse en objet avant de renvoyer au frontend.
+ */
+function parseOptions<T extends { options: string }>(rec: T): Omit<T, 'options'> & { options: unknown } {
+  let parsed: unknown = {};
+  try {
+    parsed = rec.options ? JSON.parse(rec.options) : {};
+  } catch {
+    parsed = {};
+  }
+  return { ...rec, options: parsed };
+}
+
 @Injectable()
 export class EncaissementsService {
   constructor(private prisma: PrismaService) {}
@@ -56,7 +70,7 @@ export class EncaissementsService {
         montantTotal,
         montantRecu: dto.montantRecu,
         modePaiement: dto.modePaiement as any,
-        options: options as any,
+        options: JSON.stringify(options),
         date: now,
         recuNumero,
       },
@@ -68,7 +82,7 @@ export class EncaissementsService {
       data: { soldeActuel: { increment: montantTotal } },
     });
 
-    return { ...record, monnaieRendue };
+    return { ...parseOptions(record), monnaieRendue };
   }
 
   async findAll(pdvId?: string) {
@@ -77,18 +91,20 @@ export class EncaissementsService {
       where.pdvId = pdvId;
     }
 
-    return this.prisma.encaissement.findMany({
+    const rows = await this.prisma.encaissement.findMany({
       where,
       include: ENCAISSEMENT_INCLUDE,
       orderBy: { date: 'desc' },
       take: 100,
     });
+    return rows.map(parseOptions);
   }
 
   async findOne(id: string) {
-    return this.prisma.encaissement.findUnique({
+    const rec = await this.prisma.encaissement.findUnique({
       where: { id },
       include: ENCAISSEMENT_INCLUDE,
     });
+    return rec ? parseOptions(rec) : rec;
   }
 }

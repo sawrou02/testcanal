@@ -12,8 +12,18 @@
  *
  * Pour repeupler avec des données de démonstration : npm run seed:demo
  */
-import { PrismaClient, Role, BanqueType, EntrepotType } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+
+// SQLite ne supporte pas les enum Prisma : on reproduit les valeurs en
+// constantes locales pour garder un code lisible et typé.
+const Role = {
+  SUPER_ADMIN: 'SUPER_ADMIN', ADMIN: 'ADMIN', MANAGER: 'MANAGER',
+  COMPTABLE: 'COMPTABLE', LOGISTICIEN: 'LOGISTICIEN',
+  COMMERCIAL: 'COMMERCIAL', VENDEUR: 'VENDEUR',
+} as const;
+const BanqueType = { BANQUE: 'BANQUE', MOBILE_MONEY: 'MOBILE_MONEY', WAVE: 'WAVE' } as const;
+const EntrepotType = { PRINCIPAL: 'PRINCIPAL', SECONDAIRE: 'SECONDAIRE' } as const;
 
 const prisma = new PrismaClient();
 

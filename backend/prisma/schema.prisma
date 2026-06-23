@@ -3,103 +3,14 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  SUPER_ADMIN
-  ADMIN
-  MANAGER
-  COMPTABLE
-  LOGISTICIEN
-  COMMERCIAL
-  VENDEUR
-}
-
-enum Statut {
-  ACTIF
-  INACTIF
-}
-
-enum PDVType {
-  BOUTIQUE_PROPRE
-  SOUS_RESEAU
-  AGENCE_PRINCIPALE
-  VAD
-  APPORTEUR
-}
-
-enum AbonneStatut {
-  ACTIF
-  ECHU
-  SUSPENDU
-  RESILIE
-}
-
-enum DecodeurType {
-  Z4
-  GLOBAZ
-  G11
-}
-
-enum DecodeurStatut {
-  EN_STOCK_ENTREPOT
-  EN_STOCK_PDV
-  VENDU
-  IMMOBILISE
-  DEFECTUEUX
-}
-
-enum NatureEncaissement {
-  RECRUTEMENT
-  REABONNEMENT
-  MIGRATION
-}
-
-enum ModePaiement {
-  ESPECE
-  WAVE
-  ORANGE_MONEY
-  CHEQUE
-  VIREMENT
-}
-
-enum VersementStatut {
-  ENATTENTE
-  VALIDE
-  REJETE
-}
-
-enum BanqueType {
-  BANQUE
-  MOBILE_MONEY
-  WAVE
-}
-
-enum StatutMatching {
-  EN_ATTENTE
-  MATCHE
-  ECART
-}
-
-enum EntrepotType {
-  PRINCIPAL
-  SECONDAIRE
-}
-
-enum MouvementType {
-  EN_ENTREPOT_PDV
-  PDV_PDV
-  ENTREPOT_ENTREPOT
-  PDV_ENTREPOT
-}
-
-enum NotificationType {
-  WARN
-  OK
-  URGENT
-}
+// NOTE: SQLite ne supporte pas les `enum` Prisma. Les champs ci-dessous sont
+// donc des `String` dont les valeurs autorisées sont contrôlées côté
+// application (DTO class-validator + constantes common/enums). Les valeurs
+// possibles sont rappelées en commentaire au-dessus de chaque champ.
 
 model User {
   id           String   @id @default(cuid())
@@ -107,9 +18,11 @@ model User {
   prenom       String
   email        String   @unique
   passwordHash String
-  role         Role
+  // Role: SUPER_ADMIN | ADMIN | MANAGER | COMPTABLE | LOGISTICIEN | COMMERCIAL | VENDEUR
+  role         String
   pdvId        String?
-  statut       Statut   @default(ACTIF)
+  // Statut: ACTIF | INACTIF
+  statut       String   @default("ACTIF")
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
@@ -140,12 +53,14 @@ model PDV {
   id           String   @id @default(cuid())
   code         String   @unique
   raisonSociale String
-  type         PDVType
+  // PDVType: BOUTIQUE_PROPRE | SOUS_RESEAU | AGENCE_PRINCIPALE | VAD | APPORTEUR
+  type         String
   secteurId    String
   localiteId   String
   caution      Float    @default(0)
   soldeActuel  Float    @default(0)
-  statut       Statut   @default(ACTIF)
+  // Statut: ACTIF | INACTIF
+  statut       String   @default("ACTIF")
   createdAt    DateTime @default(now())
 
   secteur       Secteur        @relation(fields: [secteurId], references: [id])
@@ -172,7 +87,8 @@ model Formule {
   nomCommercial String
   prixMateriel  Float
   prixFormule   Float
-  statut        Statut   @default(ACTIF)
+  // Statut: ACTIF | INACTIF
+  statut        String   @default("ACTIF")
 
   abonnes       Abonne[]
   encaissements Encaissement[]
@@ -189,7 +105,8 @@ model Abonne {
   decodeurId   String?
   pdvId        String
   dateEcheance DateTime
-  statut       AbonneStatut @default(ACTIF)
+  // AbonneStatut: ACTIF | ECHU | SUSPENDU | RESILIE
+  statut       String       @default("ACTIF")
   canalReabo   String?
 
   formule       Formule        @relation(fields: [formuleId], references: [id])
@@ -201,8 +118,10 @@ model Abonne {
 model Decodeur {
   id          String         @id @default(cuid())
   numSerie    String         @unique
-  type        DecodeurType
-  statut      DecodeurStatut @default(EN_STOCK_ENTREPOT)
+  // DecodeurType: Z4 | GLOBAZ | G11
+  type        String
+  // DecodeurStatut: EN_STOCK_ENTREPOT | EN_STOCK_PDV | VENDU | IMMOBILISE | DEFECTUEUX
+  statut      String         @default("EN_STOCK_ENTREPOT")
   entrepotId  String?
   pdvId       String?
   dateEntree  DateTime       @default(now())
@@ -217,14 +136,17 @@ model Encaissement {
   abonneId     String
   pdvId        String
   userId       String
-  nature       NatureEncaissement
+  // NatureEncaissement: RECRUTEMENT | REABONNEMENT | MIGRATION
+  nature       String
   formuleId    String
   nbMois       Int
   montantTotal Float
   montantRecu  Float
   monnaie      String             @default("XOF")
-  modePaiement ModePaiement
-  options      Json               @default("{}")
+  // ModePaiement: ESPECE | WAVE | ORANGE_MONEY | CHEQUE | VIREMENT
+  modePaiement String
+  // JSON sérialisé en texte (SQLite ne supporte pas le type Json natif).
+  options      String             @default("{}")
   date         DateTime
   recuNumero   String
   createdAt    DateTime           @default(now())
@@ -239,7 +161,8 @@ model Banque {
   id          String     @id @default(cuid())
   nom         String
   numCompte   String
-  type        BanqueType
+  // BanqueType: BANQUE | MOBILE_MONEY | WAVE
+  type        String
   soldeActuel Float      @default(0)
 }
 
@@ -253,7 +176,8 @@ model Versement {
   libelle       String
   numBordereau  String
   photoBordereau String?
-  statut        VersementStatut @default(ENATTENTE)
+  // VersementStatut: ENATTENTE | VALIDE | REJETE
+  statut        String          @default("ENATTENTE")
   motifRejet    String?
   valideParId   String?
   createdAt     DateTime        @default(now())
@@ -272,7 +196,8 @@ model Retrait {
   libelle       String
   numBordereau  String
   photoBordereau String?
-  statut        VersementStatut @default(ENATTENTE)
+  // VersementStatut: ENATTENTE | VALIDE | REJETE
+  statut        String          @default("ENATTENTE")
   motifRejet    String?
   valideParId   String?
   createdAt     DateTime        @default(now())
@@ -298,7 +223,8 @@ model RapportActivite {
   caCreatG11      Float
   caPayech        Float
   caAccessoires   Float
-  statutMatching  StatutMatching @default(EN_ATTENTE)
+  // StatutMatching: EN_ATTENTE | MATCHE | ECART
+  statutMatching  String         @default("EN_ATTENTE")
   importeParId    String
   importeLe       DateTime
   createdAt       DateTime       @default(now())
@@ -310,23 +236,27 @@ model Entrepot {
   id        String       @id @default(cuid())
   code      String       @unique
   nom       String
-  type      EntrepotType
+  // EntrepotType: PRINCIPAL | SECONDAIRE
+  type      String
   capacite  Int
-  statut    Statut       @default(ACTIF)
+  // Statut: ACTIF | INACTIF
+  statut    String       @default("ACTIF")
 
   decodeurs Decodeur[]
 }
 
 model MouvementStock {
   id              String        @id @default(cuid())
-  type            MouvementType
+  // MouvementType: EN_ENTREPOT_PDV | PDV_PDV | ENTREPOT_ENTREPOT | PDV_ENTREPOT
+  type            String
   materiel        String
   sourceId        String
   destinationId   String
   quantite        Int
   numBonLivraison String
   date            DateTime
-  statut          Statut        @default(ACTIF)
+  // Statut: ACTIF | INACTIF
+  statut          String        @default("ACTIF")
 }
 
 model AuditLog {
@@ -342,7 +272,8 @@ model AuditLog {
 
 model Notification {
   id        String           @id @default(cuid())
-  type      NotificationType
+  // NotificationType: WARN | OK | URGENT
+  type      String
   message   String
   lien      String?
   lu        Boolean          @default(false)
@@ -376,7 +307,8 @@ model Accessoire {
   nom           String
   prixUnitaire  Float
   stockEntrepot Int     @default(0)
-  statut        Statut  @default(ACTIF)
+  // Statut: ACTIF | INACTIF
+  statut        String  @default("ACTIF")
 
   stocksReseau StockAccessoire[]
   ventes       VenteAccessoire[]
@@ -423,7 +355,8 @@ model RetourDefectueux {
 model VenteKit {
   id           String       @id @default(cuid())
   vadPdvId     String
-  decodeurType DecodeurType
+  // DecodeurType: Z4 | GLOBAZ | G11
+  decodeurType String
   clientNom    String
   montant      Float
   date         DateTime     @default(now())

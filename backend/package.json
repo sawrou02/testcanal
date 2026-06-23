@@ -11,11 +11,12 @@
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "test": "jest",
+    "postinstall": "prisma generate",
     "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy",
+    "prisma:push": "prisma db push",
     "prisma:seed": "ts-node prisma/seed.ts",
     "seed:demo": "ts-node prisma/seed.demo.ts",
-    "db:setup": "prisma migrate deploy && ts-node prisma/seed.ts"
+    "db:setup": "prisma db push && ts-node prisma/seed.ts"
   },
   "dependencies": {
     "@nestjs/common": "^10.0.0",
