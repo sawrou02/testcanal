@@ -114,6 +114,73 @@ export interface CreateEncaissementBody {
   modePaiement: string
   options: EncaissementOptions
   montantRecu: number
+  datePaiement?: string
+  numeroContrat?: string
+  dateProchainRdv?: string
+  tel2?: string
+}
+
+// ---- Barèmes de commission ----
+export interface BaremeRow {
+  id: string
+  typeCommission: string
+  libelle: string
+  valeur: number
+  unite: string
+  actif: boolean
+}
+export const listBaremes = async (): Promise<BaremeRow[]> => {
+  const res = await apiClient.get<BaremeRow[]>('/baremes')
+  return Array.isArray(res.data) ? res.data : []
+}
+export const updateBaremes = async (
+  items: { typeCommission: string; valeur: number; unite?: string; actif?: boolean }[],
+): Promise<void> => {
+  await apiClient.patch('/baremes', { items })
+}
+
+// ---- Objectifs Distributeur ----
+export interface ObjDistRow {
+  id: string
+  annee: number
+  trimestre?: number | null
+  mois?: number | null
+  formule: string
+  typeObjectif: string
+  effectif: number
+}
+export const listObjDist = async (): Promise<ObjDistRow[]> => {
+  const res = await apiClient.get<ObjDistRow[]>('/objectifs-distributeur')
+  return Array.isArray(res.data) ? res.data : []
+}
+export const createObjDist = async (b: Omit<ObjDistRow, 'id'>): Promise<ObjDistRow> =>
+  (await apiClient.post('/objectifs-distributeur', b)).data
+export const deleteObjDist = async (id: string): Promise<void> => {
+  await apiClient.delete(`/objectifs-distributeur/${id}`)
+}
+
+// ---- Objectifs PDV ----
+export interface ObjPdvRow {
+  id: string
+  pdvId: string
+  annee: number
+  mois: number
+  typeObjectif: string
+  effectif: number
+  pdv?: { code: string; raisonSociale: string }
+}
+export const listObjPdv = async (): Promise<ObjPdvRow[]> => {
+  const res = await apiClient.get<ObjPdvRow[]>('/objectifs-pdv')
+  return Array.isArray(res.data) ? res.data : []
+}
+export const createObjPdv = async (
+  b: { pdvId: string; annee: number; mois: number; typeObjectif: string; effectif: number },
+): Promise<ObjPdvRow> => (await apiClient.post('/objectifs-pdv', b)).data
+export const importObjPdv = async (
+  items: { pdvId: string; annee: number; mois: number; typeObjectif: string; effectif: number }[],
+): Promise<{ imported: number }> => (await apiClient.post('/objectifs-pdv/import', { items })).data
+export const deleteObjPdv = async (id: string): Promise<void> => {
+  await apiClient.delete(`/objectifs-pdv/${id}`)
 }
 
 export interface Encaissement {

@@ -18,6 +18,7 @@ const NATURES: { value: string; label: string }[] = [
   { value: 'RECRUTEMENT', label: 'Recrutement' },
   { value: 'REABONNEMENT', label: 'Réabonnement' },
   { value: 'MIGRATION', label: 'Migration' },
+  { value: 'IMPAYE', label: 'Impayés' },
 ]
 
 const MODES: { value: string; label: string }[] = [
@@ -63,6 +64,7 @@ export default function EncaissementPage() {
     timbre: false,
   })
   const [montantRecu, setMontantRecu] = useState<number>(0)
+  const [extra, setExtra] = useState({ numeroContrat: '', dateProchainRdv: '', datePaiement: '', tel2: '' })
 
   const [submitting, setSubmitting] = useState(false)
   const [receipt, setReceipt] = useState<Encaissement | null>(null)
@@ -132,6 +134,10 @@ export default function EncaissementPage() {
         modePaiement,
         options,
         montantRecu,
+        ...(extra.numeroContrat ? { numeroContrat: extra.numeroContrat } : {}),
+        ...(extra.dateProchainRdv ? { dateProchainRdv: extra.dateProchainRdv } : {}),
+        ...(extra.datePaiement ? { datePaiement: extra.datePaiement } : {}),
+        ...(extra.tel2 ? { tel2: extra.tel2 } : {}),
       })
       setReceipt(created)
       setReceiptOpen(true)
@@ -201,6 +207,8 @@ export default function EncaissementPage() {
           setModePaiement={setModePaiement}
           options={options}
           toggleOption={toggleOption}
+          extra={extra}
+          setExtra={setExtra}
           selectedFormule={selectedFormule}
           base={base}
           montantTotal={montantTotal}
@@ -284,7 +292,7 @@ function SearchBlock({
           onKeyDown={(e) => {
             if (e.key === 'Enter') onSearch()
           }}
-          placeholder="N° abonné, nom, téléphone..."
+          placeholder="N° abonné, nom, téléphone, n° décodeur..."
           className="flex-1 border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         <Button variant="primary" size={compact ? 'sm' : 'md'} loading={searching} onClick={onSearch}>
@@ -510,6 +518,8 @@ interface BureauViewProps {
   setModePaiement: (v: string) => void
   options: OptionsState
   toggleOption: (key: keyof OptionsState) => void
+  extra: { numeroContrat: string; dateProchainRdv: string; datePaiement: string; tel2: string }
+  setExtra: React.Dispatch<React.SetStateAction<{ numeroContrat: string; dateProchainRdv: string; datePaiement: string; tel2: string }>>
   selectedFormule: Formule | null
   base: number
   montantTotal: number
@@ -521,6 +531,8 @@ interface BureauViewProps {
 }
 
 function BureauView(p: BureauViewProps) {
+  const setX = (k: keyof BureauViewProps['extra'], v: string) =>
+    p.setExtra((prev) => ({ ...prev, [k]: v }))
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 items-start">
       {/* LEFT (2 cols) */}
@@ -591,6 +603,33 @@ function BureauView(p: BureauViewProps) {
             <div>
               <FieldLabel>Options</FieldLabel>
               <OptionsChips options={p.options} toggleOption={p.toggleOption} />
+            </div>
+
+            {/* Informations complémentaires (facultatives) */}
+            <div className="border-t border-app-border pt-4">
+              <FieldLabel>Informations complémentaires (facultatif)</FieldLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
+                <div>
+                  <label className="text-xs text-app-muted">Numéro de contrat</label>
+                  <input value={p.extra.numeroContrat} onChange={(e) => setX('numeroContrat', e.target.value)}
+                    className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div>
+                  <label className="text-xs text-app-muted">Téléphone 2</label>
+                  <input value={p.extra.tel2} onChange={(e) => setX('tel2', e.target.value)} maxLength={10}
+                    className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div>
+                  <label className="text-xs text-app-muted">Date du prochain RDV</label>
+                  <input type="date" value={p.extra.dateProchainRdv} onChange={(e) => setX('dateProchainRdv', e.target.value)}
+                    className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+                <div>
+                  <label className="text-xs text-app-muted">Date de paiement</label>
+                  <input type="date" value={p.extra.datePaiement} onChange={(e) => setX('datePaiement', e.target.value)}
+                    className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                </div>
+              </div>
             </div>
           </div>
         </Card>

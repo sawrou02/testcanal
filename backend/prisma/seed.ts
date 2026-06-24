@@ -115,7 +115,23 @@ async function main() {
     await prisma.entrepot.upsert({ where: { id: e.id }, update: { code: e.code, nom: e.nom, type: e.type, capacite: e.capacite }, create: e });
   }
 
+  // ---------- Barèmes de commission (éditables ensuite par l'admin) ----------
+  const baremes = [
+    { typeCommission: 'comm_materielle', libelle: 'Commission matériel (par abonné)', valeur: 3500, unite: 'F' },
+    { typeCommission: 'comm_formule_abo', libelle: 'Commission formule recrutement (% CA HT)', valeur: 10, unite: '%' },
+    { typeCommission: 'comm_reabo', libelle: 'Commission réabonnement (% CA HT)', valeur: 10, unite: '%' },
+    { typeCommission: 'comm_g11', libelle: 'Commission recrut./migration G11 (par abonné)', valeur: 8475, unite: 'F' },
+  ];
+  for (const b of baremes) {
+    await prisma.parametreCommission.upsert({
+      where: { typeCommission: b.typeCommission },
+      update: { libelle: b.libelle, valeur: b.valeur, unite: b.unite },
+      create: b,
+    });
+  }
+
   console.log(`✔ ${users.length} comptes`);
+  console.log(`✔ ${baremes.length} barèmes de commission`);
   console.log(`✔ ${secteurs.length} secteurs · ${localites.length} localités · ${formules.length} formules · ${banques.length} banques · ${entrepots.length} entrepôts`);
   console.log('✔ Aucune donnée métier (PDV, abonnés, encaissements… vides).');
   console.log('  Connexion : <role>@sendistri.sn · mot de passe : Demo123!');

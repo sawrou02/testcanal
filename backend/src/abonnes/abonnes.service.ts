@@ -29,6 +29,8 @@ export class AbonnesService {
         { nom: { contains: q } },
         { prenom: { contains: q } },
         { tel1: { contains: q } },
+        { tel2: { contains: q } },
+        { decodeur: { numSerie: { contains: q } } },
       ];
     }
 

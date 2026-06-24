@@ -42,15 +42,21 @@ export class EncaissementsService {
       where: { id: dto.formuleId },
     });
 
+    const isImpaye = dto.nature === 'IMPAYE';
     const options = dto.options || {};
-    const { montantTotal, monnaieRendue } = computeEncaissement(
+    let { montantTotal, monnaieRendue } = computeEncaissement(
       formule.prixFormule,
       dto.nbMois,
       options,
       dto.montantRecu,
     );
 
-    if (monnaieRendue < 0) {
+    // Un IMPAYÉ est un règlement partiel/arriéré : le montant enregistré est
+    // simplement la somme reçue, sans exiger le prix complet de la formule.
+    if (isImpaye) {
+      montantTotal = dto.montantRecu;
+      monnaieRendue = 0;
+    } else if (monnaieRendue < 0) {
       throw new BadRequestException('Montant reçu insuffisant');
     }
 
@@ -60,37 +66,37 @@ export class EncaissementsService {
     });
 
     const now = new Date();
-    const dd = String(now.getDate()).padStart(2, '0');
-    const mm = String(now.getMonth() + 1).padStart(2, '0');
+    // Date de l'opération : saisie manuelle si fournie, sinon date système.
+    const opDate = dto.datePaiement ? new Date(dto.datePaiement) : now;
+    const dd = String(opDate.getDate()).padStart(2, '0');
+    const mm = String(opDate.getMonth() + 1).padStart(2, '0');
     const ref = abonne?.numAbonne || dto.abonneId.slice(0, 6);
     const unique = Date.now().toString(36).slice(-4).toUpperCase();
     const recuNumero = `RC-${ref}-${dd}${mm}-${unique}`;
 
     // ----- Réabonnement intelligent (Niveau 1) -----
-    // On prolonge l'échéance à partir de la date la plus tardive entre
-    // aujourd'hui et l'échéance actuelle (un client encore actif ne perd pas
-    // les jours restants ; un client échu repart d'aujourd'hui).
+    // Un IMPAYÉ enregistre une dette : il ne prolonge PAS l'abonnement et ne
+    // réactive PAS l'abonné. Les autres natures prolongent l'échéance.
     const baseEcheance =
-      abonne && abonne.dateEcheance > now ? new Date(abonne.dateEcheance) : new Date(now);
-    const nouvelleEcheance = addMonths(baseEcheance, dto.nbMois);
+      abonne && abonne.dateEcheance > opDate ? new Date(abonne.dateEcheance) : new Date(opDate);
+    const nouvelleEcheance = isImpaye
+      ? abonne?.dateEcheance ?? opDate
+      : addMonths(baseEcheance, dto.nbMois);
 
-    // Mise à jour de l'abonné : nouvelle échéance + réactivation. Le canal de
-    // réabonnement n'est renseigné que pour un vrai réabonnement.
-    const abonneUpdate: {
-      dateEcheance: Date;
-      statut: string;
-      canalReabo?: string;
-    } = {
-      dateEcheance: nouvelleEcheance,
-      statut: 'ACTIF',
-    };
-    if (dto.nature === 'REABONNEMENT') {
-      abonneUpdate.canalReabo = dto.modePaiement;
+    // Champs additionnels de l'abonné (toujours mis à jour si fournis).
+    const abonneUpdate: Record<string, unknown> = {};
+    if (!isImpaye) {
+      abonneUpdate.dateEcheance = nouvelleEcheance;
+      abonneUpdate.statut = 'ACTIF';
+      if (dto.nature === 'REABONNEMENT') abonneUpdate.canalReabo = dto.modePaiement;
     }
+    if (dto.numeroContrat !== undefined) abonneUpdate.numeroContrat = dto.numeroContrat || null;
+    if (dto.dateProchainRdv) abonneUpdate.dateProchainRdv = new Date(dto.dateProchainRdv);
+    if (dto.tel2 !== undefined) abonneUpdate.tel2 = dto.tel2 || null;
 
     // Tout est écrit en une seule transaction : soit tout réussit, soit rien
     // (pas d'encaissement enregistré sans mise à jour de l'abonné et du PDV).
-    const [record] = await this.prisma.$transaction([
+    const ops: any[] = [
       this.prisma.encaissement.create({
         data: {
           abonneId: dto.abonneId,
@@ -103,7 +109,7 @@ export class EncaissementsService {
           montantRecu: dto.montantRecu,
           modePaiement: dto.modePaiement as any,
           options: JSON.stringify(options),
-          date: now,
+          date: opDate,
           recuNumero,
         },
         include: ENCAISSEMENT_INCLUDE,
@@ -112,11 +118,17 @@ export class EncaissementsService {
         where: { id: dto.pdvId },
         data: { soldeActuel: { increment: montantTotal } },
       }),
-      this.prisma.abonne.update({
-        where: { id: dto.abonneId },
-        data: abonneUpdate as any,
-      }),
-    ]);
+    ];
+    // On ne touche à l'abonné que s'il y a quelque chose à mettre à jour.
+    if (Object.keys(abonneUpdate).length > 0) {
+      ops.push(
+        this.prisma.abonne.update({
+          where: { id: dto.abonneId },
+          data: abonneUpdate as any,
+        }),
+      );
+    }
+    const [record] = await this.prisma.$transaction(ops);
 
     return { ...parseOptions(record), monnaieRendue, nouvelleEcheance };
   }

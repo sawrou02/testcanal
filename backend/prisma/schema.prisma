@@ -72,6 +72,7 @@ model PDV {
   retraits      Retrait[]
   decodeurs     Decodeur[]
   objectifs        Objectif[]
+  objectifsPdv     ObjectifPdv[]
   stocksAccessoire StockAccessoire[]
   ventesAccessoire VenteAccessoire[]
   retoursAccessoire RetourDefectueux[]
@@ -108,6 +109,8 @@ model Abonne {
   // AbonneStatut: ACTIF | ECHU | SUSPENDU | RESILIE
   statut       String       @default("ACTIF")
   canalReabo   String?
+  numeroContrat   String?
+  dateProchainRdv DateTime?
 
   formule       Formule        @relation(fields: [formuleId], references: [id])
   pdv           PDV            @relation(fields: [pdvId], references: [id])
@@ -136,7 +139,7 @@ model Encaissement {
   abonneId     String
   pdvId        String
   userId       String
-  // NatureEncaissement: RECRUTEMENT | REABONNEMENT | MIGRATION
+  // NatureEncaissement: RECRUTEMENT | REABONNEMENT | MIGRATION | IMPAYE
   nature       String
   formuleId    String
   nbMois       Int
@@ -396,6 +399,49 @@ model Installation {
   statut          String    @default("DEMANDEE")
 
   pdv PDV @relation(fields: [pdvId], references: [id])
+}
+
+/// Barèmes de commission, ÉDITABLES par l'admin (lus depuis la BDD, jamais en
+/// dur). unite = "F" (montant fixe par abonné) ou "%" (pourcentage du CA HT).
+model ParametreCommission {
+  id              String   @id @default(cuid())
+  typeCommission  String   @unique
+  libelle         String   @default("")
+  valeur          Float
+  unite           String   @default("F")
+  actif           Boolean  @default(true)
+  updatedAt       DateTime @updatedAt
+}
+
+/// Objectifs globaux du distributeur (par an / trimestre / mois éventuel).
+model ObjectifDistributeur {
+  id           String   @id @default(cuid())
+  annee        Int
+  trimestre    Int?
+  mois         Int?
+  formule      String   @default("TOUTES")
+  // typeObjectif: RECRUTEMENT | REABONNEMENT
+  typeObjectif String
+  effectif     Int
+  createdById  String?
+  createdAt    DateTime @default(now())
+}
+
+/// Objectifs par point de vente (par an / mois).
+model ObjectifPdv {
+  id           String   @id @default(cuid())
+  pdvId        String
+  annee        Int
+  mois         Int
+  // typeObjectif: RECRUTEMENT | REABONNEMENT
+  typeObjectif String
+  effectif     Int
+  createdById  String?
+  createdAt    DateTime @default(now())
+
+  pdv PDV @relation(fields: [pdvId], references: [id])
+
+  @@unique([pdvId, annee, mois, typeObjectif])
 }
 
 model RetourRpe {

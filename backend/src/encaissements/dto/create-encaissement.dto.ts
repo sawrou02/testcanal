@@ -34,4 +34,25 @@ export class CreateEncaissementDto {
   @IsOptional()
   @IsObject()
   options?: { premium?: boolean; intl?: boolean; timbre?: boolean };
+
+  // ----- Champs additionnels (Lot Encaissement) -----
+  /** Date de paiement saisie manuellement (sinon = date système). */
+  @IsOptional()
+  @IsString()
+  datePaiement?: string;
+
+  /** Numéro de contrat de l'abonné. */
+  @IsOptional()
+  @IsString()
+  numeroContrat?: string;
+
+  /** Date du prochain rendez-vous. */
+  @IsOptional()
+  @IsString()
+  dateProchainRdv?: string;
+
+  /** Deuxième numéro de téléphone de l'abonné. */
+  @IsOptional()
+  @IsString()
+  tel2?: string;
 }

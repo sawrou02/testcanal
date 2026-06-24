@@ -11,6 +11,9 @@ import EntrepotsPage from '../pages/parametrage/EntrepotsPage'
 import PdvListePage from '../pages/parametrage/PdvListePage'
 import VadeursPage from '../pages/parametrage/VadeursPage'
 import ComptesPdvPage from '../pages/parametrage/ComptesPdvPage'
+import BaremesPage from '../pages/parametrage/BaremesPage'
+import ObjectifsDistributeurPage from '../pages/parametrage/ObjectifsDistributeurPage'
+import ObjectifsPdvPage from '../pages/parametrage/ObjectifsPdvPage'
 import EncaissementPage from '../pages/operations/EncaissementPage'
 import SuiviSoldePage from '../pages/operations/SuiviSoldePage'
 import RapportActivitePage from '../pages/operations/RapportActivitePage'
@@ -83,6 +86,9 @@ export const router = createBrowserRouter([
       { path: 'app/pdv-liste', element: <PdvListePage /> },
       { path: 'app/vadeurs', element: <VadeursPage /> },
       { path: 'app/pdv-comptes', element: <ComptesPdvPage /> },
+      { path: 'app/baremes', element: <BaremesPage /> },
+      { path: 'app/objectifs-distributeur', element: <ObjectifsDistributeurPage /> },
+      { path: 'app/objectifs-pdv', element: <ObjectifsPdvPage /> },
       { path: 'app/encaissement', element: <EncaissementPage /> },
       { path: 'app/suivi-solde', element: <SuiviSoldePage /> },
       { path: 'app/rapport-activite', element: <RapportActivitePage /> },

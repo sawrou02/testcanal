@@ -15,6 +15,9 @@ export const NAV_SECTIONS: NavSection[] = [
     icon: 'sliders',
     items: [
       { id: 'formules', label: 'Formules' },
+      { id: 'baremes', label: 'Barèmes commissions' },
+      { id: 'objectifs-distributeur', label: 'Objectifs Distributeur' },
+      { id: 'objectifs-pdv', label: 'Objectifs PDV' },
       { id: 'entrepot', label: 'Entrepôts' },
       { id: 'periodes', label: 'Périodes' },
       { id: 'comptes-dist', label: 'Comptes Distributeur' },

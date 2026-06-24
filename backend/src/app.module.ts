@@ -29,6 +29,9 @@ import { InstallationsModule } from './installations/installations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { SearchModule } from './search/search.module';
 import { RetourRpeModule } from './retour-rpe/retour-rpe.module';
+import { BaremesModule } from './baremes/baremes.module';
+import { ObjectifsDistributeurModule } from './objectifs-distributeur/objectifs-distributeur.module';
+import { ObjectifsPdvModule } from './objectifs-pdv/objectifs-pdv.module';
 
 @Module({
   imports: [
@@ -61,6 +64,9 @@ import { RetourRpeModule } from './retour-rpe/retour-rpe.module';
     NotificationsModule,
     SearchModule,
     RetourRpeModule,
+    BaremesModule,
+    ObjectifsDistributeurModule,
+    ObjectifsPdvModule,
   ],
   providers: [
     {
