@@ -1,9 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
+import { BaremesService } from '../baremes/baremes.service';
 
 @Injectable()
 export class DashboardService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private baremes: BaremesService,
+  ) {}
 
   async getStats() {
     const now = new Date();
@@ -139,6 +143,28 @@ export class DashboardService {
   }
 
   /** Cartes de synthèse (style OGECPRO) : Recouvrement / Vente / Réabonnement / Logistique. */
+  /**
+   * Résout l'objectif (effectif) pour un type donné sur la période courante,
+   * du plus précis au plus large : mois > trimestre > annuel. Retourne 0 si
+   * aucun objectif n'est saisi (jamais de valeur inventée).
+   */
+  private resolveObjectif(
+    objs: { annee: number; trimestre: number | null; mois: number | null; typeObjectif: string; effectif: number }[],
+    type: string,
+    year: number,
+    month1: number,
+  ): number {
+    const trimestre = Math.floor((month1 - 1) / 3) + 1;
+    const t = objs.filter((o) => o.typeObjectif === type && o.annee === year);
+    const sum = (rows: typeof t) => rows.reduce((s, o) => s + o.effectif, 0);
+    const monthly = t.filter((o) => o.mois === month1);
+    if (monthly.length) return sum(monthly);
+    const quarterly = t.filter((o) => o.mois == null && o.trimestre === trimestre);
+    if (quarterly.length) return sum(quarterly);
+    const annual = t.filter((o) => o.mois == null && o.trimestre == null);
+    return sum(annual);
+  }
+
   async getSynthese() {
     const now = new Date();
     const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -147,7 +173,7 @@ export class DashboardService {
 
     const [
       creditAgg, nbRecru, caRecruAgg, nbReabo, caReaboAgg, nbMigration,
-      parcActif, echus, decsByTypeStatut,
+      parcActif, echus, decsByTypeStatut, bareme, objs,
     ] = await Promise.all([
       this.prisma.credit.aggregate({ _sum: { plafond: true, avoir: true, dette: true } }),
       this.prisma.encaissement.count({ where: { nature: 'RECRUTEMENT' as any, date: period } }),
@@ -158,6 +184,8 @@ export class DashboardService {
       this.prisma.abonne.count({ where: { statut: 'ACTIF' as any } }),
       this.prisma.abonne.count({ where: { statut: 'ECHU' as any } }),
       this.prisma.decodeur.groupBy({ by: ['type', 'statut'], _count: { _all: true } }),
+      this.baremes.getMap(),
+      this.prisma.objectifDistributeur.findMany(),
     ]);
 
     const dec = (type: string, statut: string) =>
@@ -166,17 +194,38 @@ export class DashboardService {
     const caRecru = caRecruAgg._sum.montantTotal || 0;
     const caReabo = caReaboAgg._sum.montantTotal || 0;
 
+    // ----- Objectifs (R/O, reste, atterrissage) -----
+    const year = now.getFullYear();
+    const month1 = now.getMonth() + 1;
+    const objRecru = this.resolveObjectif(objs as any, 'RECRUTEMENT', year, month1);
+    const objReabo = this.resolveObjectif(objs as any, 'REABONNEMENT', year, month1);
+    // Atterrissage = projection linéaire de fin de mois (run-rate). Ce n'est pas
+    // une donnée inventée : c'est le réalisé rapporté au rythme du mois.
+    const dayOfMonth = now.getDate();
+    const daysInMonth = new Date(year, month1, 0).getDate();
+    const elapsed = Math.max(dayOfMonth / daysInMonth, 1 / daysInMonth);
+    const ro = (real: number, obj: number) => (obj > 0 ? Math.round((real / obj) * 100) : 0);
+    const reste = (real: number, obj: number) => Math.max(obj - real, 0);
+    const atterr = (real: number, obj: number) =>
+      obj > 0 ? Math.round((real / elapsed / obj) * 100) : 0;
+
     return {
       recouvrement: {
         creditRestant: (creditAgg._sum.plafond || 0) + (creditAgg._sum.avoir || 0) - (creditAgg._sum.dette || 0),
         avoir: creditAgg._sum.avoir || 0,
         encours: creditAgg._sum.dette || 0,
-        commMateriel: nbRecru * 3500,
-        commFormule: Math.round(caRecru * 0.1),
-        commReabo: Math.round(caReabo * 0.1),
+        commMateriel: Math.round(nbRecru * (bareme.comm_materielle || 0)),
+        commFormule: Math.round(caRecru * ((bareme.comm_formule_abo || 0) / 100)),
+        commReabo: Math.round(caReabo * ((bareme.comm_reabo || 0) / 100)),
       },
-      vente: { nbAbo: nbRecru, caRecru, nbMigration, rapport: now.toISOString().slice(0, 10) },
-      reabo: { parcActif, nbReabo, caReabo, echus },
+      vente: {
+        nbAbo: nbRecru, caRecru, nbMigration, rapport: now.toISOString().slice(0, 10),
+        objectif: objRecru, ro: ro(nbRecru, objRecru), reste: reste(nbRecru, objRecru), atterrissage: atterr(nbRecru, objRecru),
+      },
+      reabo: {
+        parcActif, nbReabo, caReabo, echus,
+        objectif: objReabo, ro: ro(nbReabo, objReabo), reste: reste(nbReabo, objReabo), atterrissage: atterr(nbReabo, objReabo),
+      },
       logistique: {
         z4Stock: dec('Z4', 'EN_STOCK_ENTREPOT'),
         z4Reseau: dec('Z4', 'EN_STOCK_PDV'),

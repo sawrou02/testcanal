@@ -1240,8 +1240,8 @@ export const searchGlobal = async (q: string): Promise<SearchResults> => {
 // ---------- Synthèse tableau de bord ----------
 export interface SyntheseData {
   recouvrement: { creditRestant: number; avoir: number; encours: number; commMateriel: number; commFormule: number; commReabo: number }
-  vente: { nbAbo: number; caRecru: number; nbMigration: number; rapport: string }
-  reabo: { parcActif: number; nbReabo: number; caReabo: number; echus: number }
+  vente: { nbAbo: number; caRecru: number; nbMigration: number; rapport: string; objectif: number; ro: number; reste: number; atterrissage: number }
+  reabo: { parcActif: number; nbReabo: number; caReabo: number; echus: number; objectif: number; ro: number; reste: number; atterrissage: number }
   logistique: { z4Stock: number; z4Reseau: number; z4Defectueux: number; globazStock: number; globazReseau: number; g11Stock: number; g11Reseau: number }
 }
 export const getSynthese = async (): Promise<SyntheseData> => {

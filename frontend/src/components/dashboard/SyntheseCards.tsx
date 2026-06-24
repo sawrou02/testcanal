@@ -8,19 +8,24 @@ interface Block {
   icon: string
   header: string // bg tint
   iconColor: string
-  lines: { label: string; value: string; sub?: string }[]
+  lines: { label: string; value: string; sub?: string; valueColor?: string }[]
 }
 
-function Line({ label, value, sub }: { label: string; value: string; sub?: string }) {
+function Line({ label, value, sub, valueColor }: { label: string; value: string; sub?: string; valueColor?: string }) {
   return (
     <div className="flex items-start justify-between gap-3 px-4 py-2.5 border-b border-app-border last:border-0" style={{ borderColor: 'var(--border)' }}>
       <div className="min-w-0">
         <div className="text-sm text-app-text" style={{ color: 'var(--text)' }}>{label}</div>
         {sub && <div className="text-[11px] text-app-subtle" style={{ color: 'var(--text-muted)' }}>{sub}</div>}
       </div>
-      <div className="text-sm font-bold font-mono shrink-0" style={{ color: 'var(--text)', fontFamily: 'IBM Plex Mono, monospace' }}>{value}</div>
+      <div className="text-sm font-bold font-mono shrink-0" style={{ color: valueColor || 'var(--text)', fontFamily: 'IBM Plex Mono, monospace' }}>{value}</div>
     </div>
   )
+}
+
+/** Couleur selon le taux d'atteinte (R/O ou atterrissage). */
+function pctColor(p: number): string {
+  return p >= 75 ? 'var(--primary)' : p >= 40 ? 'var(--gold-dark)' : 'var(--danger)'
 }
 
 export function SyntheseCards() {
@@ -48,18 +53,21 @@ export function SyntheseCards() {
         { label: 'Crédit restant', value: formatFCFA(data.recouvrement.creditRestant) },
         { label: 'Avoir', value: formatFCFA(data.recouvrement.avoir) },
         { label: 'Encours', value: formatFCFA(data.recouvrement.encours) },
-        { label: 'Comm. matériel', sub: '3 500 F / abo', value: formatFCFA(data.recouvrement.commMateriel) },
-        { label: 'Comm. formule', sub: '10 % CA HT', value: formatFCFA(data.recouvrement.commFormule) },
-        { label: 'Comm. réabo', sub: '10 % CA HT', value: formatFCFA(data.recouvrement.commReabo) },
+        { label: 'Comm. matériel', sub: 'par abonné', value: formatFCFA(data.recouvrement.commMateriel) },
+        { label: 'Comm. formule', sub: '% CA HT', value: formatFCFA(data.recouvrement.commFormule) },
+        { label: 'Comm. réabo', sub: '% CA HT', value: formatFCFA(data.recouvrement.commReabo) },
       ],
     },
     {
       title: 'Vente', icon: 'trend', header: 'rgba(14,138,79,0.10)', iconColor: '#0E8A4F',
       lines: [
         { label: 'NB ABO (recrutements)', value: String(data.vente.nbAbo) },
+        { label: 'Objectif', value: data.vente.objectif > 0 ? String(data.vente.objectif) : '—' },
+        { label: 'R / O', value: data.vente.objectif > 0 ? `${data.vente.ro} %` : '—', valueColor: data.vente.objectif > 0 ? pctColor(data.vente.ro) : undefined },
+        { label: 'Reste à réaliser', value: data.vente.objectif > 0 ? String(data.vente.reste) : '—' },
+        { label: 'Atterrissage', sub: 'projection fin de mois', value: data.vente.objectif > 0 ? `${data.vente.atterrissage} %` : '—', valueColor: data.vente.objectif > 0 ? pctColor(data.vente.atterrissage) : undefined },
         { label: 'CA recrutement', value: formatFCFA(data.vente.caRecru) },
         { label: 'NB migrations', value: String(data.vente.nbMigration) },
-        { label: "Rapport d'activité", value: data.vente.rapport },
       ],
     },
     {
@@ -67,6 +75,9 @@ export function SyntheseCards() {
       lines: [
         { label: 'Parc actif', value: String(data.reabo.parcActif) },
         { label: 'NB réabo (mois)', value: String(data.reabo.nbReabo) },
+        { label: 'Objectif', value: data.reabo.objectif > 0 ? String(data.reabo.objectif) : '—' },
+        { label: 'R / O', value: data.reabo.objectif > 0 ? `${data.reabo.ro} %` : '—', valueColor: data.reabo.objectif > 0 ? pctColor(data.reabo.ro) : undefined },
+        { label: 'Reste à réaliser', value: data.reabo.objectif > 0 ? String(data.reabo.reste) : '—' },
         { label: 'CA réabo', value: formatFCFA(data.reabo.caReabo) },
         { label: 'Abonnés échus', value: String(data.reabo.echus) },
       ],
