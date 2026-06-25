@@ -1,6 +1,7 @@
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { AlertBanners } from './AlertBanners'
+import { HelpAssistant } from '../help/HelpAssistant'
 import { useLocation } from 'react-router-dom'
 import { ToastProvider } from '../ui/Toast'
 
@@ -40,6 +41,7 @@ export function AppLayout({ children }: AppLayoutProps) {
             </div>
           </main>
         </div>
+        <HelpAssistant />
       </div>
     </ToastProvider>
   )
