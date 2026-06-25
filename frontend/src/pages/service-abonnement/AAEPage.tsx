@@ -13,6 +13,7 @@ import {
 } from '../../lib/api'
 import { Card, PageHeader, fullName, asRows, type Row } from './shared'
 import { useSmsRelance } from './useSmsRelance'
+import { WhatsAppButton, exportNumbers } from './relanceActions'
 
 export default function AAEPage() {
   const toast = useToast()
@@ -94,15 +95,24 @@ export default function AAEPage() {
           <h3 className="text-base font-bold text-app-text" style={{ color: 'var(--text)' }}>
             Abonnés à échéance (30 jours)
           </h3>
-          {canSendSms && (
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
-              onClick={() => void sendSms(rows)}
-              loading={sending}
+              variant="secondary"
+              onClick={() => exportNumbers(rows, 'Numéros — Abonnés à échéance')}
               disabled={rows.length === 0}
             >
-              Envoyer rappel SMS à tous ({rows.length})
+              Exporter les numéros
             </Button>
-          )}
+            {canSendSms && (
+              <Button
+                onClick={() => void sendSms(rows)}
+                loading={sending}
+                disabled={rows.length === 0}
+              >
+                Rappel SMS à tous ({rows.length})
+              </Button>
+            )}
+          </div>
         </div>
         <DataTable<Row>
           loading={loadingList}
@@ -126,6 +136,11 @@ export default function AAEPage() {
               key: 'pdv',
               label: 'PDV',
               render: (_v, row) => (row as unknown as AbonneRow).pdv?.raisonSociale ?? '-',
+            },
+            {
+              key: '__wa',
+              label: 'WhatsApp',
+              render: (_v, row) => <WhatsAppButton abonne={row as unknown as AbonneRow} />,
             },
           ]}
         />

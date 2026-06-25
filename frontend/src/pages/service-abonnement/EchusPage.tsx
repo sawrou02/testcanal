@@ -6,6 +6,7 @@ import { formatDate } from '../../lib/utils'
 import { listEchus, type AbonneRow } from '../../lib/api'
 import { Card, PageHeader, statutBadge, fullName, asRows, type Row } from './shared'
 import { useSmsRelance } from './useSmsRelance'
+import { WhatsAppButton, exportNumbers } from './relanceActions'
 
 export default function EchusPage() {
   const toast = useToast()
@@ -43,15 +44,24 @@ export default function EchusPage() {
           <h3 className="text-base font-bold text-app-text" style={{ color: 'var(--text)' }}>
             Abonnés échus
           </h3>
-          {canSendSms && (
+          <div className="flex items-center gap-2 flex-wrap">
             <Button
-              onClick={() => void sendSms(rows)}
-              loading={sending}
+              variant="secondary"
+              onClick={() => exportNumbers(rows, 'Numéros — Abonnés échus')}
               disabled={rows.length === 0}
             >
-              Relancer par SMS ({rows.length})
+              Exporter les numéros
             </Button>
-          )}
+            {canSendSms && (
+              <Button
+                onClick={() => void sendSms(rows)}
+                loading={sending}
+                disabled={rows.length === 0}
+              >
+                Relancer par SMS ({rows.length})
+              </Button>
+            )}
+          </div>
         </div>
         <DataTable<Row>
           loading={loading}
@@ -80,6 +90,11 @@ export default function EchusPage() {
               key: 'statut',
               label: 'Statut',
               render: (_v, row) => statutBadge((row as unknown as AbonneRow).statut),
+            },
+            {
+              key: '__wa',
+              label: 'WhatsApp',
+              render: (_v, row) => <WhatsAppButton abonne={row as unknown as AbonneRow} />,
             },
           ]}
         />
