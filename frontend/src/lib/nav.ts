@@ -215,6 +215,29 @@ export function visibleSections(role?: Role): NavSection[] {
   })
 }
 
+/** pageId -> sectionId (construit une seule fois depuis NAV_SECTIONS). */
+const PAGE_SECTION: Record<string, string> = (() => {
+  const m: Record<string, string> = {}
+  for (const s of NAV_SECTIONS) for (const it of s.items) m[it.id] = s.id
+  return m
+})()
+
+/**
+ * Autorisation d'accès à une page selon le rôle — SOURCE UNIQUE de vérité,
+ * utilisée à la fois pour verrouiller les routes et filtrer l'assistant.
+ * - le tableau de bord est toujours accessible
+ * - une page rattachée à une section suit les droits de cette section
+ * - une page non rattachée (générique) n'est pas restreinte
+ */
+export function canAccessPage(role: Role | undefined, pageId: string): boolean {
+  if (!pageId || pageId === 'dashboard' || pageId === 'app') return true
+  const sectionId = PAGE_SECTION[pageId]
+  if (!sectionId) return true
+  if (!role) return true
+  const allowed = SECTION_ROLES[sectionId]
+  return allowed === 'ALL' || (allowed?.includes(role) ?? false)
+}
+
 /** Liste à plat des pages navigables (pour la palette de commande). */
 export interface NavPage { id: string; label: string; section: string; path: string }
 export function navPages(role?: Role): NavPage[] {

@@ -28,7 +28,8 @@ export class ObjectifsPdvController {
   constructor(private svc: ObjectifsPdvService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...MUT)
   findAll(@Query('annee') annee?: string, @Query('mois') mois?: string) {
     return this.svc.findAll(annee ? Number(annee) : undefined, mois ? Number(mois) : undefined);
   }

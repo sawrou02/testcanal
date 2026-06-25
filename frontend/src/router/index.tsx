@@ -1,5 +1,6 @@
-import { createBrowserRouter, Navigate, Outlet } from 'react-router-dom'
+import { createBrowserRouter, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useAuthStore } from '../store/authStore'
+import { canAccessPage } from '../lib/nav'
 import { AppLayout } from '../components/layout/AppLayout'
 import LoginPage from '../pages/LoginPage'
 import DashboardPage from '../pages/DashboardPage'
@@ -57,14 +58,35 @@ import ReaboMomoPage from '../pages/analytique/ReaboMomoPage'
 import BddGlobalePage from '../pages/analytique/BddGlobalePage'
 import RetourRpePage from '../pages/commercial/RetourRpePage'
 
+function AccessDenied() {
+  return (
+    <div className="flex flex-col items-center justify-center text-center py-24 gap-3">
+      <div className="text-5xl">🔒</div>
+      <h2 className="text-xl font-black" style={{ color: 'var(--text)' }}>Accès refusé</h2>
+      <p className="text-sm max-w-md" style={{ color: 'var(--text-muted)' }}>
+        Votre profil n’a pas la permission d’accéder à cette page. Contactez votre administrateur si besoin.
+      </p>
+      <a href="/" className="mt-2 px-4 py-2 rounded-lg text-white text-sm font-semibold" style={{ background: 'var(--primary)' }}>
+        Retour au tableau de bord
+      </a>
+    </div>
+  )
+}
+
 function ProtectedRoute() {
   const isAuthenticated = useAuthStore((s) => s.isAuthenticated)
+  const role = useAuthStore((s) => s.user?.role)
+  const location = useLocation()
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />
   }
+  // Verrouillage par rôle : peu importe comment on arrive (menu, lien, URL tapée).
+  const parts = location.pathname.split('/').filter(Boolean)
+  const pageId = parts[0] === 'app' ? parts[1] || '' : 'dashboard'
+  const allowed = canAccessPage(role, pageId)
   return (
     <AppLayout>
-      <Outlet />
+      {allowed ? <Outlet /> : <AccessDenied />}
     </AppLayout>
   )
 }

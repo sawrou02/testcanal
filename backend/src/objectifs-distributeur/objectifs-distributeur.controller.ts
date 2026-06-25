@@ -24,7 +24,8 @@ export class ObjectifsDistributeurController {
   constructor(private svc: ObjectifsDistributeurService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(...MUT)
   findAll(@Query('annee') annee?: string, @Query('type') type?: string) {
     return this.svc.findAll(annee ? Number(annee) : undefined, type);
   }

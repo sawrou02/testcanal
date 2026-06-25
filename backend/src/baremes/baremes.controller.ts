@@ -23,7 +23,8 @@ export class BaremesController {
   constructor(private svc: BaremesService) {}
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(Role.SUPER_ADMIN, Role.ADMIN, Role.MANAGER)
   findAll() {
     return this.svc.findAll();
   }

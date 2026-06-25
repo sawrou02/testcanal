@@ -1,23 +1,20 @@
 import { useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useAuthStore } from '../../store/authStore'
+import { canAccessPage } from '../../lib/nav'
 import { HELP_KB, CATEGORIES, type HelpEntry } from './helpKB'
 
 /**
  * Assistant "mode d'emploi" — 100% HORS LIGNE.
  * Base de connaissances locale (helpKB) + recherche par mots-clés insensible
- * aux accents, avec correspondance par préfixe. Aucune connexion ni clé API.
+ * aux accents. Filtré par RÔLE : un utilisateur ne voit que les sujets dont
+ * la page lui est autorisée (même source de vérité que le menu et les routes).
  */
 
 const norm = (s: string) =>
   s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 
-const INDEXED = HELP_KB.map((e) => ({
-  e,
-  tokens: norm(e.q + ' ' + e.keywords).split(/\s+/).filter((t) => t.length >= 2),
-  qNorm: norm(e.q),
-}))
-
-function score(words: string[], idx: (typeof INDEXED)[number]): number {
+function score(words: string[], idx: { tokens: string[]; qNorm: string }): number {
   let s = 0
   for (const w of words) {
     if (idx.tokens.some((t) => t === w || t.startsWith(w) || w.startsWith(t))) s += 1
@@ -26,10 +23,13 @@ function score(words: string[], idx: (typeof INDEXED)[number]): number {
   return s
 }
 
-// Une question représentative par catégorie (écran d'accueil).
-const OVERVIEW: HelpEntry[] = CATEGORIES.map(
-  (c) => HELP_KB.find((e) => e.cat === c),
-).filter(Boolean) as HelpEntry[]
+/** Déduit l'identifiant de page depuis la route d'une fiche d'aide. */
+function routePageId(route?: string): string | null {
+  if (!route) return null
+  if (route === '/') return 'dashboard'
+  const m = route.match(/^\/app\/(.+)$/)
+  return m ? m[1] : null
+}
 
 export function HelpAssistant() {
   const [open, setOpen] = useState(false)
@@ -37,19 +37,44 @@ export function HelpAssistant() {
   const [openId, setOpenId] = useState<string | null>(null)
   const navigate = useNavigate()
   const inputRef = useRef<HTMLInputElement>(null)
+  const role = useAuthStore((s) => s.user?.role)
+
+  // KB filtrée par rôle : une fiche liée à une page interdite est masquée.
+  // Les fiches sans page (glossaire, aide générique) restent visibles par tous.
+  const kb = useMemo(
+    () => HELP_KB.filter((e) => {
+      const pid = routePageId(e.route)
+      return pid ? canAccessPage(role, pid) : true
+    }),
+    [role],
+  )
+
+  const indexed = useMemo(
+    () => kb.map((e) => ({
+      e,
+      tokens: norm(e.q + ' ' + e.keywords).split(/\s+/).filter((t) => t.length >= 2),
+      qNorm: norm(e.q),
+    })),
+    [kb],
+  )
+
+  const overview = useMemo(
+    () => CATEGORIES.map((c) => kb.find((e) => e.cat === c)).filter(Boolean) as HelpEntry[],
+    [kb],
+  )
 
   const results = useMemo(() => {
     const q = norm(query).trim()
-    if (!q) return OVERVIEW
+    if (!q) return overview
     const words = q.split(/\s+/).filter((w) => w.length >= 2)
-    if (words.length === 0) return OVERVIEW
-    return INDEXED
+    if (words.length === 0) return overview
+    return indexed
       .map((idx) => ({ e: idx.e, s: score(words, idx) }))
       .filter((r) => r.s > 0)
       .sort((a, b) => b.s - a.s)
       .slice(0, 8)
       .map((r) => r.e)
-  }, [query])
+  }, [query, indexed, overview])
 
   const go = (route: string) => { setOpen(false); navigate(route) }
 
@@ -75,7 +100,7 @@ export function HelpAssistant() {
         >
           <div className="px-4 py-3 text-white" style={{ background: 'var(--primary)' }}>
             <div className="font-bold">💬 Assistant SENDISTRI</div>
-            <div className="text-[11px] opacity-90">Pose ta question — {HELP_KB.length} sujets · fonctionne hors ligne</div>
+            <div className="text-[11px] opacity-90">Pose ta question — fonctionne hors ligne</div>
           </div>
 
           <div className="p-3 border-b" style={{ borderColor: 'var(--border)' }}>
