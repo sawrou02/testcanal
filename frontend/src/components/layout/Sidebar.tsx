@@ -71,7 +71,7 @@ export function Sidebar() {
         <BrandStar size={40} />
         <div>
           <div className="text-white font-black text-lg leading-tight tracking-wide">SENDISTRI</div>
-          <div className="text-green-300/60 text-xs">ERP v1.0</div>
+          <div className="text-white/55 text-xs">ERP v1.0</div>
         </div>
       </div>
 
@@ -87,7 +87,7 @@ export function Sidebar() {
                   'flex items-center gap-3 px-4 py-2.5 mx-2 rounded-lg text-sm font-semibold transition-colors',
                   currentPath === '/'
                     ? 'bg-primary text-white'
-                    : 'text-green-200/70 hover:bg-white/10 hover:text-white',
+                    : 'text-white/80 hover:bg-white/10 hover:text-white',
                 )}
               >
                 <span className="w-5 flex items-center justify-center"><Icon name={section.icon} size={18} /></span>
@@ -104,7 +104,7 @@ export function Sidebar() {
                 onClick={() => toggleSection(section.id)}
                 className={cn(
                   'w-full flex items-center gap-3 px-4 py-2.5 mx-0 text-sm font-semibold transition-colors',
-                  'text-green-200/70 hover:bg-white/10 hover:text-white',
+                  'text-white/80 hover:bg-white/10 hover:text-white',
                 )}
               >
                 <span className="w-5 flex items-center justify-center shrink-0"><Icon name={section.icon} size={18} /></span>
@@ -137,7 +137,7 @@ export function Sidebar() {
                           'flex items-center justify-between px-3 py-1.5 rounded-lg text-sm transition-colors',
                           active
                             ? 'bg-primary text-white font-semibold'
-                            : 'text-green-300/60 hover:bg-white/10 hover:text-green-100',
+                            : 'text-white/65 hover:bg-white/10 hover:text-white',
                         )}
                       >
                         <span>{item.label}</span>
@@ -166,14 +166,14 @@ export function Sidebar() {
             <div className="text-white text-sm font-semibold truncate">
               {user ? `${user.prenom} ${user.nom}` : 'Utilisateur'}
             </div>
-            <div className="text-green-300/60 text-xs truncate">
+            <div className="text-white/55 text-xs truncate">
               {user ? getRoleLabel(user.role) : ''}
             </div>
           </div>
           <button
             onClick={logout}
             title="Déconnexion"
-            className="shrink-0 text-green-300/60 hover:text-red-300 transition-colors p-1"
+            className="shrink-0 text-white/55 hover:text-red-300 transition-colors p-1"
           >
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
