@@ -31,6 +31,11 @@ export class ServiceAbonnementController {
     return this.service.getStats();
   }
 
+  @Get('taux-rpe')
+  async getTauxRpe() {
+    return this.service.getTauxRpe();
+  }
+
   @Get('aae')
   async getAae(@Query('jours') jours?: string) {
     const parsed = jours !== undefined ? parseInt(jours, 10) : NaN;

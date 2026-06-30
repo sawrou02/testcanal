@@ -37,6 +37,8 @@ export interface NavItem {
   label: string
   path?: string
   badge?: number
+  /** Restriction fine par rôle (optionnelle). Si absent, hérite de la section. */
+  roles?: Role[]
 }
 
 export interface NavSection {

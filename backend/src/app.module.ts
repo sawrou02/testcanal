@@ -32,6 +32,9 @@ import { RetourRpeModule } from './retour-rpe/retour-rpe.module';
 import { BaremesModule } from './baremes/baremes.module';
 import { ObjectifsDistributeurModule } from './objectifs-distributeur/objectifs-distributeur.module';
 import { ObjectifsPdvModule } from './objectifs-pdv/objectifs-pdv.module';
+import { GapKitModule } from './gap-kit/gap-kit.module';
+import { ParabolesModule } from './paraboles/paraboles.module';
+import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
@@ -67,6 +70,9 @@ import { ObjectifsPdvModule } from './objectifs-pdv/objectifs-pdv.module';
     BaremesModule,
     ObjectifsDistributeurModule,
     ObjectifsPdvModule,
+    GapKitModule,
+    ParabolesModule,
+    TasksModule,
   ],
   providers: [
     {

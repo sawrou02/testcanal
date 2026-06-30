@@ -80,6 +80,8 @@ model PDV {
   credit            Credit?
   arretes           ArreteSolde[]
   installations     Installation[]
+  gapKits           GapKit[]
+  ventesParabole    VenteParabole[]
 }
 
 model Formule {
@@ -442,6 +444,33 @@ model ObjectifPdv {
   pdv PDV @relation(fields: [pdvId], references: [id])
 
   @@unique([pdvId, annee, mois, typeObjectif])
+}
+
+/// Suivi des kits incomplets après une vente (Gap Kit).
+model GapKit {
+  id                String   @id @default(cuid())
+  pdvId             String
+  clientNom         String?
+  numAbonne         String?
+  kitVendu          String
+  elementsManquants String
+  // statut: EN_ATTENTE | REGULARISE
+  statut            String   @default("EN_ATTENTE")
+  date              DateTime @default(now())
+
+  pdv PDV @relation(fields: [pdvId], references: [id])
+}
+
+/// Suivi des ventes de paraboles par PDV.
+model VenteParabole {
+  id             String   @id @default(cuid())
+  pdvId          String
+  quantiteVendue Int      @default(0)
+  quantiteStock  Int      @default(0)
+  technicien     String?
+  date           DateTime @default(now())
+
+  pdv PDV @relation(fields: [pdvId], references: [id])
 }
 
 model RetourRpe {

@@ -207,12 +207,46 @@ const SECTION_ROLES: Record<string, Role[] | 'ALL'> = {
   statistiques: ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL'],
 }
 
+/**
+ * Restriction FINE par entrée (optionnelle). Une entrée listée ici n'est
+ * visible/accessible que pour ces rôles, même si la section est plus large.
+ * Permet ex. au vendeur/commercial de ne pas voir les écrans financiers.
+ */
+const ITEM_ROLES: Record<string, Role[]> = {
+  // Opérations — écrans financiers réservés (pas vendeur ni commercial)
+  matching: ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'versement-banque': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'retrait-banque': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'details-bancaires': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'suivi-solde': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'arretes-soldes': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  depenses: ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'augmentation-caution': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'rapport-activite': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
+  'suivi-installation': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'LOGISTICIEN', 'COMMERCIAL'],
+}
+
+function sectionAllowed(role: Role | undefined, sectionId: string): boolean {
+  if (!role) return true
+  const allowed = SECTION_ROLES[sectionId]
+  return allowed === 'ALL' || (allowed?.includes(role) ?? false)
+}
+
+function itemAllowed(role: Role | undefined, sectionId: string, itemId: string): boolean {
+  if (!role) return true
+  if (!sectionAllowed(role, sectionId)) return false
+  const fine = ITEM_ROLES[itemId]
+  return fine ? fine.includes(role) : true
+}
+
 export function visibleSections(role?: Role): NavSection[] {
-  if (!role) return NAV_SECTIONS
-  return NAV_SECTIONS.filter((s) => {
-    const allowed = SECTION_ROLES[s.id]
-    return allowed === 'ALL' || (allowed?.includes(role) ?? false)
-  })
+  const base = !role
+    ? NAV_SECTIONS
+    : NAV_SECTIONS.filter((s) => sectionAllowed(role, s.id))
+  // Filtre aussi les entrées restreintes ; masque une section devenue vide.
+  return base
+    .map((s) => (s.singleLink ? s : { ...s, items: s.items.filter((it) => itemAllowed(role, s.id, it.id)) }))
+    .filter((s) => s.singleLink || s.items.length > 0)
 }
 
 /** pageId -> sectionId (construit une seule fois depuis NAV_SECTIONS). */
@@ -226,16 +260,14 @@ const PAGE_SECTION: Record<string, string> = (() => {
  * Autorisation d'accès à une page selon le rôle — SOURCE UNIQUE de vérité,
  * utilisée à la fois pour verrouiller les routes et filtrer l'assistant.
  * - le tableau de bord est toujours accessible
- * - une page rattachée à une section suit les droits de cette section
+ * - une page suit les droits de sa section, ET d'une éventuelle restriction fine
  * - une page non rattachée (générique) n'est pas restreinte
  */
 export function canAccessPage(role: Role | undefined, pageId: string): boolean {
   if (!pageId || pageId === 'dashboard' || pageId === 'app') return true
   const sectionId = PAGE_SECTION[pageId]
   if (!sectionId) return true
-  if (!role) return true
-  const allowed = SECTION_ROLES[sectionId]
-  return allowed === 'ALL' || (allowed?.includes(role) ?? false)
+  return itemAllowed(role, sectionId, pageId)
 }
 
 /** Liste à plat des pages navigables (pour la palette de commande). */

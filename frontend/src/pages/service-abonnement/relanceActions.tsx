@@ -23,11 +23,18 @@ export function relanceMessage(a: AbonneRow): string {
   return `Bonjour ${nom}, votre abonnement arrive à échéance${ech}. Pensez à le renouveler pour éviter toute coupure. Merci.`
 }
 
+/** Message de bienvenue pour un nouvel abonné. */
+export function welcomeMessage(a: AbonneRow): string {
+  const nom = `${a.prenom || ''} ${a.nom || ''}`.trim()
+  return `Bonjour ${nom}, bienvenue chez nous ! Votre abonnement est bien activé. Notre équipe reste à votre disposition. Merci de votre confiance.`
+}
+
 /** Bouton WhatsApp : ouvre directement la discussion avec le numéro, message pré-rempli. */
-export function WhatsAppButton({ abonne }: { abonne: AbonneRow }) {
+export function WhatsAppButton({ abonne, kind = 'relance' }: { abonne: AbonneRow; kind?: 'relance' | 'bienvenue' }) {
   const num = waNumber(abonne.tel1)
   if (!num) return <span style={{ color: 'var(--text-muted)' }}>—</span>
-  const href = `https://wa.me/${num}?text=${encodeURIComponent(relanceMessage(abonne))}`
+  const msg = kind === 'bienvenue' ? welcomeMessage(abonne) : relanceMessage(abonne)
+  const href = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`
   return (
     <a
       href={href}

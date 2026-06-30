@@ -16,4 +16,9 @@ export class DashboardController {
   async getSynthese() {
     return this.dashboardService.getSynthese();
   }
+
+  @Get('objectifs-suivi')
+  async getObjectifsSuivi() {
+    return this.dashboardService.getObjectifsSuivi();
+  }
 }

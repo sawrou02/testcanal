@@ -3,6 +3,7 @@ import { DataTable } from '../../components/ui/DataTable'
 import { formatDate } from '../../lib/utils'
 import { type AbonneRow } from '../../lib/api'
 import { Card, PageHeader, fullName, asRows, type Row } from './shared'
+import { WhatsAppButton } from './relanceActions'
 
 export default function BienvenuePage() {
   const { data, loading } = useResource<AbonneRow>('/service-abonnement/bienvenue')
@@ -39,6 +40,11 @@ export default function BienvenuePage() {
                 const d = (row as unknown as AbonneRow).dateRecrutement
                 return d ? formatDate(d) : '-'
               },
+            },
+            {
+              key: '__wa',
+              label: 'Bienvenue',
+              render: (_v, row) => <WhatsAppButton abonne={row as unknown as AbonneRow} kind="bienvenue" />,
             },
           ]}
         />

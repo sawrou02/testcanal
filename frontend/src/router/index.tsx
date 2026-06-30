@@ -15,6 +15,9 @@ import ComptesPdvPage from '../pages/parametrage/ComptesPdvPage'
 import BaremesPage from '../pages/parametrage/BaremesPage'
 import ObjectifsDistributeurPage from '../pages/parametrage/ObjectifsDistributeurPage'
 import ObjectifsPdvPage from '../pages/parametrage/ObjectifsPdvPage'
+import TauxRpePage from '../pages/analytique/TauxRpePage'
+import GapKitPage from '../pages/accessoires/GapKitPage'
+import ParabolesPage from '../pages/accessoires/ParabolesPage'
 import EncaissementPage from '../pages/operations/EncaissementPage'
 import SuiviSoldePage from '../pages/operations/SuiviSoldePage'
 import RapportActivitePage from '../pages/operations/RapportActivitePage'
@@ -111,6 +114,9 @@ export const router = createBrowserRouter([
       { path: 'app/baremes', element: <BaremesPage /> },
       { path: 'app/objectifs-distributeur', element: <ObjectifsDistributeurPage /> },
       { path: 'app/objectifs-pdv', element: <ObjectifsPdvPage /> },
+      { path: 'app/taux-rpe', element: <TauxRpePage /> },
+      { path: 'app/gap-kit', element: <GapKitPage /> },
+      { path: 'app/suivi-paraboles', element: <ParabolesPage /> },
       { path: 'app/encaissement', element: <EncaissementPage /> },
       { path: 'app/suivi-solde', element: <SuiviSoldePage /> },
       { path: 'app/rapport-activite', element: <RapportActivitePage /> },

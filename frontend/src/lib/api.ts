@@ -183,6 +183,45 @@ export const deleteObjPdv = async (id: string): Promise<void> => {
   await apiClient.delete(`/objectifs-pdv/${id}`)
 }
 
+// ---- Taux RPE ----
+export interface TauxRpeRow { pdv: { code: string; raisonSociale: string }; nbEchus: number; nbReabo: number; taux: number }
+export interface TauxRpeData { rows: TauxRpeRow[]; totaux: { nbEchus: number; nbReabo: number; taux: number } }
+export const tauxRpe = async (): Promise<TauxRpeData> =>
+  (await apiClient.get<TauxRpeData>('/service-abonnement/taux-rpe')).data
+
+// ---- Suivi objectifs (dashboard) ----
+export interface ObjSuiviPdv { pdv: string; secteur: string; objectif: number; realise: number; ro: number; reste: number }
+export interface ObjSuiviSecteur { secteur: string; objectif: number; realise: number; ro: number; reste: number }
+export const objectifsSuivi = async (): Promise<{ pdvs: ObjSuiviPdv[]; secteurs: ObjSuiviSecteur[] }> =>
+  (await apiClient.get('/dashboard/objectifs-suivi')).data
+
+// ---- Gap Kit ----
+export interface GapKitRow {
+  id: string; pdvId: string; clientNom?: string; numAbonne?: string
+  kitVendu: string; elementsManquants: string; statut: string; date: string
+  pdv?: { code: string; raisonSociale: string }
+}
+export const listGapKit = async (): Promise<GapKitRow[]> => {
+  const res = await apiClient.get<GapKitRow[]>('/gap-kit'); return Array.isArray(res.data) ? res.data : []
+}
+export const createGapKit = async (b: { pdvId: string; clientNom?: string; numAbonne?: string; kitVendu: string; elementsManquants: string; statut?: string }): Promise<GapKitRow> =>
+  (await apiClient.post('/gap-kit', b)).data
+export const updateGapKit = async (id: string, b: Partial<GapKitRow>): Promise<GapKitRow> =>
+  (await apiClient.patch(`/gap-kit/${id}`, b)).data
+export const deleteGapKit = async (id: string): Promise<void> => { await apiClient.delete(`/gap-kit/${id}`) }
+
+// ---- Paraboles ----
+export interface ParaboleRow {
+  id: string; pdvId: string; quantiteVendue: number; quantiteStock: number
+  technicien?: string; date: string; pdv?: { code: string; raisonSociale: string }
+}
+export const listParaboles = async (): Promise<ParaboleRow[]> => {
+  const res = await apiClient.get<ParaboleRow[]>('/paraboles'); return Array.isArray(res.data) ? res.data : []
+}
+export const createParabole = async (b: { pdvId: string; quantiteVendue: number; quantiteStock?: number; technicien?: string }): Promise<ParaboleRow> =>
+  (await apiClient.post('/paraboles', b)).data
+export const deleteParabole = async (id: string): Promise<void> => { await apiClient.delete(`/paraboles/${id}`) }
+
 export interface Encaissement {
   id: string
   recuNumero: string

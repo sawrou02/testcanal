@@ -9,6 +9,61 @@ export class DashboardService {
     private baremes: BaremesService,
   ) {}
 
+  /**
+   * Suivi des objectifs de recrutement du mois, par PDV et par secteur :
+   * objectif (saisi), réalisé (recrutements du mois), R/O et reste. Aucune
+   * valeur inventée : si aucun objectif n'est saisi, R/O est à 0.
+   */
+  async getObjectifsSuivi() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month1 = now.getMonth() + 1;
+    const mStart = new Date(year, now.getMonth(), 1);
+    const mEnd = new Date(year, now.getMonth() + 1, 1);
+
+    const [pdvs, objs, recruits, secteurs] = await Promise.all([
+      this.prisma.pDV.findMany({ select: { id: true, raisonSociale: true, secteurId: true } }),
+      this.prisma.objectifPdv.findMany({ where: { annee: year, mois: month1, typeObjectif: 'RECRUTEMENT' } }),
+      this.prisma.encaissement.groupBy({
+        by: ['pdvId'],
+        where: { nature: 'RECRUTEMENT' as any, date: { gte: mStart, lt: mEnd } },
+        _count: { _all: true },
+      }),
+      this.prisma.secteur.findMany({ select: { id: true, nom: true } }),
+    ]);
+
+    const objMap = new Map(objs.map((o) => [o.pdvId, o.effectif]));
+    const recMap = new Map(recruits.map((r) => [r.pdvId, r._count._all]));
+    const secMap = new Map(secteurs.map((s) => [s.id, s.nom]));
+    const ro = (re: number, ob: number) => (ob > 0 ? Math.round((re / ob) * 100) : 0);
+
+    const pdvRows = pdvs
+      .map((p) => {
+        const objectif = objMap.get(p.id) || 0;
+        const realise = recMap.get(p.id) || 0;
+        return {
+          pdv: p.raisonSociale,
+          secteur: secMap.get(p.secteurId) || '—',
+          objectif, realise, ro: ro(realise, objectif), reste: Math.max(objectif - realise, 0),
+        };
+      })
+      .filter((r) => r.objectif > 0 || r.realise > 0);
+
+    const bySect = new Map<string, { secteur: string; objectif: number; realise: number }>();
+    for (const p of pdvs) {
+      const sec = secMap.get(p.secteurId) || '—';
+      if (!bySect.has(sec)) bySect.set(sec, { secteur: sec, objectif: 0, realise: 0 });
+      const agg = bySect.get(sec)!;
+      agg.objectif += objMap.get(p.id) || 0;
+      agg.realise += recMap.get(p.id) || 0;
+    }
+    const secteurRows = Array.from(bySect.values())
+      .map((s) => ({ ...s, ro: ro(s.realise, s.objectif), reste: Math.max(s.objectif - s.realise, 0) }))
+      .filter((s) => s.objectif > 0 || s.realise > 0);
+
+    return { pdvs: pdvRows, secteurs: secteurRows };
+  }
+
   async getStats() {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);

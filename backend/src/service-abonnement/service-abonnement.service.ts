@@ -79,6 +79,62 @@ export class ServiceAbonnementService {
     };
   }
 
+  /**
+   * Taux RPE (Retour à Plein Encaissement) par PDV : part des abonnés qui se
+   * réabonnent (mois courant) parmi ceux qui devaient renouveler (réabonnés +
+   * échus actuels). Tout est calculé depuis la base, aucune valeur inventée.
+   */
+  async getTauxRpe() {
+    const now = new Date();
+    const mStart = new Date(now.getFullYear(), now.getMonth(), 1);
+    const mEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    const [pdvs, echusByPdv, reabos] = await Promise.all([
+      this.prisma.pDV.findMany({
+        select: { id: true, code: true, raisonSociale: true },
+        orderBy: { raisonSociale: 'asc' },
+      }),
+      this.prisma.abonne.groupBy({
+        by: ['pdvId'],
+        where: { statut: 'ECHU' as any },
+        _count: { _all: true },
+      }),
+      this.prisma.encaissement.findMany({
+        where: { nature: 'REABONNEMENT' as any, date: { gte: mStart, lt: mEnd } },
+        select: { pdvId: true, abonneId: true },
+      }),
+    ]);
+
+    const echusMap = new Map(echusByPdv.map((e) => [e.pdvId, e._count._all]));
+    const reaboSet = new Map<string, Set<string>>();
+    for (const r of reabos) {
+      if (!reaboSet.has(r.pdvId)) reaboSet.set(r.pdvId, new Set());
+      reaboSet.get(r.pdvId)!.add(r.abonneId);
+    }
+
+    const rows = pdvs
+      .map((p) => {
+        const nbEchus = echusMap.get(p.id) || 0;
+        const nbReabo = reaboSet.get(p.id)?.size || 0;
+        const base = nbReabo + nbEchus;
+        const taux = base > 0 ? Math.round((nbReabo / base) * 1000) / 10 : 0;
+        return { pdv: { code: p.code, raisonSociale: p.raisonSociale }, nbEchus, nbReabo, taux };
+      })
+      .filter((r) => r.nbEchus > 0 || r.nbReabo > 0);
+
+    const totEchus = rows.reduce((s, r) => s + r.nbEchus, 0);
+    const totReabo = rows.reduce((s, r) => s + r.nbReabo, 0);
+    const totBase = totEchus + totReabo;
+    return {
+      rows,
+      totaux: {
+        nbEchus: totEchus,
+        nbReabo: totReabo,
+        taux: totBase > 0 ? Math.round((totReabo / totBase) * 1000) / 10 : 0,
+      },
+    };
+  }
+
   /** Abonnés à échéance (ACTIF) tombant dans la fenêtre [today, today+jours]. */
   async getAae(jours = 30) {
     const now = new Date();
