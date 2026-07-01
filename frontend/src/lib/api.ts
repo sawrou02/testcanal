@@ -27,24 +27,45 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+/* ------------------------------------------------------------------ *
+ * Indicateur de chargement GLOBAL (barre en haut de l'écran).
+ * On compte les requêtes en cours et on prévient les abonnés (LoadingBar).
+ * ------------------------------------------------------------------ */
+let activeRequests = 0
+const loadingListeners = new Set<(n: number) => void>()
+export const onLoadingChange = (cb: (n: number) => void): (() => void) => {
+  loadingListeners.add(cb)
+  return () => loadingListeners.delete(cb)
+}
+const notifyLoading = () => loadingListeners.forEach((l) => l(activeRequests))
+const startRequest = () => { activeRequests += 1; notifyLoading() }
+const endRequest = () => { activeRequests = Math.max(0, activeRequests - 1); notifyLoading() }
+
+apiClient.interceptors.request.use((config) => {
+  startRequest()
+  return config
+})
+
 /**
- * Réessai automatique et SILENCIEUX quand le serveur n'est pas encore prêt.
- * Au démarrage (ou pendant un redémarrage du serveur), les toutes premières
- * requêtes peuvent échouer par « erreur réseau » (pas de réponse). Plutôt que
- * d'afficher « Erreur lors du chargement », on réessaie 3 fois avec un court
- * délai — le temps que le serveur réponde. On ne réessaie QUE les lectures
- * (GET) sans réponse ; une vraie erreur applicative (400/500) n'est pas rejouée.
+ * - Suit le chargement (barre du haut).
+ * - Réessai automatique et SILENCIEUX quand le serveur n'est pas encore prêt :
+ *   au démarrage, les premières requêtes GET peuvent échouer (pas de réponse).
+ *   On réessaie jusqu'à 6 fois (~10 s au total) avant d'abandonner. Une vraie
+ *   erreur applicative (400/500) n'est PAS rejouée.
  */
+const RETRY_DELAYS = [500, 800, 1200, 1800, 2500, 3500]
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => { endRequest(); return response },
   async (error) => {
+    endRequest()
     const config = error?.config
     const noResponse = !error?.response // erreur réseau = serveur pas prêt
     const method = (config?.method || 'get').toLowerCase()
     if (config && noResponse && method === 'get') {
-      config.__retry = (config.__retry || 0) + 1
-      if (config.__retry <= 3) {
-        await new Promise((res) => setTimeout(res, 400 * config.__retry))
+      const attempt = config.__retry || 0
+      if (attempt < RETRY_DELAYS.length) {
+        config.__retry = attempt + 1
+        await new Promise((res) => setTimeout(res, RETRY_DELAYS[attempt]))
         return apiClient(config)
       }
     }

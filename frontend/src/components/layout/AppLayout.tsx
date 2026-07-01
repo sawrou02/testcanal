@@ -2,6 +2,7 @@ import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { AlertBanners } from './AlertBanners'
 import { HelpAssistant } from '../help/HelpAssistant'
+import { LoadingBar } from '../ui/LoadingBar'
 import { useLocation } from 'react-router-dom'
 import { ToastProvider } from '../ui/Toast'
 
@@ -27,6 +28,7 @@ export function AppLayout({ children }: AppLayoutProps) {
 
   return (
     <ToastProvider>
+      <LoadingBar />
       <div
         className="flex h-screen overflow-hidden"
         style={{ background: 'var(--app-bg)' }}
