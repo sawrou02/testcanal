@@ -27,6 +27,31 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+/**
+ * Réessai automatique et SILENCIEUX quand le serveur n'est pas encore prêt.
+ * Au démarrage (ou pendant un redémarrage du serveur), les toutes premières
+ * requêtes peuvent échouer par « erreur réseau » (pas de réponse). Plutôt que
+ * d'afficher « Erreur lors du chargement », on réessaie 3 fois avec un court
+ * délai — le temps que le serveur réponde. On ne réessaie QUE les lectures
+ * (GET) sans réponse ; une vraie erreur applicative (400/500) n'est pas rejouée.
+ */
+apiClient.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const config = error?.config
+    const noResponse = !error?.response // erreur réseau = serveur pas prêt
+    const method = (config?.method || 'get').toLowerCase()
+    if (config && noResponse && method === 'get') {
+      config.__retry = (config.__retry || 0) + 1
+      if (config.__retry <= 3) {
+        await new Promise((res) => setTimeout(res, 400 * config.__retry))
+        return apiClient(config)
+      }
+    }
+    return Promise.reject(error)
+  },
+)
+
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
   const res = await apiClient.post<LoginResponse>('/auth/login', { email, password })
   return res.data
