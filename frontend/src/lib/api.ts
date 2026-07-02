@@ -73,10 +73,27 @@ apiClient.interceptors.response.use(
   },
 )
 
-export const login = async (email: string, password: string): Promise<LoginResponse> => {
-  const res = await apiClient.post<LoginResponse>('/auth/login', { email, password })
+export const login = async (
+  email: string,
+  password: string,
+  captcha?: { captchaId: string; captchaAnswer: string },
+): Promise<LoginResponse> => {
+  const res = await apiClient.post<LoginResponse>('/auth/login', { email, password, ...(captcha || {}) })
   return res.data
 }
+
+export interface CaptchaChallenge { id: string; question: string }
+export const getCaptcha = async (): Promise<CaptchaChallenge> =>
+  (await apiClient.get<CaptchaChallenge>('/auth/captcha')).data
+
+// ---- Sécurité (admin) ----
+export interface SecurityEventRow { id: string; type: string; identifier?: string; ip: string; message?: string; createdAt: string }
+export interface SecurityStats { failedToday: number; accessDeniedToday: number; lockedAccounts: number }
+export const securityEvents = async (): Promise<SecurityEventRow[]> => {
+  const res = await apiClient.get<SecurityEventRow[]>('/security/events'); return Array.isArray(res.data) ? res.data : []
+}
+export const securityStats = async (): Promise<SecurityStats> =>
+  (await apiClient.get<SecurityStats>('/security/stats')).data
 
 export const getMe = async (): Promise<User> => {
   const res = await apiClient.get<User>('/auth/me')

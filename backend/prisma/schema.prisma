@@ -473,6 +473,20 @@ model VenteParabole {
   pdv PDV @relation(fields: [pdvId], references: [id])
 }
 
+/// Journal des événements de sécurité (connexions, blocages, accès refusés).
+model SecurityEvent {
+  id         String   @id @default(cuid())
+  // type: LOGIN_FAILED | LOGIN_LOCKED | LOGIN_OK | ACCESS_DENIED
+  type       String
+  identifier String?
+  ip         String   @default("")
+  message    String?
+  createdAt  DateTime @default(now())
+
+  @@index([type, createdAt])
+  @@index([identifier, createdAt])
+}
+
 model RetourRpe {
   id           String   @id @default(cuid())
   numAbonne    String

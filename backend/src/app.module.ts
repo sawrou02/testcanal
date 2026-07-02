@@ -35,6 +35,9 @@ import { ObjectifsPdvModule } from './objectifs-pdv/objectifs-pdv.module';
 import { GapKitModule } from './gap-kit/gap-kit.module';
 import { ParabolesModule } from './paraboles/paraboles.module';
 import { TasksModule } from './tasks/tasks.module';
+import { SecurityModule } from './security/security.module';
+import { AccessDeniedFilter } from './security/access-denied.filter';
+import { APP_FILTER } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -73,11 +76,16 @@ import { TasksModule } from './tasks/tasks.module';
     GapKitModule,
     ParabolesModule,
     TasksModule,
+    SecurityModule,
   ],
   providers: [
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AccessDeniedFilter,
     },
   ],
 })

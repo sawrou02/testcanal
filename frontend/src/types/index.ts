@@ -20,7 +20,7 @@ export interface AuthState {
   user: User | null
   token: string | null
   isAuthenticated: boolean
-  login: (email: string, password: string) => Promise<void>
+  login: (email: string, password: string, captcha?: { captchaId: string; captchaAnswer: string }) => Promise<void>
   logout: () => void
 }
 

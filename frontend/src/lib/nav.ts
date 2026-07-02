@@ -15,6 +15,7 @@ export const NAV_SECTIONS: NavSection[] = [
     icon: 'sliders',
     items: [
       { id: 'formules', label: 'Formules' },
+      { id: 'securite', label: 'Sécurité' },
       { id: 'baremes', label: 'Barèmes commissions' },
       { id: 'objectifs-distributeur', label: 'Objectifs Distributeur' },
       { id: 'objectifs-pdv', label: 'Objectifs PDV' },
@@ -224,6 +225,8 @@ const ITEM_ROLES: Record<string, Role[]> = {
   'augmentation-caution': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
   'rapport-activite': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
   'suivi-installation': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'LOGISTICIEN', 'COMMERCIAL'],
+  // Sécurité : réservé aux administrateurs
+  securite: ['SUPER_ADMIN', 'ADMIN'],
 }
 
 function sectionAllowed(role: Role | undefined, sectionId: string): boolean {

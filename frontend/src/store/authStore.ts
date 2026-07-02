@@ -12,8 +12,8 @@ export const useAuthStore = create<AuthStore>()(
       token: null,
       isAuthenticated: false,
 
-      login: async (email: string, password: string) => {
-        const data = await apiLogin(email, password)
+      login: async (email: string, password: string, captcha?: { captchaId: string; captchaAnswer: string }) => {
+        const data = await apiLogin(email, password, captcha)
         set({
           user: data.user,
           token: data.access_token,

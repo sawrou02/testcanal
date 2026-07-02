@@ -1,8 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BrandStar } from '../components/ui/BrandStar'
 import { Button } from '../components/ui/Button'
 import { useAuthStore } from '../store/authStore'
+import { getCaptcha, type CaptchaChallenge } from '../lib/api'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -12,18 +13,39 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [captcha, setCaptcha] = useState<CaptchaChallenge | null>(null)
+  const [captchaAnswer, setCaptchaAnswer] = useState('')
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
-      await login(email, password)
+      const cap = captcha ? { captchaId: captcha.id, captchaAnswer } : undefined
+      await login(email, password, cap)
       navigate('/')
     } catch (err: unknown) {
-      if (err && typeof err === 'object' && 'response' in err) {
-        const res = (err as { response?: { data?: { message?: string } } }).response
-        setError(res?.data?.message || 'Identifiants incorrects')
+      const res = (err as { response?: { data?: { message?: string; code?: string } } })?.response
+      const data = res?.data
+      if (data?.code === 'CAPTCHA_REQUIRED') {
+        // Trop d'essais : on affiche un petit calcul anti-robot à résoudre.
+        try {
+          const c = await getCaptcha()
+          setCaptcha(c)
+          setCaptchaAnswer('')
+          setError('Trop d’essais. Résolvez le calcul ci-dessous pour continuer.')
+        } catch {
+          setError('Vérification requise, réessayez.')
+        }
+      } else if (data?.code === 'LOCKED') {
+        setCaptcha(null)
+        setError(data.message || 'Compte temporairement bloqué. Réessayez dans 15 minutes.')
+      } else if (data) {
+        // Échec normal : si un captcha était affiché, on en régénère un.
+        if (captcha) {
+          try { setCaptcha(await getCaptcha()); setCaptchaAnswer('') } catch { /* ignore */ }
+        }
+        setError(data.message || 'Identifiants incorrects')
       } else {
         setError('Erreur de connexion au serveur')
       }
@@ -165,6 +187,23 @@ export default function LoginPage() {
                 </button>
               </div>
             </div>
+
+            {captcha && (
+              <div>
+                <label className="block text-sm font-semibold text-app-text mb-1.5">
+                  Vérification anti-robot — combien font <span className="font-mono">{captcha.question}</span>
+                </label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={captchaAnswer}
+                  onChange={(e) => setCaptchaAnswer(e.target.value)}
+                  required
+                  placeholder="Votre réponse"
+                  className="w-full px-4 py-3 rounded-lg border border-app-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
+                />
+              </div>
+            )}
 
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
