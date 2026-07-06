@@ -37,6 +37,8 @@ import { ParabolesModule } from './paraboles/paraboles.module';
 import { TasksModule } from './tasks/tasks.module';
 import { SecurityModule } from './security/security.module';
 import { ImportModule } from './import/import.module';
+import { DocumentsModule } from './documents/documents.module';
+import { MessagesModule } from './messages/messages.module';
 import { AccessDeniedFilter } from './security/access-denied.filter';
 import { APP_FILTER } from '@nestjs/core';
 
@@ -79,6 +81,8 @@ import { APP_FILTER } from '@nestjs/core';
     TasksModule,
     SecurityModule,
     ImportModule,
+    DocumentsModule,
+    MessagesModule,
   ],
   providers: [
     {

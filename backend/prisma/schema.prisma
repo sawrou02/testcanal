@@ -489,6 +489,31 @@ model SecurityEvent {
   @@index([identifier, createdAt])
 }
 
+/// Fichiers déposés dans l'espace Documents (rapports, contrats, justificatifs…).
+model Document {
+  id           String   @id @default(cuid())
+  filename     String
+  storedName   String
+  mimeType     String   @default("")
+  size         Int      @default(0)
+  category     String   @default("Général")
+  description  String?
+  uploadedById String?
+  uploadedByName String @default("")
+  createdAt    DateTime @default(now())
+
+  @@index([category, createdAt])
+}
+
+/// Messages de l'espace Échanges (fil de discussion d'équipe).
+model Message {
+  id        String   @id @default(cuid())
+  userId    String
+  userName  String   @default("")
+  content   String
+  createdAt DateTime @default(now())
+}
+
 model RetourRpe {
   id           String   @id @default(cuid())
   numAbonne    String

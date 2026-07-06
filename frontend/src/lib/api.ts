@@ -103,6 +103,61 @@ export interface CanalImportResult {
 export const importCanal = async (content: string): Promise<CanalImportResult> =>
   (await apiClient.post<CanalImportResult>('/import/canal', { content })).data
 
+// ---- Espace Documents & Échanges ----
+function authToken(): string {
+  try {
+    const parsed = JSON.parse(localStorage.getItem('sendistri-auth') || '{}') as { state?: { token?: string } }
+    return parsed?.state?.token || ''
+  } catch { return '' }
+}
+
+export interface DocumentRow {
+  id: string; filename: string; mimeType: string; size: number
+  category: string; description?: string; uploadedByName: string; createdAt: string
+}
+export const listDocuments = async (category?: string): Promise<DocumentRow[]> => {
+  const res = await apiClient.get<DocumentRow[]>('/documents', { params: category ? { category } : {} })
+  return Array.isArray(res.data) ? res.data : []
+}
+export const uploadDocument = async (file: File, category: string, description: string): Promise<DocumentRow> => {
+  const fd = new FormData()
+  fd.append('file', file)
+  fd.append('category', category)
+  if (description) fd.append('description', description)
+  const res = await fetch(`${BASE_URL}/api/documents`, {
+    method: 'POST', headers: { Authorization: `Bearer ${authToken()}` }, body: fd,
+  })
+  if (!res.ok) throw new Error("Échec de l'envoi")
+  return res.json()
+}
+export const downloadDocument = async (id: string, filename: string): Promise<void> => {
+  const res = await fetch(`${BASE_URL}/api/documents/${id}/download`, {
+    headers: { Authorization: `Bearer ${authToken()}` },
+  })
+  if (!res.ok) throw new Error('Téléchargement impossible')
+  const blob = await res.blob()
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a'); a.href = url; a.download = filename; a.click()
+  URL.revokeObjectURL(url)
+}
+export const deleteDocument = async (id: string): Promise<void> => { await apiClient.delete(`/documents/${id}`) }
+export const getDocumentText = async (id: string): Promise<string> => {
+  const res = await fetch(`${BASE_URL}/api/documents/${id}/download`, {
+    headers: { Authorization: `Bearer ${authToken()}` },
+  })
+  if (!res.ok) throw new Error('Lecture impossible')
+  return res.text()
+}
+
+export interface MessageRow { id: string; userId: string; userName: string; content: string; createdAt: string }
+export const listMessages = async (): Promise<MessageRow[]> => {
+  const res = await apiClient.get<MessageRow[]>('/messages')
+  return Array.isArray(res.data) ? res.data : []
+}
+export const postMessage = async (content: string): Promise<MessageRow> =>
+  (await apiClient.post<MessageRow>('/messages', { content })).data
+export const deleteMessage = async (id: string): Promise<void> => { await apiClient.delete(`/messages/${id}`) }
+
 export const getMe = async (): Promise<User> => {
   const res = await apiClient.get<User>('/auth/me')
   return res.data

@@ -20,6 +20,9 @@ backend/prisma/*.db
 # Sauvegardes automatiques de la base
 backend/backups/
 
+# Fichiers déposés (espace Documents)
+backend/uploads/
+
 # Logs
 *.log
 npm-debug.log*

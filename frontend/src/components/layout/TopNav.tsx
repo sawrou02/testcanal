@@ -43,6 +43,8 @@ export function TopNav() {
     if (currentPath === '/' || currentPath === '') return 'dashboard'
     const m = currentPath.match(/^\/app\/([^/]+)/)
     if (!m) return null
+    const direct = sections.find((s) => s.singleLink && s.id === m[1])
+    if (direct) return direct.id
     return sections.find((s) => s.items.some((it) => it.id === m[1]))?.id ?? null
   }, [currentPath, sections])
 
@@ -64,7 +66,7 @@ export function TopNav() {
           const highlighted = active || openId === s.id
           if (s.singleLink) {
             return (
-              <Link key={s.id} to="/"
+              <Link key={s.id} to={s.id === 'dashboard' ? '/' : `/app/${s.id}`}
                 className={cn('flex items-center gap-2 px-3 h-9 rounded-lg text-sm font-semibold whitespace-nowrap transition-colors',
                   highlighted ? 'bg-primary text-white' : 'text-white/80 hover:bg-white/10 hover:text-white')}>
                 <Icon name={s.icon} size={16} /><span>{s.label}</span>

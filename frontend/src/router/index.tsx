@@ -19,6 +19,7 @@ import TauxRpePage from '../pages/analytique/TauxRpePage'
 import GapKitPage from '../pages/accessoires/GapKitPage'
 import ParabolesPage from '../pages/accessoires/ParabolesPage'
 import SecurityPage from '../pages/parametrage/SecurityPage'
+import EchangesPage from '../pages/echanges/EchangesPage'
 import EncaissementPage from '../pages/operations/EncaissementPage'
 import SuiviSoldePage from '../pages/operations/SuiviSoldePage'
 import RapportActivitePage from '../pages/operations/RapportActivitePage'
@@ -119,6 +120,7 @@ export const router = createBrowserRouter([
       { path: 'app/gap-kit', element: <GapKitPage /> },
       { path: 'app/suivi-paraboles', element: <ParabolesPage /> },
       { path: 'app/securite', element: <SecurityPage /> },
+      { path: 'app/echanges', element: <EchangesPage /> },
       { path: 'app/encaissement', element: <EncaissementPage /> },
       { path: 'app/suivi-solde', element: <SuiviSoldePage /> },
       { path: 'app/rapport-activite', element: <RapportActivitePage /> },

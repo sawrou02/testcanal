@@ -10,6 +10,13 @@ export const NAV_SECTIONS: NavSection[] = [
     singleLink: true,
   },
   {
+    id: 'echanges',
+    label: 'Échanges',
+    icon: 'send',
+    items: [],
+    singleLink: true,
+  },
+  {
     id: 'parametrage',
     label: 'Paramétrage',
     icon: 'sliders',
@@ -195,6 +202,7 @@ export const NAV_SECTIONS: NavSection[] = [
 /** Sections visibles par rôle (filtrage du menu). Admin/Super Admin/Manager voient tout. */
 const SECTION_ROLES: Record<string, Role[] | 'ALL'> = {
   dashboard: 'ALL',
+  echanges: 'ALL',
   parametrage: ['SUPER_ADMIN', 'ADMIN', 'MANAGER'],
   operations: ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE', 'COMMERCIAL', 'VENDEUR'],
   'gestion-credit': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMPTABLE'],
