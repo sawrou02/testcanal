@@ -1,5 +1,5 @@
-import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { TopNav } from './TopNav'
 import { AlertBanners } from './AlertBanners'
 import { HelpAssistant } from '../help/HelpAssistant'
 import { LoadingBar } from '../ui/LoadingBar'
@@ -30,21 +30,19 @@ export function AppLayout({ children }: AppLayoutProps) {
     <ToastProvider>
       <LoadingBar />
       <div
-        className="flex h-screen overflow-hidden"
+        className="flex flex-col h-screen overflow-hidden"
         style={{ background: 'var(--app-bg)' }}
       >
-        <Sidebar />
-        <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
-          <Header title={PAGE_TITLES[location.pathname] || title} />
-          <AlertBanners />
-          <main className="main-scroll flex-1 p-4 md:p-6">
-            <div className="max-w-[1600px] mx-auto w-full">
-              {children}
-            </div>
-          </main>
-        </div>
-        <HelpAssistant />
+        <Header title={PAGE_TITLES[location.pathname] || title} />
+        <TopNav />
+        <AlertBanners />
+        <main className="main-scroll flex-1 p-4 md:p-6">
+          <div className="max-w-[1600px] mx-auto w-full">
+            {children}
+          </div>
+        </main>
       </div>
+      <HelpAssistant />
     </ToastProvider>
   )
 }

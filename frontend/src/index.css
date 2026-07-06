@@ -37,6 +37,15 @@ body {
   font-family: 'IBM Plex Mono', monospace;
 }
 
+/* Barre de navigation horizontale : masquer la scrollbar tout en gardant le défilement */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Anti-jank: reserve scrollbar space so the layout never shifts when the
    scrollbar appears/disappears between pages. `overflow-y: scroll` is a
    fallback for browsers that do not support scrollbar-gutter. */

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { BrandStar } from '../ui/BrandStar'
 import { useThemeStore } from '../../hooks/useTheme'
 import { useAuthStore } from '../../store/authStore'
 import {
@@ -111,9 +112,12 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
       className="h-16 flex items-center gap-4 px-6 bg-white border-b border-app-border shrink-0"
       style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
     >
-      <div className="flex flex-col min-w-0">
-        <span className="text-xs text-app-subtle uppercase tracking-wider">SENDISTRI</span>
-        <h1 className="text-base font-bold text-app-text truncate">{title}</h1>
+      <div className="flex items-center gap-2.5 min-w-0">
+        <BrandStar size={34} />
+        <div className="flex flex-col min-w-0">
+          <span className="text-sm font-black text-app-text leading-tight tracking-wide">SENDISTRI</span>
+          <h1 className="text-[11px] text-app-subtle truncate leading-tight">{title}</h1>
+        </div>
       </div>
 
       <div className="flex-1 max-w-md mx-auto relative" ref={searchRef}>
