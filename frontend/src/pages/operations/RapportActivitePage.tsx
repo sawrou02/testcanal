@@ -13,9 +13,11 @@ import {
   previewRapport,
   importRapport,
   matcherRapport,
+  importCanal,
   type RapportActivite,
   type RapportStats,
   type RapportPreview,
+  type CanalImportResult,
 } from '../../lib/api'
 import axios from 'axios'
 
@@ -38,7 +40,7 @@ function statutBadge(statut: RapportActivite['statutMatching']) {
   return <Badge variant="warning">En attente</Badge>
 }
 
-type Tab = 'importation' | 'consultation'
+type Tab = 'canal' | 'importation' | 'consultation'
 
 export default function RapportActivitePage() {
   const toast = useToast()
@@ -130,6 +132,44 @@ export default function RapportActivitePage() {
       setImportError(extractError(err))
     } finally {
       setImporting(false)
+    }
+  }
+
+  // --- Import CANAL (CSV détaillé) ---
+  const canalRef = useRef<HTMLInputElement>(null)
+  const [canalImporting, setCanalImporting] = useState(false)
+  const [canalResult, setCanalResult] = useState<(CanalImportResult & { fichiers: number }) | null>(null)
+  const [canalError, setCanalError] = useState<string | null>(null)
+
+  const handleCanalFiles = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || [])
+    if (files.length === 0) return
+    setCanalImporting(true)
+    setCanalError(null)
+    setCanalResult(null)
+    const agg: CanalImportResult & { fichiers: number } = {
+      fichiers: 0, lignes: 0, transactions: 0, pdvs: 0, formules: 0, abonnesCrees: 0, encaissementsCrees: 0, montantTotal: 0,
+    }
+    try {
+      for (const f of files) {
+        const content = await f.text()
+        const r = await importCanal(content)
+        agg.fichiers += 1
+        agg.lignes += r.lignes
+        agg.transactions += r.transactions
+        agg.pdvs = Math.max(agg.pdvs, r.pdvs)
+        agg.formules = Math.max(agg.formules, r.formules)
+        agg.abonnesCrees += r.abonnesCrees
+        agg.encaissementsCrees += r.encaissementsCrees
+        agg.montantTotal += r.montantTotal
+      }
+      setCanalResult(agg)
+      toast.success(`Import terminé : ${agg.encaissementsCrees} encaissement(s), ${agg.abonnesCrees} abonné(s) créé(s) ✓`)
+    } catch (err) {
+      setCanalError(extractError(err))
+    } finally {
+      setCanalImporting(false)
+      if (canalRef.current) canalRef.current.value = ''
     }
   }
 
@@ -283,23 +323,85 @@ export default function RapportActivitePage() {
 
       {/* Tab bar */}
       <div className="flex items-center gap-1 border-b border-app-border" style={{ borderColor: 'var(--border)' }}>
-        {(['importation', 'consultation'] as Tab[]).map((t) => (
+        {(['canal', 'importation', 'consultation'] as Tab[]).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={cn(
-              'px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors capitalize',
+              'px-4 py-2.5 text-sm font-semibold border-b-2 -mb-px transition-colors',
               tab === t
                 ? 'border-primary text-primary'
                 : 'border-transparent text-app-muted hover:text-app-text',
             )}
           >
-            {t === 'importation' ? 'Importation' : 'Consultation'}
+            {t === 'canal' ? 'Import CANAL (CSV)' : t === 'importation' ? 'Import Excel' : 'Consultation'}
           </button>
         ))}
       </div>
 
-      {tab === 'consultation' ? (
+      {tab === 'canal' ? (
+        <Card>
+          <div className="min-h-[420px] space-y-4">
+            <div>
+              <h3 className="text-base font-bold text-app-text" style={{ color: 'var(--text)' }}>Import du rapport détaillé CANAL</h3>
+              <p className="text-sm text-app-muted mt-1" style={{ color: 'var(--text-muted)' }}>
+                Déposez un ou plusieurs fichiers <span className="font-mono">.csv</span> (rapport d'activité distributeur détaillé).
+                Le logiciel crée automatiquement les <b>PDV</b>, <b>formules</b>, <b>abonnés</b> et <b>encaissements</b>.
+                Ré-importer le même fichier ne crée pas de doublon.
+              </p>
+            </div>
+
+            {canMutate ? (
+              <input
+                ref={canalRef}
+                type="file"
+                accept=".csv,text/csv"
+                multiple
+                onChange={handleCanalFiles}
+                disabled={canalImporting}
+                className="block text-sm text-app-text file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-primary-dark disabled:opacity-50"
+              />
+            ) : (
+              <p className="text-sm text-app-muted">Vous n'avez pas la permission d'importer.</p>
+            )}
+
+            <div className="min-h-[200px]">
+              {canalImporting && (
+                <div className="flex items-center gap-3 text-sm text-app-muted">
+                  <span className="inline-block w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  Import en cours… (les gros fichiers peuvent prendre quelques secondes)
+                </div>
+              )}
+              {!canalImporting && canalError && (
+                <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-800">{canalError}</div>
+              )}
+              {!canalImporting && canalResult && (
+                <div className="rounded-lg border border-app-border p-4" style={{ borderColor: 'var(--border)' }}>
+                  <p className="text-sm font-semibold text-primary-dark mb-3">✅ Import terminé — {canalResult.fichiers} fichier(s)</p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
+                    {([
+                      ['Lignes lues', canalResult.lignes.toLocaleString('fr-FR')],
+                      ['Transactions', canalResult.transactions.toLocaleString('fr-FR')],
+                      ['Abonnés créés', canalResult.abonnesCrees.toLocaleString('fr-FR')],
+                      ['Encaissements créés', canalResult.encaissementsCrees.toLocaleString('fr-FR')],
+                      ['PDV', String(canalResult.pdvs)],
+                      ['Montant total', formatFCFA(canalResult.montantTotal)],
+                    ] as const).map(([label, val]) => (
+                      <div key={label} className="rounded-lg bg-gray-50 p-3" style={{ background: 'var(--app-bg)' }}>
+                        <p className="text-app-muted text-xs">{label}</p>
+                        <p className="font-mono font-semibold text-app-text">{val}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-xs text-app-muted mt-3">
+                    💡 Les données apparaissent dans « Base de données globale », les analyses et les commissions — par la <b>période</b> du rapport.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Card>
+      ) : tab === 'consultation' ? (
         <Card>
           <div className="min-h-[420px]">
             <DataTable

@@ -154,6 +154,8 @@ model Encaissement {
   options      String             @default("{}")
   date         DateTime
   recuNumero   String
+  // Clé d'idempotence pour l'import CANAL (évite les doublons au ré-import).
+  importKey    String?            @unique
   createdAt    DateTime           @default(now())
 
   abonne  Abonne  @relation(fields: [abonneId], references: [id])

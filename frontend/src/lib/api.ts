@@ -95,6 +95,14 @@ export const securityEvents = async (): Promise<SecurityEventRow[]> => {
 export const securityStats = async (): Promise<SecurityStats> =>
   (await apiClient.get<SecurityStats>('/security/stats')).data
 
+// ---- Import CANAL (rapport détaillé CSV) ----
+export interface CanalImportResult {
+  lignes: number; transactions: number; pdvs: number; formules: number
+  abonnesCrees: number; encaissementsCrees: number; montantTotal: number
+}
+export const importCanal = async (content: string): Promise<CanalImportResult> =>
+  (await apiClient.post<CanalImportResult>('/import/canal', { content })).data
+
 export const getMe = async (): Promise<User> => {
   const res = await apiClient.get<User>('/auth/me')
   return res.data

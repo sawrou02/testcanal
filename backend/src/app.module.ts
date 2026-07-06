@@ -36,6 +36,7 @@ import { GapKitModule } from './gap-kit/gap-kit.module';
 import { ParabolesModule } from './paraboles/paraboles.module';
 import { TasksModule } from './tasks/tasks.module';
 import { SecurityModule } from './security/security.module';
+import { ImportModule } from './import/import.module';
 import { AccessDeniedFilter } from './security/access-denied.filter';
 import { APP_FILTER } from '@nestjs/core';
 
@@ -77,6 +78,7 @@ import { APP_FILTER } from '@nestjs/core';
     ParabolesModule,
     TasksModule,
     SecurityModule,
+    ImportModule,
   ],
   providers: [
     {
