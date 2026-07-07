@@ -43,7 +43,7 @@ export default function MaterielsVendusPage() {
         {loading || !data ? (
           <SkeletonCardGrid count={1} />
         ) : (
-          <KpiCard label="Total matériels vendus" value={num(data.total)} delta={0} deltaLabel="unités" color="green" icon="📦" />
+          <KpiCard label="Total matériels vendus" value={num(data.total)} delta={0} deltaLabel="unités" color="green" icon="package" />
         )}
       </div>
 

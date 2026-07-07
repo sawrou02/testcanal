@@ -61,10 +61,10 @@ export default function ArpuPage() {
           <SkeletonCardGrid count={4} />
         ) : (
           <>
-            <KpiCard label="ARPU réseau" value={formatFCFA(arpuReseau)} delta={0} deltaLabel="revenu moyen / abonné" color="green" icon="📈" />
-            <KpiCard label="CA total" value={formatFCFA(sumCa)} delta={0} deltaLabel="période" color="blue" icon="💰" />
-            <KpiCard label="Abonnés actifs" value={num(sumAbo)} delta={0} deltaLabel="réseau" color="gold" icon="👥" />
-            <KpiCard label="Nb PDV" value={num(rows.length)} delta={0} deltaLabel="points de vente" color="blue" icon="🏪" />
+            <KpiCard label="ARPU réseau" value={formatFCFA(arpuReseau)} delta={0} deltaLabel="revenu moyen / abonné" color="green" icon="trend" />
+            <KpiCard label="CA total" value={formatFCFA(sumCa)} delta={0} deltaLabel="période" color="blue" icon="card" />
+            <KpiCard label="Abonnés actifs" value={num(sumAbo)} delta={0} deltaLabel="réseau" color="gold" icon="users" />
+            <KpiCard label="Nb PDV" value={num(rows.length)} delta={0} deltaLabel="points de vente" color="blue" icon="card" />
           </>
         )}
       </div>

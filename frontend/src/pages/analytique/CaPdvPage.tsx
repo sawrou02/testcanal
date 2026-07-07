@@ -73,10 +73,10 @@ export default function CaPdvPage({ title }: { title?: string }) {
           <SkeletonCardGrid count={4} />
         ) : (
           <>
-            <KpiCard label="CA total réseau" value={formatFCFA(caTotalReseau)} delta={0} deltaLabel="période" color="green" icon="💰" />
-            <KpiCard label="Nb PDV" value={num(rows.length)} delta={0} deltaLabel="points de vente" color="blue" icon="🏪" />
-            <KpiCard label="CA recrut. total" value={formatFCFA(caRecruTotal)} delta={0} deltaLabel="recrutements" color="gold" icon="🆕" />
-            <KpiCard label="CA réabo total" value={formatFCFA(caReaboTotal)} delta={0} deltaLabel="réabonnements" color="blue" icon="🔁" />
+            <KpiCard label="CA total réseau" value={formatFCFA(caTotalReseau)} delta={0} deltaLabel="période" color="green" icon="card" />
+            <KpiCard label="Nb PDV" value={num(rows.length)} delta={0} deltaLabel="points de vente" color="blue" icon="card" />
+            <KpiCard label="CA recrut. total" value={formatFCFA(caRecruTotal)} delta={0} deltaLabel="recrutements" color="gold" icon="plus" />
+            <KpiCard label="CA réabo total" value={formatFCFA(caReaboTotal)} delta={0} deltaLabel="réabonnements" color="blue" icon="trend" />
           </>
         )}
       </div>

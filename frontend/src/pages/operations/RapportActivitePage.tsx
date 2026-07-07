@@ -291,7 +291,7 @@ export default function RapportActivitePage() {
               delta={0}
               deltaLabel="au total"
               color="blue"
-              icon="📄"
+              icon="receipt"
             />
             <KpiCard
               label="CA cumulé"
@@ -299,7 +299,7 @@ export default function RapportActivitePage() {
               delta={0}
               deltaLabel="tous rapports"
               color="green"
-              icon="💰"
+              icon="card"
             />
             <KpiCard
               label="Matchés"
@@ -307,7 +307,7 @@ export default function RapportActivitePage() {
               delta={0}
               deltaLabel="rapprochés"
               color="green"
-              icon="✅"
+              icon="check"
             />
             <KpiCard
               label="Écarts"
@@ -377,7 +377,7 @@ export default function RapportActivitePage() {
               )}
               {!canalImporting && canalResult && (
                 <div className="rounded-lg border border-app-border p-4" style={{ borderColor: 'var(--border)' }}>
-                  <p className="text-sm font-semibold text-primary-dark mb-3">✅ Import terminé — {canalResult.fichiers} fichier(s)</p>
+                  <p className="text-sm font-semibold text-primary-dark mb-3">Import terminé — {canalResult.fichiers} fichier(s)</p>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
                     {([
                       ['Lignes lues', canalResult.lignes.toLocaleString('fr-FR')],
@@ -394,7 +394,7 @@ export default function RapportActivitePage() {
                     ))}
                   </div>
                   <p className="text-xs text-app-muted mt-3">
-                    💡 Les données apparaissent dans « Base de données globale », les analyses et les commissions — par la <b>période</b> du rapport.
+                    Les données apparaissent dans « Base de données globale », les analyses et les commissions — par la <b>période</b> du rapport.
                   </p>
                 </div>
               )}

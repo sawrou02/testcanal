@@ -4,7 +4,8 @@ import { useToast } from '../../components/ui/Toast'
 import { classementPdv, type ClassementPdvRow } from '../../lib/api'
 import { Card, PageHeader, PeriodeSelector, currentMonth, money, num, type Row } from './shared'
 
-const medal = (rang: number) => (rang === 1 ? '🥇' : rang === 2 ? '🥈' : rang === 3 ? '🥉' : '')
+const rankColor = (rang: number) =>
+  rang === 1 ? '#E2A000' : rang === 2 ? '#9AA3AE' : rang === 3 ? '#B5723A' : ''
 
 export default function ClassementPage() {
   const toast = useToast()
@@ -35,11 +36,13 @@ export default function ClassementPage() {
       label: 'Rang',
       render: (v: unknown) => {
         const r = Number(v) || 0
-        return (
-          <span className="font-bold">
-            {medal(r)} {r}
-          </span>
-        )
+        const c = rankColor(r)
+        if (c) {
+          return (
+            <span className="inline-flex items-center justify-center w-6 h-6 rounded-full text-white text-xs font-bold" style={{ background: c }}>{r}</span>
+          )
+        }
+        return <span className="font-bold">{r}</span>
       },
     },
     {

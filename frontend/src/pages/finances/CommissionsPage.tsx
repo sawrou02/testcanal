@@ -152,7 +152,7 @@ export default function CommissionsPage() {
               delta={0}
               deltaLabel="période"
               color="blue"
-              icon="💼"
+              icon="card"
             />
             <KpiCard
               label="Déductions"
@@ -160,7 +160,7 @@ export default function CommissionsPage() {
               delta={0}
               deltaLabel="période"
               color="red"
-              icon="➖"
+              icon="card"
             />
             <KpiCard
               label="Com. nette"
@@ -168,7 +168,7 @@ export default function CommissionsPage() {
               delta={0}
               deltaLabel="à payer"
               color="green"
-              icon="💰"
+              icon="card"
             />
             <KpiCard
               label="Partenaires"
@@ -176,7 +176,7 @@ export default function CommissionsPage() {
               delta={0}
               deltaLabel="concernés"
               color="gold"
-              icon="🤝"
+              icon="users"
             />
           </>
         )}

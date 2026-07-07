@@ -137,7 +137,7 @@ export default function DetailsBancairesPage() {
               delta={0}
               deltaLabel="crédits"
               color="green"
-              icon="⬆️"
+              icon="trend"
             />
             <KpiCard
               label="Total retraits"
@@ -145,7 +145,7 @@ export default function DetailsBancairesPage() {
               delta={0}
               deltaLabel="débits"
               color="red"
-              icon="⬇️"
+              icon="trend"
             />
             <KpiCard
               label="Solde net"

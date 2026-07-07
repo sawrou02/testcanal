@@ -71,7 +71,7 @@ export default function SecurityPage() {
       </Card>
 
       <p className="text-xs text-app-muted">
-        🔒 Protection active : blocage du compte après 5 échecs (15 min), vérification anti-robot dès 3 échecs,
+        Protection active : blocage du compte après 5 échecs (15 min), vérification anti-robot dès 3 échecs,
         limite de débit, et journal de toutes les tentatives. Une alerte apparaît dans la cloche en cas de blocage.
       </p>
     </div>

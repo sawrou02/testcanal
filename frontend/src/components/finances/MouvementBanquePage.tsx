@@ -274,7 +274,7 @@ export function MouvementBanquePage(props: MouvementBanquePageProps) {
               delta={0}
               deltaLabel="ce mois"
               color="green"
-              icon="✅"
+              icon="check"
             />
             <KpiCard
               label="En attente"
@@ -298,7 +298,7 @@ export function MouvementBanquePage(props: MouvementBanquePageProps) {
               delta={0}
               deltaLabel="mouvements"
               color="blue"
-              icon="🏦"
+              icon="card"
             />
           </>
         )}

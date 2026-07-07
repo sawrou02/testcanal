@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BrandStar } from '../ui/BrandStar'
+import { getRoleLabel } from '../../lib/utils'
 import { useThemeStore } from '../../hooks/useTheme'
 import { useAuthStore } from '../../store/authStore'
 import {
@@ -25,6 +26,9 @@ const DOT: Record<NotificationRow['type'], string> = {
 export function Header({ title = 'Tableau de bord' }: HeaderProps) {
   const { theme, toggleTheme } = useThemeStore()
   const user = useAuthStore((s) => s.user)
+  const logout = useAuthStore((s) => s.logout)
+  const [userOpen, setUserOpen] = useState(false)
+  const userRef = useRef<HTMLDivElement>(null)
   const [search, setSearch] = useState('')
   const navigate = useNavigate()
   const [results, setResults] = useState<SearchResults | null>(null)
@@ -75,10 +79,11 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
     void load()
   }, [])
 
-  // close dropdown on outside click
+  // close dropdowns on outside click
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false)
+      if (userRef.current && !userRef.current.contains(e.target as Node)) setUserOpen(false)
     }
     document.addEventListener('mousedown', onClick)
     return () => document.removeEventListener('mousedown', onClick)
@@ -248,12 +253,50 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
           )}
         </div>
 
-        {/* User avatar (real initials) */}
-        <div
-          className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold"
-          title={user ? `${user.prenom} ${user.nom}` : ''}
-        >
-          {initials}
+        {/* User menu + logout */}
+        <div className="relative" ref={userRef}>
+          <button
+            onClick={() => setUserOpen((v) => !v)}
+            className="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-gray-100 transition-colors"
+            style={{ color: 'var(--text)' }}
+            title={user ? `${user.prenom} ${user.nom}` : ''}
+          >
+            <span className="w-9 h-9 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold">
+              {initials}
+            </span>
+            <svg className="w-3.5 h-3.5 hidden sm:block" style={{ color: 'var(--text-muted)' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 9l6 6 6-6" />
+            </svg>
+          </button>
+
+          {userOpen && (
+            <div
+              className="absolute right-0 mt-2 w-60 rounded-xl border shadow-lg z-50 overflow-hidden"
+              style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
+            >
+              <div className="px-4 py-3 border-b flex items-center gap-3" style={{ borderColor: 'var(--border)' }}>
+                <span className="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center text-sm font-bold shrink-0">{initials}</span>
+                <div className="min-w-0">
+                  <div className="text-sm font-bold truncate" style={{ color: 'var(--text)' }}>
+                    {user ? `${user.prenom} ${user.nom}` : 'Utilisateur'}
+                  </div>
+                  <div className="text-[11px] truncate" style={{ color: 'var(--text-muted)' }}>
+                    {user ? getRoleLabel(user.role) : ''}
+                  </div>
+                </div>
+              </div>
+              <button
+                onClick={() => { setUserOpen(false); logout(); navigate('/login') }}
+                className="w-full flex items-center gap-2.5 px-4 py-3 text-sm font-semibold text-left hover:bg-red-50 transition-colors"
+                style={{ color: 'var(--danger)' }}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Se déconnecter
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </header>

@@ -90,22 +90,38 @@ export function TopNav() {
       </div>
 
       {openSection && !openSection.singleLink && (
-        <div className="absolute left-0 right-0 top-full z-40 border-b shadow-xl"
+        <div className="absolute left-0 right-0 top-full z-40 border-b shadow-2xl"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
-          <div className="max-w-[1600px] mx-auto p-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1">
-            {openSection.items.map((it) => {
-              const active = currentPath === `/app/${it.id}`
-              const b = itemBadge[it.id] || 0
-              return (
-                <Link key={it.id} to={`/app/${it.id}`}
-                  className={cn('flex items-center justify-between gap-2 px-3 py-2 rounded-lg text-sm transition-colors',
-                    active ? 'bg-primary text-white font-semibold' : 'hover:bg-primary/5')}
-                  style={active ? undefined : { color: 'var(--text)' }}>
-                  <span className="truncate">{it.label}</span>
-                  {b > 0 && <span className="min-w-[18px] h-[18px] px-1 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">{b}</span>}
-                </Link>
-              )
-            })}
+          <div className="max-w-[1600px] mx-auto px-4 py-4">
+            {/* En-tête du méga-menu */}
+            <div className="flex items-center gap-2.5 pb-3 mb-2 border-b" style={{ borderColor: 'var(--border)' }}>
+              <span className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: 'var(--primary)', color: '#fff' }}>
+                <Icon name={openSection.icon} size={17} />
+              </span>
+              <span className="text-sm font-black" style={{ color: 'var(--text)' }}>{openSection.label}</span>
+              <span className="text-xs" style={{ color: 'var(--text-muted)' }}>· {openSection.items.length} rubriques</span>
+            </div>
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1">
+              {openSection.items.map((it) => {
+                const active = currentPath === `/app/${it.id}`
+                const b = itemBadge[it.id] || 0
+                return (
+                  <Link key={it.id} to={`/app/${it.id}`}
+                    className={cn('group flex items-center gap-2.5 px-3 py-2.5 rounded-lg text-sm transition-all',
+                      active ? 'bg-primary text-white font-semibold' : 'hover:bg-primary/5 hover:pl-4')}
+                    style={active ? undefined : { color: 'var(--text)' }}>
+                    <span className={cn('w-1.5 h-1.5 rounded-full shrink-0 transition-colors',
+                      active ? 'bg-white' : 'bg-primary/40 group-hover:bg-primary')} />
+                    <span className="truncate flex-1">{it.label}</span>
+                    {b > 0 && <span className="min-w-[18px] h-[18px] px-1 bg-danger text-white text-[10px] font-bold rounded-full flex items-center justify-center">{b}</span>}
+                    <svg className={cn('w-3.5 h-3.5 shrink-0 transition-opacity', active ? 'opacity-90' : 'opacity-0 group-hover:opacity-60')}
+                      viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 6l6 6-6 6" />
+                    </svg>
+                  </Link>
+                )
+              })}
+            </div>
           </div>
         </div>
       )}

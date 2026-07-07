@@ -66,7 +66,10 @@ import RetourRpePage from '../pages/commercial/RetourRpePage'
 function AccessDenied() {
   return (
     <div className="flex flex-col items-center justify-center text-center py-24 gap-3">
-      <div className="text-5xl">🔒</div>
+      <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <rect width="18" height="11" x="3" y="11" rx="2" />
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+      </svg>
       <h2 className="text-xl font-black" style={{ color: 'var(--text)' }}>Accès refusé</h2>
       <p className="text-sm max-w-md" style={{ color: 'var(--text-muted)' }}>
         Votre profil n’a pas la permission d’accéder à cette page. Contactez votre administrateur si besoin.

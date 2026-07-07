@@ -63,7 +63,7 @@ export default function ImmobilisesPage({ type, title }: ImmobilisesPageProps) {
             delta={0}
             deltaLabel="à traiter"
             color="red"
-            icon="⛔"
+            icon="info"
           />
         )}
       </div>

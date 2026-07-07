@@ -76,7 +76,7 @@ export default function InventairePage({ scope, type, title }: InventairePagePro
               delta={0}
               deltaLabel="décodeurs"
               color="blue"
-              icon="📦"
+              icon="package"
             />
             <KpiCard
               label="En entrepôt"
@@ -84,7 +84,7 @@ export default function InventairePage({ scope, type, title }: InventairePagePro
               delta={0}
               deltaLabel="en stock"
               color="green"
-              icon="🏬"
+              icon="package"
             />
             <KpiCard
               label="En PDV"
@@ -92,7 +92,7 @@ export default function InventairePage({ scope, type, title }: InventairePagePro
               delta={0}
               deltaLabel="sur le réseau"
               color="gold"
-              icon="🏪"
+              icon="card"
             />
             <KpiCard
               label="Immobilisés"
@@ -100,7 +100,7 @@ export default function InventairePage({ scope, type, title }: InventairePagePro
               delta={0}
               deltaLabel="à traiter"
               color="red"
-              icon="⛔"
+              icon="info"
             />
           </>
         )}

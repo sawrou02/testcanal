@@ -99,7 +99,7 @@ export function HelpAssistant() {
           style={{ background: 'var(--surface)', borderColor: 'var(--border)', maxHeight: '72vh' }}
         >
           <div className="px-4 py-3 text-white" style={{ background: 'var(--primary)' }}>
-            <div className="font-bold">💬 Assistant SENDISTRI</div>
+            <div className="font-bold">Assistant SENDISTRI</div>
             <div className="text-[11px] opacity-90">Pose ta question — fonctionne hors ligne</div>
           </div>
 
@@ -144,7 +144,7 @@ export function HelpAssistant() {
                         </ol>
                         {e.note && (
                           <div className="mt-2 text-[12px] rounded-md px-2 py-1.5" style={{ background: 'var(--app-bg)', color: 'var(--text-muted)' }}>
-                            ⚠️ {e.note}
+                            {e.note}
                           </div>
                         )}
                         {e.route && (
