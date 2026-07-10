@@ -191,6 +191,7 @@ export const NAV_SECTIONS: NavSection[] = [
     label: 'Statistiques',
     icon: 'pie',
     items: [
+      { id: 'rapport-graphique', label: 'Rapport graphique' },
       { id: 'stat-objectif-pdv', label: 'Objectif PDV' },
       { id: 'stat-classement', label: 'Classement' },
       { id: 'stat-ca-pdv', label: 'CA PDV' },

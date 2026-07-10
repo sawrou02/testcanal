@@ -41,6 +41,7 @@ import ImmobilisesPage from '../pages/logistique/ImmobilisesPage'
 import MouvementsPage from '../pages/logistique/MouvementsPage'
 import CaPdvPage from '../pages/analytique/CaPdvPage'
 import ClassementPage from '../pages/analytique/ClassementPage'
+import RapportGraphiquePage from '../pages/analytique/RapportGraphiquePage'
 import PoidsFormulesPage from '../pages/analytique/PoidsFormulesPage'
 import RecrutementUserPage from '../pages/analytique/RecrutementUserPage'
 import ArpuPage from '../pages/analytique/ArpuPage'
@@ -188,6 +189,7 @@ export const router = createBrowserRouter([
       { path: 'app/g11-livraison', element: <MouvementsPage title="Livraison G11" /> },
 
       // --- Analytique / Statistiques ---
+      { path: 'app/rapport-graphique', element: <RapportGraphiquePage /> },
       { path: 'app/stat-ca-pdv', element: <CaPdvPage /> },
       { path: 'app/stat-classement', element: <ClassementPage /> },
       {

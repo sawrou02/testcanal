@@ -961,6 +961,38 @@ export interface AuditLogRow {
   user: { prenom: string; nom: string; role: string }
 }
 
+export interface RapportGraphiqueData {
+  periode: string
+  totaux: {
+    caTotal: number
+    caRecru: number
+    caReabo: number
+    caMigration: number
+    caImpaye: number
+    nbOps: number
+    nbRecru: number
+    nbReabo: number
+  }
+  byDay: { date: string; recru: number; reabo: number; total: number }[]
+  byFormule: { formule: string; montant: number; nb: number }[]
+  byPdv: { pdv: string; montant: number; nb: number }[]
+}
+
+const EMPTY_RAPPORT: RapportGraphiqueData = {
+  periode: '',
+  totaux: { caTotal: 0, caRecru: 0, caReabo: 0, caMigration: 0, caImpaye: 0, nbOps: 0, nbRecru: 0, nbReabo: 0 },
+  byDay: [],
+  byFormule: [],
+  byPdv: [],
+}
+
+export const rapportGraphique = async (periode?: string): Promise<RapportGraphiqueData> => {
+  const res = await apiClient.get<RapportGraphiqueData>('/analytics/rapport-graphique', {
+    params: periode ? { periode } : undefined,
+  })
+  return res.data && typeof res.data === 'object' ? { ...EMPTY_RAPPORT, ...res.data } : EMPTY_RAPPORT
+}
+
 export const caPdv = async (periode?: string): Promise<CaPdvRow[]> => {
   const res = await apiClient.get<CaPdvRow[]>('/analytics/ca-pdv', {
     params: periode ? { periode } : undefined,

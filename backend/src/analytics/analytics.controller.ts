@@ -15,6 +15,12 @@ export class AnalyticsController {
     return this.analyticsService.getCaPdv(periode);
   }
 
+  @Get('analytics/rapport-graphique')
+  @UseGuards(JwtAuthGuard)
+  async getRapportGraphique(@Query('periode') periode?: string) {
+    return this.analyticsService.getRapportGraphique(periode);
+  }
+
   @Get('analytics/classement-pdv')
   @UseGuards(JwtAuthGuard)
   async getClassementPdv(@Query('periode') periode?: string) {

@@ -81,8 +81,14 @@ body {
   #receipt-print,
   #receipt-print *,
   #commissions-print,
-  #commissions-print * {
+  #commissions-print *,
+  #rapport-print,
+  #rapport-print * {
     visibility: visible;
+  }
+  #rapport-print {
+    position: absolute;
+    inset: 0;
   }
   #receipt-print {
     position: absolute;

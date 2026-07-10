@@ -34,6 +34,79 @@ export class AnalyticsService {
   }
 
   /**
+   * Données agrégées pour le rapport graphique du CA sur une période :
+   * totaux par nature, évolution jour par jour, répartition par formule, top PDV.
+   * Tout est calculé depuis les encaissements réels.
+   */
+  async getRapportGraphique(periodeParam?: string) {
+    const { periode, start, end } = this.resolvePeriode(periodeParam);
+    const period = { gte: start, lt: end };
+
+    const [byNature, rows, byFormuleG, byPdvG] = await Promise.all([
+      this.prisma.encaissement.groupBy({
+        by: ['nature'], where: { date: period }, _sum: { montantTotal: true }, _count: { _all: true },
+      }),
+      this.prisma.encaissement.findMany({
+        where: { date: period }, select: { date: true, nature: true, montantTotal: true },
+      }),
+      this.prisma.encaissement.groupBy({
+        by: ['formuleId'], where: { date: period }, _sum: { montantTotal: true }, _count: { _all: true },
+      }),
+      this.prisma.encaissement.groupBy({
+        by: ['pdvId'], where: { date: period }, _sum: { montantTotal: true }, _count: { _all: true },
+      }),
+    ]);
+
+    const natSum = (n: string) => byNature.find((x) => x.nature === n)?._sum.montantTotal || 0;
+    const natNb = (n: string) => byNature.find((x) => x.nature === n)?._count._all || 0;
+    const caRecru = natSum('RECRUTEMENT');
+    const caReabo = natSum('REABONNEMENT');
+    const caMigration = natSum('MIGRATION');
+    const caImpaye = natSum('IMPAYE');
+    const caTotal = byNature.reduce((s, x) => s + (x._sum.montantTotal || 0), 0);
+    const nbOps = byNature.reduce((s, x) => s + (x._count._all || 0), 0);
+
+    // Évolution par jour (recrutement vs réabonnement)
+    const dayMap = new Map<string, { recru: number; reabo: number; total: number }>();
+    for (const r of rows) {
+      const d = new Date(r.date);
+      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      if (!dayMap.has(key)) dayMap.set(key, { recru: 0, reabo: 0, total: 0 });
+      const e = dayMap.get(key)!;
+      e.total += r.montantTotal;
+      if (r.nature === 'RECRUTEMENT') e.recru += r.montantTotal;
+      else if (r.nature === 'REABONNEMENT') e.reabo += r.montantTotal;
+    }
+    const byDay = [...dayMap.entries()].sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, v]) => ({ date, recru: this.round(v.recru), reabo: this.round(v.reabo), total: this.round(v.total) }));
+
+    // Répartition par formule
+    const formuleIds = byFormuleG.map((g) => g.formuleId);
+    const formules = await this.prisma.formule.findMany({ where: { id: { in: formuleIds } }, select: { id: true, code: true, nomCommercial: true } });
+    const fMap = new Map(formules.map((f) => [f.id, f]));
+    const byFormule = byFormuleG
+      .map((g) => ({ formule: fMap.get(g.formuleId)?.nomCommercial || fMap.get(g.formuleId)?.code || '—', montant: this.round(g._sum.montantTotal || 0), nb: g._count._all }))
+      .filter((x) => x.montant > 0)
+      .sort((a, b) => b.montant - a.montant)
+      .slice(0, 8);
+
+    // Top PDV
+    const pdvIds = byPdvG.map((g) => g.pdvId);
+    const pdvs = await this.prisma.pDV.findMany({ where: { id: { in: pdvIds } }, select: { id: true, raisonSociale: true } });
+    const pMap = new Map(pdvs.map((p) => [p.id, p.raisonSociale]));
+    const byPdv = byPdvG
+      .map((g) => ({ pdv: pMap.get(g.pdvId) || '—', montant: this.round(g._sum.montantTotal || 0), nb: g._count._all }))
+      .sort((a, b) => b.montant - a.montant)
+      .slice(0, 10);
+
+    return {
+      periode,
+      totaux: { caTotal, caRecru, caReabo, caMigration, caImpaye, nbOps, nbRecru: natNb('RECRUTEMENT'), nbReabo: natNb('REABONNEMENT') },
+      byDay, byFormule, byPdv,
+    };
+  }
+
+  /**
    * CA per PDV for the period, split by nature (recrutement / reabonnement).
    * groupBy(pdvId, nature) merged with PDV + secteur names.
    */
