@@ -36,7 +36,8 @@ export default function DashboardPage() {
               label="Encaissé du mois"
               value={formatFCFA(stats.encaisseDuMois)}
               delta={0}
-              deltaLabel="ce mois"
+              trend={stats.deltas?.encaisse ?? null}
+              deltaLabel="vs mois dernier"
               color="green"
               icon="card"
             />
@@ -44,7 +45,8 @@ export default function DashboardPage() {
               label="Recrutements"
               value={num(stats.recrutementsCount)}
               delta={0}
-              deltaLabel="ce mois"
+              trend={stats.deltas?.recrutements ?? null}
+              deltaLabel="vs mois dernier"
               color="blue"
               icon="users"
             />
@@ -52,7 +54,8 @@ export default function DashboardPage() {
               label="Réabonnements"
               value={num(stats.reaboCount)}
               delta={0}
-              deltaLabel="ce mois"
+              trend={stats.deltas?.reabo ?? null}
+              deltaLabel="vs mois dernier"
               color="gold"
               icon="trend"
             />

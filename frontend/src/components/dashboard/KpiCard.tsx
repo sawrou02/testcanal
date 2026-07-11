@@ -8,6 +8,9 @@ interface KpiCardProps {
   deltaLabel: string
   color?: 'green' | 'gold' | 'red' | 'blue'
   icon?: string
+  /** Si défini, affiche une tendance en pourcentage (▲/▼) au lieu de `delta`.
+   *  null = pas de base de comparaison → affiche « — ». */
+  trend?: number | null
 }
 
 const colorMap = {
@@ -17,10 +20,13 @@ const colorMap = {
   blue: { accent: 'border-t-blue-600', badge: 'bg-blue-50 text-blue-800' },
 }
 
-export function KpiCard({ label, value, delta, deltaLabel, color = 'green', icon }: KpiCardProps) {
+export function KpiCard({ label, value, delta, deltaLabel, color = 'green', icon, trend }: KpiCardProps) {
   const colors = colorMap[color]
-  const isPositive = delta >= 0
-  const deltaColor = color === 'red' ? (isPositive ? 'text-danger' : 'text-primary') : (isPositive ? 'text-primary' : 'text-danger')
+  const usePercent = trend !== undefined
+  const isPositive = usePercent ? (trend ?? 0) >= 0 : delta >= 0
+  const deltaColor = color === 'red'
+    ? (isPositive ? 'text-danger' : 'text-primary')
+    : (isPositive ? 'text-primary' : 'text-danger')
 
   return (
     <div
@@ -49,9 +55,19 @@ export function KpiCard({ label, value, delta, deltaLabel, color = 'green', icon
         )}
       </div>
       <div className="mt-3 flex items-center gap-2">
-        <span className={cn('text-sm font-semibold', deltaColor)}>
-          {isPositive ? '+' : ''}{delta}{typeof delta === 'number' && Math.abs(delta) < 1000 ? (deltaLabel.includes('%') ? '' : '') : ''}
-        </span>
+        {usePercent ? (
+          trend === null ? (
+            <span className="text-sm font-semibold" style={{ color: 'var(--text-muted)' }}>—</span>
+          ) : (
+            <span className={cn('text-sm font-semibold', deltaColor)}>
+              {isPositive ? '▲' : '▼'} {Math.abs(trend as number)}%
+            </span>
+          )
+        ) : (
+          <span className={cn('text-sm font-semibold', deltaColor)}>
+            {isPositive ? '+' : ''}{delta}
+          </span>
+        )}
         <span className="text-xs text-app-subtle" style={{ color: 'var(--text-muted)' }}>
           {deltaLabel}
         </span>

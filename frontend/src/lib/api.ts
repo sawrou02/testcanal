@@ -174,6 +174,11 @@ export interface DashboardStats {
   totalAbonnes: number
   activite30j: { date: string; recrut: number; reabo: number }[]
   soldesParSecteur: { secteur: string; ventes: number }[]
+  deltas?: {
+    encaisse: number | null
+    recrutements: number | null
+    reabo: number | null
+  }
 }
 
 export const getDashboardStats = async (): Promise<DashboardStats> => {
@@ -1099,6 +1104,12 @@ export interface RapportGraphiqueData {
     nbOps: number
     nbRecru: number
     nbReabo: number
+  }
+  deltas?: {
+    caTotal: number | null
+    caRecru: number | null
+    caReabo: number | null
+    nbOps: number | null
   }
   byDay: { date: string; recru: number; reabo: number; total: number }[]
   byFormule: { formule: string; montant: number; nb: number }[]

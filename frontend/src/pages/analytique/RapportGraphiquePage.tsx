@@ -6,15 +6,30 @@ import { formatFCFA } from '../../lib/utils'
 import { HBarChart, ShareBar, TimeAreaChart, SERIES } from '../../components/charts/RevenueCharts'
 import { Card, PageHeader, currentMonth } from './shared'
 
-/** Petite tuile de statistique (sans variation, style bordereau). */
-function Stat({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent: string }) {
+/** Badge de tendance ▲/▼ en % (null = pas de comparaison possible). */
+function TrendBadge({ trend }: { trend?: number | null }) {
+  if (trend === undefined) return null
+  if (trend === null) return <span className="text-xs font-semibold" style={{ color: 'var(--text-muted)' }}>—</span>
+  const up = trend >= 0
+  return (
+    <span className="text-xs font-bold" style={{ color: up ? '#0E8A4F' : '#D23A2C' }}>
+      {up ? '▲' : '▼'} {Math.abs(trend)}%
+    </span>
+  )
+}
+
+/** Petite tuile de statistique, avec variation vs période précédente. */
+function Stat({ label, value, sub, accent, trend }: { label: string; value: string; sub?: string; accent: string; trend?: number | null }) {
   return (
     <div
       className="rounded-xl border p-4 relative overflow-hidden"
       style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}
     >
       <span className="absolute left-0 top-0 bottom-0 w-1" style={{ background: accent }} />
-      <p className="text-sm font-medium mb-1" style={{ color: 'var(--text-muted)' }}>{label}</p>
+      <div className="flex items-center justify-between gap-2 mb-1">
+        <p className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>{label}</p>
+        <TrendBadge trend={trend} />
+      </div>
       <p className="text-2xl font-black leading-tight" style={{ color: 'var(--text)', fontFamily: 'IBM Plex Mono, monospace' }}>
         {value}
       </p>
@@ -143,9 +158,9 @@ export default function RapportGraphiquePage() {
           ))
         ) : (
           <>
-            <Stat label="CA total" value={formatFCFA(t.caTotal)} sub={`${t.nbOps.toLocaleString('fr-FR')} opérations`} accent={SERIES.recru} />
-            <Stat label="Recrutement" value={formatFCFA(t.caRecru)} sub={`${t.nbRecru.toLocaleString('fr-FR')} nouveaux abonnés`} accent={SERIES.recru} />
-            <Stat label="Réabonnement" value={formatFCFA(t.caReabo)} sub={`${t.nbReabo.toLocaleString('fr-FR')} réabonnements`} accent={SERIES.reabo} />
+            <Stat label="CA total" value={formatFCFA(t.caTotal)} sub={`${t.nbOps.toLocaleString('fr-FR')} opérations`} accent={SERIES.recru} trend={data?.deltas?.caTotal} />
+            <Stat label="Recrutement" value={formatFCFA(t.caRecru)} sub={`${t.nbRecru.toLocaleString('fr-FR')} nouveaux abonnés`} accent={SERIES.recru} trend={data?.deltas?.caRecru} />
+            <Stat label="Réabonnement" value={formatFCFA(t.caReabo)} sub={`${t.nbReabo.toLocaleString('fr-FR')} réabonnements`} accent={SERIES.reabo} trend={data?.deltas?.caReabo} />
             <Stat label="Panier moyen" value={formatFCFA(panierMoyen)} sub="par opération" accent={SERIES.migration} />
           </>
         )}

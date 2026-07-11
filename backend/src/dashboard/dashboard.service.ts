@@ -68,6 +68,9 @@ export class DashboardService {
     const now = new Date();
     const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
     const monthEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    // Mois précédent (pour la comparaison / tendances).
+    const prevStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevEnd = monthStart;
     const dayStart = new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -97,6 +100,9 @@ export class DashboardService {
       last30Encaissements,
       secteurs,
       pdvs,
+      prevRecrutements,
+      prevReabo,
+      prevEncaisse,
     ] = await Promise.all([
       this.prisma.encaissement.count({
         where: {
@@ -132,7 +138,24 @@ export class DashboardService {
       }),
       this.prisma.secteur.findMany({ select: { id: true, nom: true } }),
       this.prisma.pDV.findMany({ select: { id: true, secteurId: true } }),
+      this.prisma.encaissement.count({
+        where: { nature: 'RECRUTEMENT' as any, date: { gte: prevStart, lt: prevEnd } },
+      }),
+      this.prisma.encaissement.count({
+        where: { nature: 'REABONNEMENT' as any, date: { gte: prevStart, lt: prevEnd } },
+      }),
+      this.prisma.encaissement.aggregate({
+        _sum: { montantTotal: true },
+        where: { date: { gte: prevStart, lt: prevEnd } },
+      }),
     ]);
+
+    // Variation en % vs mois précédent. null = pas de base de comparaison
+    // (mois précédent à 0) → l'UI affiche « — » au lieu d'un pourcentage faux.
+    const variation = (current: number, previous: number): number | null => {
+      if (previous <= 0) return null;
+      return Math.round(((current - previous) / previous) * 100);
+    };
 
     // activite30j: one bucket per day for the last 30 days, defaulting to 0.
     const dayKey = (d: Date) =>
@@ -194,6 +217,12 @@ export class DashboardService {
       totalAbonnes,
       activite30j,
       soldesParSecteur,
+      // Tendances vs mois précédent (%).
+      deltas: {
+        encaisse: variation(encaisseMois._sum.montantTotal || 0, prevEncaisse._sum.montantTotal || 0),
+        recrutements: variation(recrutementsCount, prevRecrutements),
+        reabo: variation(reaboCount, prevReabo),
+      },
     };
   }
 

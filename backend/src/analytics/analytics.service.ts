@@ -73,8 +73,12 @@ export class AnalyticsService {
   async getRapportGraphique(periodeParam?: string, debut?: string, fin?: string) {
     const { label: periode, start, end, bucket } = this.resolveRange(periodeParam, debut, fin);
     const period = { gte: start, lt: end };
+    // Période précédente de même durée (pour la comparaison / tendances).
+    const dureeMs = end.getTime() - start.getTime();
+    const prevStart = new Date(start.getTime() - dureeMs);
+    const prevPeriod = { gte: prevStart, lt: start };
 
-    const [byNature, rows, byFormuleG, byPdvG] = await Promise.all([
+    const [byNature, rows, byFormuleG, byPdvG, byNaturePrev] = await Promise.all([
       this.prisma.encaissement.groupBy({
         by: ['nature'], where: { date: period }, _sum: { montantTotal: true }, _count: { _all: true },
       }),
@@ -87,6 +91,9 @@ export class AnalyticsService {
       this.prisma.encaissement.groupBy({
         by: ['pdvId'], where: { date: period }, _sum: { montantTotal: true }, _count: { _all: true },
       }),
+      this.prisma.encaissement.groupBy({
+        by: ['nature'], where: { date: prevPeriod }, _sum: { montantTotal: true }, _count: { _all: true },
+      }),
     ]);
 
     const natSum = (n: string) => byNature.find((x) => x.nature === n)?._sum.montantTotal || 0;
@@ -97,6 +104,19 @@ export class AnalyticsService {
     const caImpaye = natSum('IMPAYE');
     const caTotal = byNature.reduce((s, x) => s + (x._sum.montantTotal || 0), 0);
     const nbOps = byNature.reduce((s, x) => s + (x._count._all || 0), 0);
+
+    // Totaux période précédente + variations (%).
+    const prevSum = (n: string) => byNaturePrev.find((x) => x.nature === n)?._sum.montantTotal || 0;
+    const prevCaTotal = byNaturePrev.reduce((s, x) => s + (x._sum.montantTotal || 0), 0);
+    const prevNbOps = byNaturePrev.reduce((s, x) => s + (x._count._all || 0), 0);
+    const variation = (cur: number, prev: number): number | null =>
+      prev <= 0 ? null : Math.round(((cur - prev) / prev) * 100);
+    const deltas = {
+      caTotal: variation(caTotal, prevCaTotal),
+      caRecru: variation(caRecru, prevSum('RECRUTEMENT')),
+      caReabo: variation(caReabo, prevSum('REABONNEMENT')),
+      nbOps: variation(nbOps, prevNbOps),
+    };
 
     // Évolution (recrutement vs réabonnement) — regroupée par jour ou par mois selon la plage
     const dayMap = new Map<string, { recru: number; reabo: number; total: number }>();
@@ -137,6 +157,7 @@ export class AnalyticsService {
       periode,
       bucket,
       totaux: { caTotal, caRecru, caReabo, caMigration, caImpaye, nbOps, nbRecru: natNb('RECRUTEMENT'), nbReabo: natNb('REABONNEMENT') },
+      deltas,
       byDay, byFormule, byPdv,
     };
   }
