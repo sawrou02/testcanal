@@ -155,4 +155,100 @@ export class CommissionsService {
       totaux: { comNette: comNetteTotal, partenaires },
     };
   }
+
+  /**
+   * Bordereau de commission détaillé pour UN point de vente et une période :
+   * le relevé à remettre au partenaire. Reprend exactement la même formule
+   * que getCommissions, mais pour un seul PDV, avec le détail des opérations.
+   */
+  async getBordereau(pdvId: string, periodeParam?: string) {
+    const { periode, start, end } = this.resolvePeriode(periodeParam);
+    const bareme = await this.baremes.getMap();
+
+    const pdv = await this.prisma.pDV.findUnique({
+      where: { id: pdvId },
+      select: { code: true, raisonSociale: true },
+    });
+    if (!pdv) {
+      return null;
+    }
+
+    const [grouped, g11Rows, detailRows] = await Promise.all([
+      this.prisma.encaissement.groupBy({
+        by: ['nature'],
+        where: { pdvId, date: { gte: start, lt: end } },
+        _count: { _all: true },
+        _sum: { montantTotal: true },
+      }),
+      this.prisma.encaissement.findMany({
+        where: {
+          pdvId,
+          nature: { in: ['RECRUTEMENT', 'MIGRATION'] as any },
+          date: { gte: start, lt: end },
+          abonne: { decodeur: { type: 'G11' } },
+        },
+        select: { id: true },
+      }),
+      this.prisma.encaissement.findMany({
+        where: { pdvId, date: { gte: start, lt: end } },
+        select: {
+          date: true,
+          nature: true,
+          montantTotal: true,
+          abonne: { select: { numAbonne: true, nom: true, prenom: true } },
+          formule: { select: { nomCommercial: true } },
+        },
+        orderBy: { date: 'asc' },
+        take: 1000,
+      }),
+    ]);
+
+    const natSum = (n: string) =>
+      grouped.find((g) => g.nature === (n as any))?._sum?.montantTotal || 0;
+    const natNb = (n: string) =>
+      grouped.find((g) => g.nature === (n as any))?._count?._all || 0;
+
+    const nbRecru = natNb('RECRUTEMENT');
+    const caRecru = natSum('RECRUTEMENT');
+    const nbReabo = natNb('REABONNEMENT');
+    const caReabo = natSum('REABONNEMENT');
+    const nbMigration = natNb('MIGRATION');
+    const nbG11 = g11Rows.length;
+
+    const tauxFormule = (bareme.comm_formule_abo || 0) / 100;
+    const tauxReabo = (bareme.comm_reabo || 0) / 100;
+    const fMateriel = bareme.comm_materielle || 0;
+    const fG11 = bareme.comm_g11 || 0;
+
+    const comMateriel = nbRecru * fMateriel;
+    const comFormule = caRecru * tauxFormule;
+    const comReabo = caReabo * tauxReabo;
+    const comG11 = nbG11 * fG11;
+    const comNette = comMateriel + comFormule + comReabo + comG11;
+
+    // Lignes récapitulatives (base × taux = montant) pour le bordereau.
+    const resume = [
+      { libelle: 'Recrutement (matériel)', base: nbRecru, uniteBase: 'abonné(s)', taux: fMateriel, uniteTaux: '/abonné', montant: comMateriel },
+      { libelle: 'Commission formule', base: caRecru, uniteBase: 'CA recrut.', taux: bareme.comm_formule_abo || 0, uniteTaux: '%', montant: comFormule },
+      { libelle: 'Réabonnement', base: caReabo, uniteBase: 'CA réabo.', taux: bareme.comm_reabo || 0, uniteTaux: '%', montant: comReabo },
+      { libelle: 'Réseau G11', base: nbG11, uniteBase: 'unité(s)', taux: fG11, uniteTaux: '/unité', montant: comG11 },
+    ];
+
+    return {
+      periode,
+      pdv,
+      compteurs: { nbRecru, caRecru, nbReabo, caReabo, nbMigration, nbG11 },
+      resume,
+      comNette,
+      detail: detailRows.map((r) => ({
+        date: r.date,
+        numAbonne: r.abonne?.numAbonne ?? '—',
+        client: [r.abonne?.prenom, r.abonne?.nom].filter(Boolean).join(' ') || '—',
+        nature: r.nature,
+        formule: r.formule?.nomCommercial ?? '—',
+        montant: r.montantTotal,
+      })),
+      detailTronque: detailRows.length >= 1000,
+    };
+  }
 }

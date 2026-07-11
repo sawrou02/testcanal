@@ -83,10 +83,16 @@ body {
   #commissions-print,
   #commissions-print *,
   #rapport-print,
-  #rapport-print * {
+  #rapport-print *,
+  #bordereau-print,
+  #bordereau-print * {
     visibility: visible;
   }
   #rapport-print {
+    position: absolute;
+    inset: 0;
+  }
+  #bordereau-print {
     position: absolute;
     inset: 0;
   }

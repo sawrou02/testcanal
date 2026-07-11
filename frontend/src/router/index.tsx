@@ -30,6 +30,7 @@ import VersementsPage from '../pages/finances/VersementsPage'
 import RetraitsPage from '../pages/finances/RetraitsPage'
 import DetailsBancairesPage from '../pages/finances/DetailsBancairesPage'
 import CommissionsPage from '../pages/finances/CommissionsPage'
+import BordereauPage from '../pages/finances/BordereauPage'
 import AAEPage from '../pages/service-abonnement/AAEPage'
 import RelancesPage from '../pages/service-abonnement/RelancesPage'
 import EchusPage from '../pages/service-abonnement/EchusPage'
@@ -135,6 +136,7 @@ export const router = createBrowserRouter([
       { path: 'app/rapport-activite', element: <RapportActivitePage /> },
       { path: 'app/matching', element: <MatchingPage /> },
       { path: 'app/ana-commissions', element: <CommissionsPage /> },
+      { path: 'app/bordereau-commission', element: <BordereauPage /> },
       { path: 'app/versement-banque', element: <VersementsPage /> },
       { path: 'app/retrait-banque', element: <RetraitsPage /> },
       { path: 'app/details-bancaires', element: <DetailsBancairesPage /> },

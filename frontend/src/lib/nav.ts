@@ -187,6 +187,7 @@ export const NAV_SECTIONS: NavSection[] = [
       { id: 'ana-objectifs-pdv', label: 'Objectifs PDV' },
       { id: 'ana-recap-objectif', label: 'Récap Objectif' },
       { id: 'ana-commissions', label: 'Commissions' },
+      { id: 'bordereau-commission', label: 'Bordereau Commission' },
     ],
   },
   {

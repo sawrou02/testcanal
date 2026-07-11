@@ -678,6 +678,39 @@ export const getCommissions = async (periode?: string): Promise<CommissionsResul
   return res.data
 }
 
+export interface BordereauResumeLigne {
+  libelle: string
+  base: number
+  uniteBase: string
+  taux: number
+  uniteTaux: string
+  montant: number
+}
+export interface BordereauDetailLigne {
+  date: string
+  numAbonne: string
+  client: string
+  nature: string
+  formule: string
+  montant: number
+}
+export interface BordereauResult {
+  periode: string
+  pdv: { code: string; raisonSociale: string }
+  compteurs: { nbRecru: number; caRecru: number; nbReabo: number; caReabo: number; nbMigration: number; nbG11: number }
+  resume: BordereauResumeLigne[]
+  comNette: number
+  detail: BordereauDetailLigne[]
+  detailTronque: boolean
+}
+
+export const getBordereau = async (pdvId: string, periode?: string): Promise<BordereauResult | null> => {
+  const res = await apiClient.get<BordereauResult | null>('/commissions/bordereau', {
+    params: { pdvId, ...(periode ? { periode } : {}) },
+  })
+  return res.data ?? null
+}
+
 // ---- Service Abonnement ----
 
 export type StatutAbonne = 'ACTIF' | 'ECHU' | 'SUSPENDU' | 'RESILIE'

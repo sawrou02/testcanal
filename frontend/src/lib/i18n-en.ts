@@ -82,6 +82,8 @@ export const EN: Record<string, string> = {
   'Gap Kit': 'Gap Kit',
   // États Analytiques
   'BDD Globale': 'Global Database',
+  'Commissions': 'Commissions',
+  'Bordereau Commission': 'Commission Statement',
   'ARPU': 'ARPU',
   'Suivi Installation': 'Installation Tracking',
 

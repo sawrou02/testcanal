@@ -11,4 +11,13 @@ export class CommissionsController {
   async getCommissions(@Query('periode') periode?: string) {
     return this.commissionsService.getCommissions(periode);
   }
+
+  @Get('bordereau')
+  @UseGuards(JwtAuthGuard)
+  async getBordereau(
+    @Query('pdvId') pdvId: string,
+    @Query('periode') periode?: string,
+  ) {
+    return this.commissionsService.getBordereau(pdvId, periode);
+  }
 }
