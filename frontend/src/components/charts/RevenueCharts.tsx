@@ -16,6 +16,24 @@ const compact = (n: number) => {
   return String(Math.round(n))
 }
 
+const MOIS_COURTS = ['jan', 'fév', 'mar', 'avr', 'mai', 'juin', 'juil', 'août', 'sep', 'oct', 'nov', 'déc']
+/** Étiquette d'axe : "05/07" pour un jour (YYYY-MM-DD), "juil. 26" pour un mois (YYYY-MM). */
+const axisLabel = (date: string) => {
+  if (date.length <= 7) {
+    const [y, m] = date.split('-')
+    return `${MOIS_COURTS[Number(m) - 1]} ${y.slice(2)}`
+  }
+  return `${date.slice(8, 10)}/${date.slice(5, 7)}`
+}
+/** Étiquette longue pour l'info-bulle. */
+const fullLabel = (date: string) => {
+  if (date.length <= 7) {
+    const [y, m] = date.split('-')
+    return `${MOIS_COURTS[Number(m) - 1]} ${y}`
+  }
+  return date.split('-').reverse().join('/')
+}
+
 /* ---------------- Barres horizontales (magnitude par identité) ---------------- */
 export function HBarChart({ items, color = SERIES.recru }: {
   items: { label: string; value: number }[]
@@ -84,6 +102,11 @@ export function TimeAreaChart({ data }: { data: { date: string; recru: number; r
   const area = (key: 'recru' | 'reabo') => `${line(key)} L ${x(data.length - 1)},${y(0)} L ${x(0)},${y(0)} Z`
   const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => maxY * f)
 
+  // Étiquettes d'axe : toutes si peu de points (mois), sinon début / milieu / fin (jours).
+  const labelIdx = data.length <= 12
+    ? data.map((_, i) => i)
+    : [0, Math.floor(data.length / 2), data.length - 1].filter((v, i, a) => a.indexOf(v) === i)
+
   const onMove = (e: React.MouseEvent<SVGSVGElement>) => {
     const rect = e.currentTarget.getBoundingClientRect()
     const px = ((e.clientX - rect.left) / rect.width) * W
@@ -116,14 +139,14 @@ export function TimeAreaChart({ data }: { data: { date: string; recru: number; r
           </g>
         )}
         {/* labels x (début / milieu / fin) */}
-        {[0, Math.floor(data.length / 2), data.length - 1].filter((v, i, a) => a.indexOf(v) === i).map((i) => (
-          <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize="10" fill="var(--text-muted)">{data[i].date.slice(8, 10)}/{data[i].date.slice(5, 7)}</text>
+        {labelIdx.map((i) => (
+          <text key={i} x={x(i)} y={H - 8} textAnchor="middle" fontSize="10" fill="var(--text-muted)">{axisLabel(data[i].date)}</text>
         ))}
       </svg>
       {hover !== null && (
         <div className="absolute top-0 pointer-events-none rounded-lg border shadow-lg px-3 py-2 text-xs"
           style={{ background: 'var(--surface)', borderColor: 'var(--border)', left: `${(x(hover) / W) * 100}%`, transform: 'translateX(-50%)' }}>
-          <div className="font-bold mb-1" style={{ color: 'var(--text)' }}>{data[hover].date.split('-').reverse().join('/')}</div>
+          <div className="font-bold mb-1" style={{ color: 'var(--text)' }}>{fullLabel(data[hover].date)}</div>
           <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ background: SERIES.recru }} /><span style={{ color: 'var(--text-muted)' }}>Recrut.</span><span className="font-mono font-bold" style={{ color: 'var(--text)' }}>{formatFCFA(data[hover].recru)}</span></div>
           <div className="flex items-center gap-2"><span className="w-2 h-2 rounded-full" style={{ background: SERIES.reabo }} /><span style={{ color: 'var(--text-muted)' }}>Réabo.</span><span className="font-mono font-bold" style={{ color: 'var(--text)' }}>{formatFCFA(data[hover].reabo)}</span></div>
         </div>

@@ -34,12 +34,44 @@ export class AnalyticsService {
   }
 
   /**
+   * Résout une plage de mois (debut..fin inclus). Si debut/fin absents ou invalides,
+   * retombe sur resolvePeriode(periodeParam) (un seul mois / mois courant).
+   * bucket = 'month' dès que la plage couvre au moins 2 mois distincts, sinon 'day'.
+   */
+  private resolveRange(periodeParam?: string, debut?: string, fin?: string): {
+    label: string;
+    start: Date;
+    end: Date;
+    bucket: 'day' | 'month';
+  } {
+    const md = debut?.match(/^(\d{4})-(\d{1,2})$/);
+    const mf = fin?.match(/^(\d{4})-(\d{1,2})$/);
+    if (md && mf) {
+      let y1 = parseInt(md[1], 10), m1 = parseInt(md[2], 10) - 1;
+      let y2 = parseInt(mf[1], 10), m2 = parseInt(mf[2], 10) - 1;
+      // Réordonne si l'utilisateur inverse début/fin
+      if (y2 < y1 || (y2 === y1 && m2 < m1)) {
+        [y1, y2] = [y2, y1];
+        [m1, m2] = [m2, m1];
+      }
+      const start = new Date(y1, m1, 1);
+      const end = new Date(y2, m2 + 1, 1);
+      const monthsSpan = (y2 - y1) * 12 + (m2 - m1) + 1;
+      const fmt = (y: number, m: number) => `${y}-${String(m + 1).padStart(2, '0')}`;
+      const label = monthsSpan <= 1 ? fmt(y1, m1) : `${fmt(y1, m1)} → ${fmt(y2, m2)}`;
+      return { label, start, end, bucket: monthsSpan >= 2 ? 'month' : 'day' };
+    }
+    const { periode, start, end } = this.resolvePeriode(periodeParam);
+    return { label: periode, start, end, bucket: 'day' };
+  }
+
+  /**
    * Données agrégées pour le rapport graphique du CA sur une période :
    * totaux par nature, évolution jour par jour, répartition par formule, top PDV.
    * Tout est calculé depuis les encaissements réels.
    */
-  async getRapportGraphique(periodeParam?: string) {
-    const { periode, start, end } = this.resolvePeriode(periodeParam);
+  async getRapportGraphique(periodeParam?: string, debut?: string, fin?: string) {
+    const { label: periode, start, end, bucket } = this.resolveRange(periodeParam, debut, fin);
     const period = { gte: start, lt: end };
 
     const [byNature, rows, byFormuleG, byPdvG] = await Promise.all([
@@ -66,11 +98,13 @@ export class AnalyticsService {
     const caTotal = byNature.reduce((s, x) => s + (x._sum.montantTotal || 0), 0);
     const nbOps = byNature.reduce((s, x) => s + (x._count._all || 0), 0);
 
-    // Évolution par jour (recrutement vs réabonnement)
+    // Évolution (recrutement vs réabonnement) — regroupée par jour ou par mois selon la plage
     const dayMap = new Map<string, { recru: number; reabo: number; total: number }>();
     for (const r of rows) {
       const d = new Date(r.date);
-      const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+      const key = bucket === 'month'
+        ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`
+        : `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       if (!dayMap.has(key)) dayMap.set(key, { recru: 0, reabo: 0, total: 0 });
       const e = dayMap.get(key)!;
       e.total += r.montantTotal;
@@ -101,6 +135,7 @@ export class AnalyticsService {
 
     return {
       periode,
+      bucket,
       totaux: { caTotal, caRecru, caReabo, caMigration, caImpaye, nbOps, nbRecru: natNb('RECRUTEMENT'), nbReabo: natNb('REABONNEMENT') },
       byDay, byFormule, byPdv,
     };

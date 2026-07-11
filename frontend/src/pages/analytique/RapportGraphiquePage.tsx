@@ -4,7 +4,7 @@ import { useToast } from '../../components/ui/Toast'
 import { rapportGraphique, type RapportGraphiqueData } from '../../lib/api'
 import { formatFCFA } from '../../lib/utils'
 import { HBarChart, ShareBar, TimeAreaChart, SERIES } from '../../components/charts/RevenueCharts'
-import { Card, PageHeader, PeriodeSelector, currentMonth } from './shared'
+import { Card, PageHeader, currentMonth } from './shared'
 
 /** Petite tuile de statistique (sans variation, style bordereau). */
 function Stat({ label, value, sub, accent }: { label: string; value: string; sub?: string; accent: string }) {
@@ -35,23 +35,36 @@ function ChartCard({ title, subtitle, children }: { title: string; subtitle?: st
   )
 }
 
+const MONTH_NAMES = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
 const monthLabel = (p: string) => {
   if (!/^\d{4}-\d{2}$/.test(p)) return p
   const [y, m] = p.split('-')
-  const names = ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre']
-  return `${names[Number(m) - 1]} ${y}`
+  return `${MONTH_NAMES[Number(m) - 1]} ${y}`
 }
+/** Étiquette lisible d'une plage : "juillet 2026" si un seul mois, sinon "janvier → juin 2026". */
+const rangeLabel = (debut: string, fin: string) => {
+  if (debut === fin) return monthLabel(debut)
+  const [, m1] = debut.split('-')
+  const [y2] = fin.split('-')
+  const sameYear = debut.split('-')[0] === y2
+  const left = sameYear ? MONTH_NAMES[Number(m1) - 1] : monthLabel(debut)
+  return `${left} → ${monthLabel(fin)}`
+}
+/** Normalise pour que début ≤ fin. */
+const ordered = (a: string, b: string): [string, string] => (a <= b ? [a, b] : [b, a])
 
 export default function RapportGraphiquePage() {
   const toast = useToast()
-  const [periode, setPeriode] = useState(currentMonth())
+  const [debut, setDebut] = useState(currentMonth())
+  const [fin, setFin] = useState(currentMonth())
   const [data, setData] = useState<RapportGraphiqueData | null>(null)
   const [loading, setLoading] = useState(true)
 
-  const fetchData = useCallback(async (p: string) => {
+  const fetchData = useCallback(async (d: string, f: string) => {
     setLoading(true)
     try {
-      setData(await rapportGraphique(p))
+      const [dd, ff] = ordered(d, f)
+      setData(await rapportGraphique({ debut: dd, fin: ff }))
     } catch {
       toast.error('Erreur lors du chargement du rapport')
       setData(null)
@@ -62,8 +75,11 @@ export default function RapportGraphiquePage() {
   }, [])
 
   useEffect(() => {
-    void fetchData(periode)
-  }, [periode, fetchData])
+    void fetchData(debut, fin)
+  }, [debut, fin, fetchData])
+
+  const [dd, ff] = ordered(debut, fin)
+  const periodeTexte = rangeLabel(dd, ff)
 
   const t = data?.totaux
   const panierMoyen = t && t.nbOps > 0 ? t.caTotal / t.nbOps : 0
@@ -83,16 +99,39 @@ export default function RapportGraphiquePage() {
         title="Rapport graphique"
         subtitle="Chiffre d'affaires : recrutement, réabonnement et répartition"
       >
-        <PeriodeSelector periode={periode} onChange={setPeriode} />
-        <Button variant="secondary" onClick={() => window.print()}>
-          Imprimer / PDF
-        </Button>
+        <div className="flex items-end gap-2 no-print">
+          <label className="flex flex-col text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+            Du mois
+            <input
+              type="month"
+              value={debut}
+              max={fin}
+              onChange={(e) => e.target.value && setDebut(e.target.value)}
+              className="mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}
+            />
+          </label>
+          <label className="flex flex-col text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
+            Au mois
+            <input
+              type="month"
+              value={fin}
+              min={debut}
+              onChange={(e) => e.target.value && setFin(e.target.value)}
+              className="mt-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+              style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}
+            />
+          </label>
+          <Button variant="secondary" onClick={() => window.print()}>
+            Imprimer / PDF
+          </Button>
+        </div>
       </PageHeader>
 
       {/* Bandeau titre pour l'impression */}
       <div className="hidden print:block">
         <p className="text-lg font-black" style={{ color: 'var(--text)' }}>
-          Bordereau d'activité — {monthLabel(periode)}
+          Bordereau d'activité — {periodeTexte}
         </p>
       </div>
 
@@ -113,7 +152,7 @@ export default function RapportGraphiquePage() {
       </div>
 
       {/* Évolution temporelle */}
-      <ChartCard title="Évolution du chiffre d'affaires" subtitle={`Jour par jour — ${monthLabel(periode)}`}>
+      <ChartCard title="Évolution du chiffre d'affaires" subtitle={`${data?.bucket === 'month' ? 'Mois par mois' : 'Jour par jour'} — ${periodeTexte}`}>
         {loading ? (
           <div className="h-64 animate-pulse rounded-lg" style={{ background: 'var(--app-bg)' }} />
         ) : (

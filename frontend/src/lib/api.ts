@@ -963,6 +963,7 @@ export interface AuditLogRow {
 
 export interface RapportGraphiqueData {
   periode: string
+  bucket: 'day' | 'month'
   totaux: {
     caTotal: number
     caRecru: number
@@ -980,15 +981,25 @@ export interface RapportGraphiqueData {
 
 const EMPTY_RAPPORT: RapportGraphiqueData = {
   periode: '',
+  bucket: 'day',
   totaux: { caTotal: 0, caRecru: 0, caReabo: 0, caMigration: 0, caImpaye: 0, nbOps: 0, nbRecru: 0, nbReabo: 0 },
   byDay: [],
   byFormule: [],
   byPdv: [],
 }
 
-export const rapportGraphique = async (periode?: string): Promise<RapportGraphiqueData> => {
+export const rapportGraphique = async (
+  opts?: { periode?: string; debut?: string; fin?: string },
+): Promise<RapportGraphiqueData> => {
+  const params: Record<string, string> = {}
+  if (opts?.debut && opts?.fin) {
+    params.debut = opts.debut
+    params.fin = opts.fin
+  } else if (opts?.periode) {
+    params.periode = opts.periode
+  }
   const res = await apiClient.get<RapportGraphiqueData>('/analytics/rapport-graphique', {
-    params: periode ? { periode } : undefined,
+    params: Object.keys(params).length ? params : undefined,
   })
   return res.data && typeof res.data === 'object' ? { ...EMPTY_RAPPORT, ...res.data } : EMPTY_RAPPORT
 }
