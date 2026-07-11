@@ -240,9 +240,19 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
                       <span className="mt-1.5 w-2 h-2 rounded-full shrink-0" style={{ background: DOT[n.type] }} />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-app-text" style={{ color: 'var(--text)' }}>{n.message}</p>
-                        <p className="text-xs text-app-subtle mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                          {new Date(n.createdAt).toLocaleString('fr-FR')}
-                        </p>
+                        <div className="flex items-center gap-3 mt-0.5">
+                          <p className="text-xs text-app-subtle" style={{ color: 'var(--text-muted)' }}>
+                            {new Date(n.createdAt).toLocaleString('fr-FR')}
+                          </p>
+                          {n.lien && (
+                            <button
+                              onClick={() => { setOpen(false); navigate(n.lien as string) }}
+                              className="text-xs font-semibold text-primary hover:underline"
+                            >
+                              Ouvrir →
+                            </button>
+                          )}
+                        </div>
                       </div>
                       <button onClick={() => remove(n.id)} title="Ignorer" className="text-app-subtle hover:text-app-text text-sm shrink-0">×</button>
                     </div>
