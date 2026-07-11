@@ -29,6 +29,7 @@ import RetraitsPage from '../pages/finances/RetraitsPage'
 import DetailsBancairesPage from '../pages/finances/DetailsBancairesPage'
 import CommissionsPage from '../pages/finances/CommissionsPage'
 import AAEPage from '../pages/service-abonnement/AAEPage'
+import RelancesPage from '../pages/service-abonnement/RelancesPage'
 import EchusPage from '../pages/service-abonnement/EchusPage'
 import NonQualifiesPage from '../pages/service-abonnement/NonQualifiesPage'
 import SuiviMpPage from '../pages/service-abonnement/SuiviMpPage'
@@ -133,6 +134,7 @@ export const router = createBrowserRouter([
       { path: 'app/versement-banque', element: <VersementsPage /> },
       { path: 'app/retrait-banque', element: <RetraitsPage /> },
       { path: 'app/details-bancaires', element: <DetailsBancairesPage /> },
+      { path: 'app/relances-reabo', element: <RelancesPage /> },
       { path: 'app/aae', element: <AAEPage /> },
       { path: 'app/liste-echus', element: <EchusPage /> },
       { path: 'app/abonnes-nonqual', element: <NonQualifiesPage /> },

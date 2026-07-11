@@ -160,6 +160,66 @@ export class ServiceAbonnementService {
   }
 
   /**
+   * Échéancier de relance unifié : abonnés à relancer, des récemment échus
+   * jusqu'aux échéances à venir dans `jours` jours.
+   *
+   * Fenêtre = [aujourd'hui - `passe` jours ; aujourd'hui + `jours` jours].
+   * On borne le passé pour ne pas remonter des échus très anciens (clients
+   * probablement perdus). Chaque abonné reçoit :
+   *  - joursRestants : > 0 à venir, 0 aujourd'hui, < 0 échu depuis N jours
+   *  - urgence : 'echu' | 'urgent' (0–7 j) | 'avenir' (8+ j)
+   */
+  async getRelances(jours = 30, passe = 30) {
+    const j = Number.isFinite(jours) && jours > 0 ? Math.min(jours, 365) : 30;
+    const p = Number.isFinite(passe) && passe >= 0 ? Math.min(passe, 365) : 30;
+
+    const now = new Date();
+    const debut = addDays(now, -p);
+    const fin = addDays(now, j);
+    // Début de journée pour un calcul de "jours restants" stable.
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    const abonnes = await this.prisma.abonne.findMany({
+      where: {
+        statut: { in: ['ACTIF', 'ECHU'] as any },
+        dateEcheance: { gte: debut, lte: fin },
+      },
+      include: FORMULE_PDV_INCLUDE,
+      orderBy: { dateEcheance: 'asc' },
+      take: 3000,
+    });
+
+    const DAY = 24 * 60 * 60 * 1000;
+    let echus = 0;
+    let urgent = 0;
+    let avenir = 0;
+    const items = abonnes.map((a) => {
+      const ech = new Date(a.dateEcheance);
+      const echDay = new Date(ech.getFullYear(), ech.getMonth(), ech.getDate());
+      const joursRestants = Math.round((echDay.getTime() - today.getTime()) / DAY);
+      let urgence: 'echu' | 'urgent' | 'avenir';
+      if (joursRestants < 0) {
+        urgence = 'echu';
+        echus++;
+      } else if (joursRestants <= 7) {
+        urgence = 'urgent';
+        urgent++;
+      } else {
+        urgence = 'avenir';
+        avenir++;
+      }
+      return { ...a, joursRestants, urgence };
+    });
+
+    return {
+      jours: j,
+      passe: p,
+      counts: { echus, urgent, avenir, total: items.length },
+      items,
+    };
+  }
+
+  /**
    * Fiches non qualifiées (heuristique = dossier incomplet) :
    * décodeur non attribué OU téléphone principal vide.
    */

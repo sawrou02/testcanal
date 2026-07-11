@@ -48,6 +48,13 @@ export class ServiceAbonnementController {
     return this.service.getEchus();
   }
 
+  @Get('relances')
+  async getRelances(@Query('jours') jours?: string) {
+    const parsed = jours !== undefined ? parseInt(jours, 10) : NaN;
+    const j = Number.isFinite(parsed) && parsed > 0 ? parsed : 30;
+    return this.service.getRelances(j);
+  }
+
   @Get('non-qualifies')
   async getNonQualifies() {
     return this.service.getNonQualifies();

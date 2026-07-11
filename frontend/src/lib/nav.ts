@@ -75,6 +75,7 @@ export const NAV_SECTIONS: NavSection[] = [
     label: 'Service Abonnement',
     icon: 'users',
     items: [
+      { id: 'relances-reabo', label: 'Relances Réabo' },
       { id: 'periode-recrutement', label: 'Période Recrutement' },
       { id: 'bienvenue-abonnes', label: 'Bienvenue Abonnés' },
       { id: 'abonnes-nonqual', label: 'Abonnés Non Qualifiés' },

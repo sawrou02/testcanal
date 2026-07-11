@@ -734,6 +734,32 @@ export const listEchus = async (): Promise<AbonneRow[]> => {
   return Array.isArray(res.data) ? res.data : []
 }
 
+export type UrgenceRelance = 'echu' | 'urgent' | 'avenir'
+export interface RelanceRow extends AbonneRow {
+  joursRestants: number
+  urgence: UrgenceRelance
+}
+export interface RelancesData {
+  jours: number
+  passe: number
+  counts: { echus: number; urgent: number; avenir: number; total: number }
+  items: RelanceRow[]
+}
+
+const EMPTY_RELANCES: RelancesData = {
+  jours: 30,
+  passe: 30,
+  counts: { echus: 0, urgent: 0, avenir: 0, total: 0 },
+  items: [],
+}
+
+export const listRelances = async (jours?: number): Promise<RelancesData> => {
+  const res = await apiClient.get<RelancesData>('/service-abonnement/relances', {
+    params: jours !== undefined ? { jours } : undefined,
+  })
+  return res.data && Array.isArray(res.data.items) ? res.data : EMPTY_RELANCES
+}
+
 export const listNonQualifies = async (): Promise<AbonneRow[]> => {
   const res = await apiClient.get<AbonneRow[]>('/service-abonnement/non-qualifies')
   return Array.isArray(res.data) ? res.data : []
