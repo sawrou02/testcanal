@@ -797,6 +797,27 @@ export const envoyerSms = async (abonneIds: string[]): Promise<EnvoiSmsResultat>
   return normSmsRes(res.data)
 }
 
+// ---- Réglages régionaux (devise / langue) ----
+export interface RegionConfig {
+  pays: string
+  devise: string
+  symbole: string
+  symboleAvant: boolean
+  decimales: number
+  langue: string
+  locale: string
+}
+
+export const getRegion = async (): Promise<RegionConfig> => {
+  const res = await apiClient.get<RegionConfig>('/region/config')
+  return res.data
+}
+
+export const saveRegion = async (dto: Partial<RegionConfig>): Promise<RegionConfig> => {
+  const res = await apiClient.put<RegionConfig>('/region/config', dto)
+  return res.data
+}
+
 // ---- Configuration passerelle SMS (admin) ----
 export interface ConfigSmsPublic {
   provider: string

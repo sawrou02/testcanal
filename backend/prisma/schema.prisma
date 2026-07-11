@@ -417,6 +417,20 @@ model ParametreCommission {
   updatedAt       DateTime @updatedAt
 }
 
+/// Réglages régionaux (ligne unique, id = "region") : pays, devise, langue.
+/// Un déploiement = un pays/une devise (pas de conversion de change).
+model ConfigRegion {
+  id           String   @id @default("region")
+  pays         String   @default("SN")
+  devise       String   @default("XOF") // code ISO : XOF, XAF, NGN, GHS, KES, USD…
+  symbole      String   @default("F")   // symbole affiché : F, ₦, KSh, $…
+  symboleAvant Boolean  @default(false) // symbole avant le montant ? ($100 vs 100 F)
+  decimales    Int      @default(0)     // nombre de décimales (0 pour XOF, 2 pour USD)
+  langue       String   @default("fr")  // fr | en
+  locale       String   @default("fr-FR") // formatage des nombres/dates
+  updatedAt    DateTime @updatedAt
+}
+
 /// Configuration de la passerelle SMS (ligne unique, id = "sms").
 /// Générique multi-fournisseurs : provider = ORANGE | AFRICASTALKING | TWILIO | CUSTOM.
 /// Tant que actif=false ou clé vide, l'envoi reste en mode simulation (semi-auto).

@@ -14,6 +14,7 @@ import VadeursPage from '../pages/parametrage/VadeursPage'
 import ComptesPdvPage from '../pages/parametrage/ComptesPdvPage'
 import BaremesPage from '../pages/parametrage/BaremesPage'
 import ConfigSmsPage from '../pages/parametres/ConfigSmsPage'
+import RegionPage from '../pages/parametres/RegionPage'
 import ObjectifsDistributeurPage from '../pages/parametrage/ObjectifsDistributeurPage'
 import ObjectifsPdvPage from '../pages/parametrage/ObjectifsPdvPage'
 import TauxRpePage from '../pages/analytique/TauxRpePage'
@@ -121,6 +122,7 @@ export const router = createBrowserRouter([
       { path: 'app/pdv-comptes', element: <ComptesPdvPage /> },
       { path: 'app/baremes', element: <BaremesPage /> },
       { path: 'app/config-sms', element: <ConfigSmsPage /> },
+      { path: 'app/parametres-region', element: <RegionPage /> },
       { path: 'app/objectifs-distributeur', element: <ObjectifsDistributeurPage /> },
       { path: 'app/objectifs-pdv', element: <ObjectifsPdvPage /> },
       { path: 'app/taux-rpe', element: <TauxRpePage /> },
