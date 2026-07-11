@@ -1,6 +1,8 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { PrismaService } from '../prisma/prisma.service';
+import { SmsService, normaliserNumero } from '../sms/sms.service';
+import { messageRelance } from '../service-abonnement/service-abonnement.service';
 
 /** Fenêtres (en jours) de l'échéancier de relance quotidien. */
 const RELANCE_URGENT_JOURS = 7; // à échoir sous 7 jours
@@ -19,7 +21,10 @@ const RELANCE_ECHU_JOURS = 30; // échus récents (≤ 30 jours)
 export class TasksService implements OnModuleInit {
   private readonly logger = new Logger('Tasks');
 
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private sms: SmsService,
+  ) {}
 
   async onModuleInit() {
     await this.marquerEchus().catch(() => undefined);
@@ -64,18 +69,23 @@ export class TasksService implements OnModuleInit {
     const echuDebut = new Date(jourDebut);
     echuDebut.setDate(echuDebut.getDate() - RELANCE_ECHU_JOURS);
 
-    const [nbUrgent, nbEchus] = await Promise.all([
-      this.prisma.abonne.count({
+    const select = { prenom: true, nom: true, tel1: true, dateEcheance: true };
+    const [urgents, echus] = await Promise.all([
+      this.prisma.abonne.findMany({
         where: { statut: 'ACTIF' as any, dateEcheance: { gte: now, lte: urgentLimite } },
+        select,
       }),
-      this.prisma.abonne.count({
+      this.prisma.abonne.findMany({
         where: { statut: 'ECHU' as any, dateEcheance: { gte: echuDebut, lt: now } },
+        select,
       }),
     ]);
+    const nbUrgent = urgents.length;
+    const nbEchus = echus.length;
     const total = nbUrgent + nbEchus;
     if (total === 0) return 0;
 
-    // Anti-doublon : pas deux alertes de relance le même jour.
+    // Anti-doublon : une seule notification de relance par jour.
     const dejaAujourdhui = await this.prisma.notification.findFirst({
       where: {
         createdAt: { gte: jourDebut },
@@ -84,6 +94,27 @@ export class TasksService implements OnModuleInit {
     });
     if (dejaAujourdhui) return total;
 
+    // Envoi automatique si la passerelle est activée pour l'envoi auto.
+    const config = await this.sms.getConfig();
+    if (config.envoiAuto) {
+      const messages = [...echus, ...urgents]
+        .map((a) => ({ to: normaliserNumero(a.tel1), body: messageRelance(a) }))
+        .filter((m) => m.to);
+      const res = await this.sms.envoyer(messages);
+      if (!res.simulated) {
+        await this.prisma.notification.create({
+          data: {
+            type: 'OK',
+            message: `Relances : ${res.sent} SMS de relance envoyé(s) automatiquement ce matin (${nbEchus} échu(s), ${nbUrgent} urgent(s))${res.failed ? ` — ${res.failed} échec(s)` : ''}.`,
+            lien: '/app/relances-reabo',
+          },
+        });
+        this.logger.log(`Relances auto : ${res.sent} SMS envoyés, ${res.failed} échec(s)`);
+        return res.sent;
+      }
+    }
+
+    // Semi-automatique : on prépare la liste et on alerte (envoi en 1 clic).
     await this.prisma.notification.create({
       data: {
         type: 'WARN',

@@ -2,6 +2,18 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { AuditService } from '../audit/audit.service';
 import { SendSmsDto } from './dto/send-sms.dto';
+import { SmsService, normaliserNumero } from '../sms/sms.service';
+
+/** Message de relance par défaut, personnalisé avec le nom de l'abonné. */
+export function messageRelance(a: { prenom?: string; nom?: string; dateEcheance?: Date | string }): string {
+  const nom = `${a.prenom || ''} ${a.nom || ''}`.trim();
+  let ech = '';
+  if (a.dateEcheance) {
+    const d = new Date(a.dateEcheance);
+    ech = ` (échéance le ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()})`;
+  }
+  return `Bonjour ${nom}, votre abonnement arrive à échéance${ech}. Pensez à le renouveler pour éviter toute coupure. Merci.`;
+}
 
 /**
  * Shared include used across most list endpoints. Keeps the formule/pdv
@@ -24,6 +36,7 @@ export class ServiceAbonnementService {
   constructor(
     private prisma: PrismaService,
     private audit: AuditService,
+    private sms: SmsService,
   ) {}
 
   /**
@@ -389,6 +402,15 @@ export class ServiceAbonnementService {
 
     await this.audit.log(userId, 'ENVOI_SMS', 'SERVICE_ABONNEMENT', ip);
 
-    return { sent: dto.abonneIds.length };
+    const abonnes = await this.prisma.abonne.findMany({
+      where: { id: { in: dto.abonneIds } },
+      select: { prenom: true, nom: true, tel1: true, dateEcheance: true },
+    });
+    const perso = dto.message?.trim();
+    const messages = abonnes
+      .map((a) => ({ to: normaliserNumero(a.tel1), body: perso || messageRelance(a) }))
+      .filter((m) => m.to);
+
+    return this.sms.envoyer(messages);
   }
 }

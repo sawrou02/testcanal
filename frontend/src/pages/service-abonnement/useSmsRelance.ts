@@ -19,7 +19,11 @@ export function useSmsRelance() {
     setSending(true)
     try {
       const res = await envoyerSms(rows.map((r) => r.id))
-      toast.success(`SMS envoyés à ${res.sent} abonnés ✓`)
+      if (res.simulated) {
+        toast.info(`${res.sent} abonné(s) prêts — activez la passerelle SMS (Paramètres) pour un envoi réel.`)
+      } else {
+        toast.success(`SMS envoyés : ${res.sent}${res.failed ? ` (${res.failed} échec)` : ''}`)
+      }
     } catch {
       toast.error("Erreur lors de l'envoi des SMS")
     } finally {

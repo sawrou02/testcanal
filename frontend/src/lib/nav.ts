@@ -23,6 +23,7 @@ export const NAV_SECTIONS: NavSection[] = [
     items: [
       { id: 'formules', label: 'Formules' },
       { id: 'securite', label: 'Sécurité' },
+      { id: 'config-sms', label: 'Passerelle SMS' },
       { id: 'baremes', label: 'Barèmes commissions' },
       { id: 'objectifs-distributeur', label: 'Objectifs Distributeur' },
       { id: 'objectifs-pdv', label: 'Objectifs PDV' },
@@ -237,6 +238,7 @@ const ITEM_ROLES: Record<string, Role[]> = {
   'suivi-installation': ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'LOGISTICIEN', 'COMMERCIAL'],
   // Sécurité : réservé aux administrateurs
   securite: ['SUPER_ADMIN', 'ADMIN'],
+  'config-sms': ['SUPER_ADMIN', 'ADMIN'],
 }
 
 function sectionAllowed(role: Role | undefined, sectionId: string): boolean {

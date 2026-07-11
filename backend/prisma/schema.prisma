@@ -417,6 +417,21 @@ model ParametreCommission {
   updatedAt       DateTime @updatedAt
 }
 
+/// Configuration de la passerelle SMS (ligne unique, id = "sms").
+/// Générique multi-fournisseurs : provider = ORANGE | AFRICASTALKING | TWILIO | CUSTOM.
+/// Tant que actif=false ou clé vide, l'envoi reste en mode simulation (semi-auto).
+model ConfigSms {
+  id         String   @id @default("sms")
+  provider   String   @default("CUSTOM")
+  apiUrl     String   @default("")
+  apiKey     String   @default("")
+  apiSecret  String   @default("") // ex. Twilio Auth Token / AT username
+  sender     String   @default("SENDISTRI")
+  actif      Boolean  @default(false) // passerelle activée (envois réels)
+  envoiAuto  Boolean  @default(false) // envoi automatique chaque matin
+  updatedAt  DateTime @updatedAt
+}
+
 /// Objectifs globaux du distributeur (par an / trimestre / mois éventuel).
 model ObjectifDistributeur {
   id           String   @id @default(cuid())

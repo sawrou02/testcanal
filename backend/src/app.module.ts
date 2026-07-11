@@ -36,6 +36,7 @@ import { GapKitModule } from './gap-kit/gap-kit.module';
 import { ParabolesModule } from './paraboles/paraboles.module';
 import { TasksModule } from './tasks/tasks.module';
 import { SecurityModule } from './security/security.module';
+import { SmsModule } from './sms/sms.module';
 import { ImportModule } from './import/import.module';
 import { DocumentsModule } from './documents/documents.module';
 import { MessagesModule } from './messages/messages.module';
@@ -80,6 +81,7 @@ import { APP_FILTER } from '@nestjs/core';
     ParabolesModule,
     TasksModule,
     SecurityModule,
+    SmsModule,
     ImportModule,
     DocumentsModule,
     MessagesModule,

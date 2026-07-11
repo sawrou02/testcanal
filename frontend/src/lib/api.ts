@@ -780,9 +780,55 @@ export const listRecrutement = async (): Promise<RecrutementRow[]> => {
   return Array.isArray(res.data) ? res.data : []
 }
 
-export const envoyerSms = async (abonneIds: string[]): Promise<{ sent: number }> => {
-  const res = await apiClient.post<{ sent: number }>('/service-abonnement/sms', { abonneIds })
+export interface EnvoiSmsResultat {
+  sent: number
+  failed: number
+  simulated: boolean
+}
+
+const normSmsRes = (d?: Partial<EnvoiSmsResultat>): EnvoiSmsResultat => ({
+  sent: d?.sent ?? 0,
+  failed: d?.failed ?? 0,
+  simulated: d?.simulated ?? true,
+})
+
+export const envoyerSms = async (abonneIds: string[]): Promise<EnvoiSmsResultat> => {
+  const res = await apiClient.post<EnvoiSmsResultat>('/service-abonnement/sms', { abonneIds })
+  return normSmsRes(res.data)
+}
+
+// ---- Configuration passerelle SMS (admin) ----
+export interface ConfigSmsPublic {
+  provider: string
+  apiUrl: string
+  sender: string
+  actif: boolean
+  envoiAuto: boolean
+  apiKeyDefinie: boolean
+  apiSecretDefini: boolean
+}
+
+export const getConfigSms = async (): Promise<ConfigSmsPublic> => {
+  const res = await apiClient.get<ConfigSmsPublic>('/sms/config')
   return res.data
+}
+
+export const saveConfigSms = async (dto: Partial<{
+  provider: string
+  apiUrl: string
+  apiKey: string
+  apiSecret: string
+  sender: string
+  actif: boolean
+  envoiAuto: boolean
+}>): Promise<ConfigSmsPublic> => {
+  const res = await apiClient.put<ConfigSmsPublic>('/sms/config', dto)
+  return res.data
+}
+
+export const testerSms = async (numero: string): Promise<EnvoiSmsResultat> => {
+  const res = await apiClient.post<EnvoiSmsResultat>('/sms/test', { numero })
+  return normSmsRes(res.data)
 }
 
 // ---- Logistique : Décodeurs / Entrepôts / Mouvements de stock ----
