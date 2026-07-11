@@ -2,20 +2,21 @@ import { useCallback, useEffect, useState } from 'react'
 import { Badge } from '../../components/ui/Badge'
 import { Button } from '../../components/ui/Button'
 import { Modal } from '../../components/ui/Modal'
-import { DataTable } from '../../components/ui/DataTable'
 import { RowDeleteButton } from '../../components/ui/RowDeleteButton'
 import { useToast } from '../../components/ui/Toast'
 import { useAuthStore } from '../../store/authStore'
 import { useResource } from '../../hooks/useResource'
 import { formatDate } from '../../lib/utils'
+import { exportExcel } from '../../lib/export'
 import {
   bddGlobale,
   createAbonne,
   updateAbonne,
   type BddAbonneRow,
+  type BddGlobaleResult,
   type AbonneInput,
 } from '../../lib/api'
-import { Card, PageHeader, FieldLabel, inputCls, type Row } from '../../components/ui/Section'
+import { Card, PageHeader, FieldLabel, inputCls } from '../../components/ui/Section'
 
 const STATUT_VARIANT: Record<string, 'success' | 'danger' | 'warning' | 'neutral'> = {
   ACTIF: 'success',
@@ -26,6 +27,8 @@ const STATUT_VARIANT: Record<string, 'success' | 'danger' | 'warning' | 'neutral
 
 const MUT = ['SUPER_ADMIN', 'ADMIN', 'MANAGER', 'COMMERCIAL', 'VENDEUR']
 const STATUTS = ['ACTIF', 'ECHU', 'SUSPENDU', 'RESILIE']
+const PAGE_SIZE = 50
+const EXPORT_CAP = 5000
 
 interface FormuleLite { id: string; code: string; nomCommercial: string }
 interface PdvLite { id: string; raisonSociale: string }
@@ -43,24 +46,69 @@ export default function BddGlobalePage() {
   const { data: formules } = useResource<FormuleLite>('/formules')
   const { data: pdvs } = useResource<PdvLite>('/pdvs')
 
-  const [rows, setRows] = useState<BddAbonneRow[]>([])
+  // ----- Recherche serveur -----
+  const [q, setQ] = useState('')
+  const [qDebounced, setQDebounced] = useState('')
+  const [statut, setStatut] = useState('')
+  const [formuleId, setFormuleId] = useState('')
+  const [page, setPage] = useState(1)
+  const [data, setData] = useState<BddGlobaleResult>({ rows: [], total: 0, page: 1, pageSize: PAGE_SIZE })
   const [loading, setLoading] = useState(true)
+  const [exporting, setExporting] = useState(false)
+
+  // Debounce de la saisie (350 ms) pour ne pas requêter à chaque touche.
+  useEffect(() => {
+    const t = setTimeout(() => setQDebounced(q.trim()), 350)
+    return () => clearTimeout(t)
+  }, [q])
+
+  // Tout changement de filtre revient à la page 1.
+  useEffect(() => { setPage(1) }, [qDebounced, statut, formuleId])
 
   const refetch = useCallback(async () => {
     setLoading(true)
     try {
-      setRows(await bddGlobale())
+      setData(await bddGlobale({ q: qDebounced, statut, formuleId, page, pageSize: PAGE_SIZE }))
     } catch {
       toast.error('Erreur lors du chargement')
     } finally {
       setLoading(false)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [qDebounced, statut, formuleId, page])
 
-  useEffect(() => {
-    void refetch()
-  }, [refetch])
+  useEffect(() => { void refetch() }, [refetch])
+
+  const totalPages = Math.max(1, Math.ceil(data.total / PAGE_SIZE))
+  const from = data.total === 0 ? 0 : (data.page - 1) * PAGE_SIZE + 1
+  const to = Math.min(data.page * PAGE_SIZE, data.total)
+
+  const exportResults = async () => {
+    setExporting(true)
+    try {
+      const all = await bddGlobale({ q: qDebounced, statut, formuleId, page: 1, pageSize: EXPORT_CAP })
+      if (all.total > EXPORT_CAP) {
+        toast.warning(`Export limité aux ${EXPORT_CAP.toLocaleString('fr-FR')} premiers résultats sur ${all.total.toLocaleString('fr-FR')}.`)
+      }
+      await exportExcel({
+        title: 'Base de données globale',
+        columns: [
+          { key: 'numAbonne', label: 'N° Abonné' },
+          { key: 'client', label: 'Nom & Prénom' },
+          { key: 'tel1', label: 'Téléphone' },
+          { key: 'formule', label: 'Formule' },
+          { key: 'pdv', label: 'PDV' },
+          { key: 'dateEcheance', label: 'Échéance' },
+          { key: 'statut', label: 'Statut' },
+        ],
+        rows: all.rows.map((r) => ({ ...r, dateEcheance: r.dateEcheance ? formatDate(r.dateEcheance) : '' })),
+      })
+    } catch {
+      toast.error("Erreur lors de l'export")
+    } finally {
+      setExporting(false)
+    }
+  }
 
   // ----- Create / Edit -----
   const [open, setOpen] = useState(false)
@@ -75,11 +123,9 @@ export default function BddGlobalePage() {
     setOpen(true)
   }
 
-  const openEdit = (r: Row) => {
+  const openEdit = (row: BddAbonneRow) => {
     if (!canMutate) return
-    const row = r as unknown as BddAbonneRow
     setEditId(row.id)
-    // La liste ne renvoie que des libellés ; on retrouve les IDs via les selects.
     const f = formules.find((x) => `${x.code}` === row.formule || x.nomCommercial === row.formule)
     const p = pdvs.find((x) => x.raisonSociale === row.pdv)
     const [prenom, ...rest] = (row.client || '').split(' ')
@@ -121,37 +167,102 @@ export default function BddGlobalePage() {
     }
   }
 
+  const selectCls = 'border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20'
+  const selectStyle = { background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' } as const
+
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <PageHeader title="Base de données globale" subtitle="Tous les abonnés du réseau" />
+        <PageHeader title="Base de données globale" subtitle="Tous les abonnés du réseau — recherche instantanée" />
         {canMutate && <Button variant="primary" onClick={openCreate}>+ Nouvel abonné</Button>}
       </div>
 
       <Card>
-        <div className="min-h-[420px]">
-          <DataTable<Row>
-            loading={loading}
-            rows={rows as unknown as Row[]}
-            searchable
-            pageSize={25}
-            exportTitle="Base de données globale"
-            onRowClick={canMutate ? openEdit : undefined}
-            emptyMessage="Aucun abonné — cliquez sur « Nouvel abonné » pour commencer"
-            columns={[
-              { key: 'numAbonne', label: 'N° Abonné' },
-              { key: 'client', label: 'Nom & Prénom' },
-              { key: 'tel1', label: 'Téléphone' },
-              { key: 'formule', label: 'Formule' },
-              { key: 'pdv', label: 'PDV' },
-              { key: 'dateEcheance', label: 'Échéance', render: (v) => (v ? formatDate(String(v)) : '—') },
-              { key: 'statut', label: 'Statut', render: (v) => <Badge variant={STATUT_VARIANT[String(v)] ?? 'neutral'}>{String(v)}</Badge> },
-              ...(canMutate ? [{ key: '__del', label: '', render: (_v: unknown, r: Row) => (
-                <RowDeleteButton path="/abonnes" id={String((r as { id: string }).id)} confirmLabel="Résilier cet abonné ?" onDone={refetch} />
-              ) }] : []),
-            ]}
+        {/* Barre de recherche + filtres (côté serveur) */}
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          <input
+            type="search"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Rechercher : nom, téléphone, N° abonné, PDV…"
+            className={selectCls + ' flex-1 min-w-[240px]'}
+            style={selectStyle}
           />
+          <select value={statut} onChange={(e) => setStatut(e.target.value)} className={selectCls} style={selectStyle}>
+            <option value="">Tous statuts</option>
+            {STATUTS.map((s) => <option key={s} value={s}>{s}</option>)}
+          </select>
+          <select value={formuleId} onChange={(e) => setFormuleId(e.target.value)} className={selectCls} style={selectStyle}>
+            <option value="">Toutes formules</option>
+            {formules.map((f) => <option key={f.id} value={f.id}>{f.nomCommercial}</option>)}
+          </select>
+          <Button variant="secondary" onClick={exportResults} loading={exporting} disabled={data.total === 0}>
+            Exporter
+          </Button>
         </div>
+
+        {/* Compteur */}
+        <div className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>
+          {loading ? 'Chargement…' : (
+            data.total === 0 ? 'Aucun abonné trouvé'
+              : `${data.total.toLocaleString('fr-FR')} abonné(s) — affichage ${from.toLocaleString('fr-FR')}–${to.toLocaleString('fr-FR')}`
+          )}
+        </div>
+
+        {/* Tableau */}
+        <div className="overflow-x-auto min-h-[420px]">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left border-b" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
+                <th className="py-2 pr-3 font-semibold">N° Abonné</th>
+                <th className="py-2 pr-3 font-semibold">Nom &amp; Prénom</th>
+                <th className="py-2 pr-3 font-semibold">Téléphone</th>
+                <th className="py-2 pr-3 font-semibold">Formule</th>
+                <th className="py-2 pr-3 font-semibold">PDV</th>
+                <th className="py-2 pr-3 font-semibold">Échéance</th>
+                <th className="py-2 pr-3 font-semibold">Statut</th>
+                {canMutate && <th className="py-2 font-semibold" />}
+              </tr>
+            </thead>
+            <tbody>
+              {data.rows.map((r) => (
+                <tr
+                  key={r.id}
+                  onClick={() => openEdit(r)}
+                  className={'border-b transition-colors ' + (canMutate ? 'cursor-pointer hover:bg-primary/5' : '')}
+                  style={{ borderColor: 'var(--border)', color: 'var(--text)' }}
+                >
+                  <td className="py-2 pr-3 font-mono">{r.numAbonne}</td>
+                  <td className="py-2 pr-3">{r.client}</td>
+                  <td className="py-2 pr-3">{r.tel1}</td>
+                  <td className="py-2 pr-3">{r.formule}</td>
+                  <td className="py-2 pr-3">{r.pdv}</td>
+                  <td className="py-2 pr-3">{r.dateEcheance ? formatDate(r.dateEcheance) : '—'}</td>
+                  <td className="py-2 pr-3"><Badge variant={STATUT_VARIANT[r.statut] ?? 'neutral'}>{r.statut}</Badge></td>
+                  {canMutate && (
+                    <td className="py-2" onClick={(e) => e.stopPropagation()}>
+                      <RowDeleteButton path="/abonnes" id={r.id} confirmLabel="Résilier cet abonné ?" onDone={refetch} />
+                    </td>
+                  )}
+                </tr>
+              ))}
+              {!loading && data.rows.length === 0 && (
+                <tr><td colSpan={8} className="py-12 text-center" style={{ color: 'var(--text-muted)' }}>Aucun résultat</td></tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Pagination */}
+        {data.total > PAGE_SIZE && (
+          <div className="flex items-center justify-between gap-3 mt-4 flex-wrap">
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Page {data.page} / {totalPages}</span>
+            <div className="flex items-center gap-2">
+              <Button variant="secondary" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={data.page <= 1 || loading}>Précédent</Button>
+              <Button variant="secondary" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={data.page >= totalPages || loading}>Suivant</Button>
+            </div>
+          </div>
+        )}
       </Card>
 
       <Modal isOpen={open} onClose={() => !submitting && setOpen(false)} title={editId ? 'Modifier l’abonné' : 'Nouvel abonné'} size="lg">

@@ -454,24 +454,61 @@ export class AnalyticsService {
   }
 
   /** Global subscriber database. */
-  async getBddGlobale() {
-    const rows = await this.prisma.abonne.findMany({
-      include: {
-        formule: { select: { nomCommercial: true } },
-        pdv: { select: { raisonSociale: true } },
-      },
-      orderBy: { nom: 'asc' },
-      take: 1000,
-    });
-    return rows.map((a) => ({
-      id: a.id,
-      numAbonne: a.numAbonne,
-      client: [a.prenom, a.nom].filter(Boolean).join(' '),
-      tel1: a.tel1,
-      formule: a.formule?.nomCommercial ?? '—',
-      pdv: a.pdv?.raisonSociale ?? '—',
-      statut: a.statut,
-      dateEcheance: a.dateEcheance,
-    }));
+  async getBddGlobale(params: {
+    q?: string;
+    statut?: string;
+    formuleId?: string;
+    page?: number;
+    pageSize?: number;
+  } = {}) {
+    const page = Math.max(1, Math.floor(params.page || 1));
+    const pageSize = Math.min(200, Math.max(1, Math.floor(params.pageSize || 50)));
+    const q = (params.q || '').trim();
+
+    const where: Record<string, unknown> = {};
+    if (params.statut) where.statut = params.statut;
+    if (params.formuleId) where.formuleId = params.formuleId;
+    if (q) {
+      // Recherche multi-champs (LIKE, insensible à la casse ASCII sous SQLite).
+      where.OR = [
+        { numAbonne: { contains: q } },
+        { nom: { contains: q } },
+        { prenom: { contains: q } },
+        { tel1: { contains: q } },
+        { tel2: { contains: q } },
+        { pdv: { raisonSociale: { contains: q } } },
+        { formule: { nomCommercial: { contains: q } } },
+      ];
+    }
+
+    const [total, rows] = await Promise.all([
+      this.prisma.abonne.count({ where }),
+      this.prisma.abonne.findMany({
+        where,
+        include: {
+          formule: { select: { nomCommercial: true } },
+          pdv: { select: { raisonSociale: true } },
+        },
+        orderBy: { nom: 'asc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+      }),
+    ]);
+
+    return {
+      rows: rows.map((a) => ({
+        id: a.id,
+        numAbonne: a.numAbonne,
+        client: [a.prenom, a.nom].filter(Boolean).join(' '),
+        tel1: a.tel1,
+        formule: a.formule?.nomCommercial ?? '—',
+        pdv: a.pdv?.raisonSociale ?? '—',
+        statut: a.statut,
+        dateEcheance: a.dateEcheance,
+      })),
+      total,
+      page,
+      pageSize,
+    };
   }
 }

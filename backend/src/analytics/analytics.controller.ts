@@ -63,8 +63,20 @@ export class AnalyticsController {
 
   @Get('analytics/bdd-globale')
   @UseGuards(JwtAuthGuard)
-  async getBddGlobale() {
-    return this.analyticsService.getBddGlobale();
+  async getBddGlobale(
+    @Query('q') q?: string,
+    @Query('statut') statut?: string,
+    @Query('formuleId') formuleId?: string,
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    return this.analyticsService.getBddGlobale({
+      q,
+      statut,
+      formuleId,
+      page: page ? parseInt(page, 10) : undefined,
+      pageSize: pageSize ? parseInt(pageSize, 10) : undefined,
+    });
   }
 
   @Get('audit-log')

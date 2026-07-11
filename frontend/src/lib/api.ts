@@ -1501,9 +1501,34 @@ export const reaboMomo = async (): Promise<ReaboMomoRow[]> => {
   const res = await apiClient.get<ReaboMomoRow[]>('/analytics/reabo-momo')
   return Array.isArray(res.data) ? res.data : []
 }
-export const bddGlobale = async (): Promise<BddAbonneRow[]> => {
-  const res = await apiClient.get<BddAbonneRow[]>('/analytics/bdd-globale')
-  return Array.isArray(res.data) ? res.data : []
+export interface BddGlobaleParams {
+  q?: string
+  statut?: string
+  formuleId?: string
+  page?: number
+  pageSize?: number
+}
+export interface BddGlobaleResult {
+  rows: BddAbonneRow[]
+  total: number
+  page: number
+  pageSize: number
+}
+
+export const bddGlobale = async (params: BddGlobaleParams = {}): Promise<BddGlobaleResult> => {
+  const clean: Record<string, string | number> = {}
+  if (params.q) clean.q = params.q
+  if (params.statut) clean.statut = params.statut
+  if (params.formuleId) clean.formuleId = params.formuleId
+  if (params.page) clean.page = params.page
+  if (params.pageSize) clean.pageSize = params.pageSize
+  const res = await apiClient.get<BddGlobaleResult>('/analytics/bdd-globale', {
+    params: Object.keys(clean).length ? clean : undefined,
+  })
+  const d = res.data
+  return d && Array.isArray(d.rows)
+    ? d
+    : { rows: [], total: 0, page: 1, pageSize: params.pageSize ?? 50 }
 }
 
 // ---------- Notifications ----------
