@@ -12,21 +12,17 @@ services:
     rootDir: backend
     plan: free
     region: frankfurt # le plus proche de l'Afrique de l'Ouest
-    buildCommand: npm install && npm run cloud:build && npm run cloud:deploy
+    buildCommand: npm install --include=dev && npm run cloud:build && npm run cloud:deploy
     startCommand: npm run start:prod
     healthCheckPath: /api/region/config
     autoDeploy: true
-    disk:
-      name: sendistri-uploads
-      mountPath: /var/data/uploads
-      sizeGB: 1
+    # (Pas de disque persistant : réservé aux offres payantes. Les fichiers
+    #  uploadés sont donc temporaires — sans importance pour un test.)
     envVars:
       - key: NODE_ENV
         value: production
       - key: JWT_SECRET
         generateValue: true # Render génère une clé sécurisée unique
-      - key: UPLOADS_DIR
-        value: /var/data/uploads
       - key: DATABASE_URL
         sync: false # ← colle ici l'URL PostgreSQL de Neon
       - key: WEB_ORIGIN
