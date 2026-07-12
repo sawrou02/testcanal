@@ -8,6 +8,9 @@
   "scripts": {
     "build": "nest build",
     "start": "node dist/main",
+    "start:prod": "node dist/src/main",
+    "cloud:build": "node scripts/use-postgres.js && prisma generate && nest build",
+    "cloud:deploy": "prisma db push --skip-generate --accept-data-loss && ts-node prisma/seed.ts",
     "start:dev": "nest start --watch",
     "start:debug": "nest start --debug --watch",
     "test": "jest",

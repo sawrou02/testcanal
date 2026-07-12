@@ -16,6 +16,15 @@ export class SchemaGuardService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
 
   async onModuleInit() {
+    // Ce gardien utilise du SQL propre à SQLite (version hors-ligne Windows).
+    // En cloud (PostgreSQL), c'est `prisma db push` au déploiement qui gère le
+    // schéma → on n'exécute PAS ce SQLite-DDL sur Postgres.
+    const url = process.env.DATABASE_URL || '';
+    const isSqlite = url.startsWith('file:') || url === '' || url.includes('.db');
+    if (!isSqlite) {
+      this.logger.log('Base non-SQLite détectée : gardien SQLite ignoré (schéma géré au déploiement).');
+      return;
+    }
     try {
       await this.ensure();
       this.logger.log('Schéma vérifié / réparé.');

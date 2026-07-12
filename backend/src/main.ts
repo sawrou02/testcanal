@@ -16,6 +16,11 @@ import { AppModule } from './app.module';
  */
 function syncDatabaseSchema() {
   try {
+    // Uniquement pour la base SQLite hors-ligne. En cloud (Postgres), le schéma
+    // est appliqué au déploiement (build) → on ne relance pas db push à chaque boot.
+    const url = process.env.DATABASE_URL || '';
+    const isSqlite = url.startsWith('file:') || url === '' || url.includes('.db');
+    if (!isSqlite) return;
     // backend/dist/src/main.js -> racine backend = ../../..
     const root = join(__dirname, '..', '..');
     const prismaCli = join(root, 'node_modules', 'prisma', 'build', 'index.js');

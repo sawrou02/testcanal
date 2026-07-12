@@ -3,7 +3,9 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as fs from 'fs';
 import * as path from 'path';
 
-export const UPLOADS_DIR = path.join(process.cwd(), 'uploads');
+// Dossier des fichiers uploadés. Configurable via UPLOADS_DIR (déploiement
+// cloud : disque persistant), sinon ./uploads à côté du serveur (hors-ligne).
+export const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(process.cwd(), 'uploads');
 
 @Injectable()
 export class DocumentsService {
