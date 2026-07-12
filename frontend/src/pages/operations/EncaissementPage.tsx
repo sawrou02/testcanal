@@ -6,6 +6,7 @@ import { useResource } from '../../hooks/useResource'
 import { searchAbonnes, createEncaissement } from '../../lib/api'
 import type { Abonne, Encaissement } from '../../lib/api'
 import { formatFCFA, formatDate, cn } from '../../lib/utils'
+import { t } from '../../lib/locale'
 
 interface Formule {
   id: string
@@ -97,7 +98,7 @@ export default function EncaissementPage() {
       const res = await searchAbonnes(query.trim())
       setResults(res)
     } catch {
-      toast.error('Erreur lors de la recherche')
+      toast.error(t('Erreur lors de la recherche'))
       setResults([])
     } finally {
       setSearching(false)
@@ -116,11 +117,11 @@ export default function EncaissementPage() {
 
   const handleSubmit = async () => {
     if (monnaie < 0) {
-      toast.error('Montant reçu insuffisant !')
+      toast.error(t('Montant reçu insuffisant !'))
       return
     }
     if (!selectedAbonne) {
-      toast.error('Sélectionnez un abonné')
+      toast.error(t('Sélectionnez un abonné'))
       return
     }
     setSubmitting(true)
@@ -143,11 +144,11 @@ export default function EncaissementPage() {
       setReceiptOpen(true)
       toast.success(
         created.nouvelleEcheance
-          ? `Encaissement enregistré ✓ — abonné actif jusqu'au ${formatDate(created.nouvelleEcheance)}`
-          : 'Encaissement enregistré ✓',
+          ? `${t("Encaissement enregistré ✓ — actif jusqu'au")} ${formatDate(created.nouvelleEcheance)}`
+          : t('Encaissement enregistré ✓'),
       )
     } catch {
-      toast.error("Erreur lors de l'enregistrement")
+      toast.error(t("Erreur lors de l'enregistrement"))
     } finally {
       setSubmitting(false)
     }
@@ -159,10 +160,10 @@ export default function EncaissementPage() {
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-xl font-black text-app-text" style={{ color: 'var(--text)' }}>
-            Encaissement
+            {t('Encaissement')}
           </h2>
           <p className="text-sm text-app-muted mt-0.5" style={{ color: 'var(--text-muted)' }}>
-            Recrutement, réabonnement et migration des abonnés
+            {t('Recrutement, réabonnement et migration des abonnés')}
           </p>
         </div>
         <div className="flex items-center gap-1 bg-gray-100 rounded-lg p-1 shrink-0">
@@ -173,7 +174,7 @@ export default function EncaissementPage() {
               view === 'bureau' ? 'bg-primary text-white' : 'text-app-muted hover:text-app-text',
             )}
           >
-            Bureau
+            {t('Bureau')}
           </button>
           <button
             onClick={() => setView('terrain')}
@@ -182,7 +183,7 @@ export default function EncaissementPage() {
               view === 'terrain' ? 'bg-primary text-white' : 'text-app-muted hover:text-app-text',
             )}
           >
-            Terrain
+            {t('Terrain')}
           </button>
         </div>
       </div>
@@ -292,11 +293,11 @@ function SearchBlock({
           onKeyDown={(e) => {
             if (e.key === 'Enter') onSearch()
           }}
-          placeholder="N° abonné, nom, téléphone, n° décodeur..."
+          placeholder={t('N° abonné, nom, téléphone, n° décodeur...')}
           className="flex-1 border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20"
         />
         <Button variant="primary" size={compact ? 'sm' : 'md'} loading={searching} onClick={onSearch}>
-          Rechercher
+          {t('Rechercher')}
         </Button>
       </div>
 
@@ -325,14 +326,14 @@ function SearchBlock({
             <span className="text-sm font-bold text-primary-dark">
               {selectedAbonne.prenom} {selectedAbonne.nom}
             </span>
-            <span className="text-xs font-semibold text-primary-dark">✓ Sélectionné</span>
+            <span className="text-xs font-semibold text-primary-dark">✓ {t('Sélectionné')}</span>
           </div>
           <div className="mt-1 text-xs text-primary-dark/80 space-y-0.5">
-            <div>N° abonné : {selectedAbonne.numAbonne}</div>
+            <div>{t('N° abonné')} : {selectedAbonne.numAbonne}</div>
             <div>
-              Formule : {selectedAbonne.formule.code} — {selectedAbonne.formule.nomCommercial}
+              {t('Formule')} : {selectedAbonne.formule.code} — {selectedAbonne.formule.nomCommercial}
             </div>
-            <div>Échéance : {formatDate(selectedAbonne.dateEcheance)}</div>
+            <div>{t('Échéance')} : {formatDate(selectedAbonne.dateEcheance)}</div>
           </div>
         </div>
       )}
@@ -366,7 +367,7 @@ function ToggleGroup({
               : 'bg-white text-app-text border-app-border hover:bg-gray-50',
           )}
         >
-          {it.label}
+          {t(it.label)}
         </button>
       ))}
     </div>
@@ -399,7 +400,7 @@ function OptionsChips({
               : 'bg-white text-app-text border-app-border hover:bg-gray-50',
           )}
         >
-          {c.label} <span className="opacity-80">+{c.price.toLocaleString('fr-FR')}</span>
+          {t(c.label)} <span className="opacity-80">+{c.price.toLocaleString('fr-FR')}</span>
         </button>
       ))}
     </div>
@@ -437,29 +438,29 @@ function Recap({
 }: RecapProps) {
   return (
     <div className="space-y-3">
-      <h3 className="text-base font-bold text-app-text">Récapitulatif</h3>
+      <h3 className="text-base font-bold text-app-text">{t('Récapitulatif')}</h3>
       <div className="space-y-2 text-sm">
         <div className="flex items-center justify-between">
           <span className="text-app-muted">
-            {selectedFormule ? selectedFormule.code : 'Formule'} × {nbMois} mois
+            {selectedFormule ? selectedFormule.code : t('Formule')} × {nbMois} {t('mois')}
           </span>
           <span className="font-medium text-app-text">{formatFCFA(base)}</span>
         </div>
         {options.premium && (
           <div className="flex items-center justify-between">
-            <span className="text-app-muted">Premium</span>
+            <span className="text-app-muted">{t('Premium')}</span>
             <span className="font-medium text-app-text">+ {formatFCFA(PRICE_PREMIUM)}</span>
           </div>
         )}
         {options.intl && (
           <div className="flex items-center justify-between">
-            <span className="text-app-muted">International</span>
+            <span className="text-app-muted">{t('International')}</span>
             <span className="font-medium text-app-text">+ {formatFCFA(PRICE_INTL)}</span>
           </div>
         )}
         {options.timbre && (
           <div className="flex items-center justify-between">
-            <span className="text-app-muted">Timbre</span>
+            <span className="text-app-muted">{t('Timbre')}</span>
             <span className="font-medium text-app-text">+ {formatFCFA(PRICE_TIMBRE)}</span>
           </div>
         )}
@@ -467,13 +468,13 @@ function Recap({
 
       <div className="border-t border-app-border pt-3">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-semibold text-app-text">Montant total</span>
+          <span className="text-sm font-semibold text-app-text">{t('Montant total')}</span>
           <span className="text-2xl font-bold text-primary font-mono">{formatFCFA(montantTotal)}</span>
         </div>
       </div>
 
       <div>
-        <FieldLabel>Montant reçu</FieldLabel>
+        <FieldLabel>{t('Montant reçu')}</FieldLabel>
         <input
           type="number"
           value={montantRecu === 0 ? '' : montantRecu}
@@ -484,14 +485,14 @@ function Recap({
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-sm font-semibold text-app-text">Monnaie rendue</span>
+        <span className="text-sm font-semibold text-app-text">{t('Monnaie rendue')}</span>
         <span className={cn('text-lg font-bold font-mono', monnaie >= 0 ? 'text-primary' : 'text-danger')}>
           {formatFCFA(monnaie)}
         </span>
       </div>
 
       <Button variant="primary" className="w-full" loading={submitting} onClick={onSubmit}>
-        Enregistrer l'encaissement
+        {t("Enregistrer l'encaissement")}
       </Button>
     </div>
   )
@@ -538,7 +539,7 @@ function BureauView(p: BureauViewProps) {
       {/* LEFT (2 cols) */}
       <div className="lg:col-span-2 space-y-4">
         <Card>
-          <h3 className="text-base font-bold text-app-text mb-3">Client</h3>
+          <h3 className="text-base font-bold text-app-text mb-3">{t('Client')}</h3>
           <SearchBlock
             query={p.query}
             setQuery={p.setQuery}
@@ -551,22 +552,22 @@ function BureauView(p: BureauViewProps) {
         </Card>
 
         <Card>
-          <h3 className="text-base font-bold text-app-text mb-4">Détails de l'opération</h3>
+          <h3 className="text-base font-bold text-app-text mb-4">{t("Détails de l'opération")}</h3>
           <div className="space-y-4">
             <div>
-              <FieldLabel>PDV</FieldLabel>
+              <FieldLabel>{t('PDV')}</FieldLabel>
               <div className="border border-app-border rounded-lg px-3 py-2 text-sm bg-gray-50 text-app-text">
                 {p.selectedAbonne ? p.selectedAbonne.pdv.raisonSociale : '—'}
               </div>
             </div>
 
             <div>
-              <FieldLabel>Type d'opération</FieldLabel>
+              <FieldLabel>{t("Type d'opération")}</FieldLabel>
               <ToggleGroup value={p.nature} onChange={p.setNature} items={NATURES} />
             </div>
 
             <div>
-              <FieldLabel>Formule</FieldLabel>
+              <FieldLabel>{t('Formule')}</FieldLabel>
               <select
                 value={p.effectiveFormuleId}
                 onChange={(e) => p.setFormuleId(e.target.value)}
@@ -581,7 +582,7 @@ function BureauView(p: BureauViewProps) {
             </div>
 
             <div>
-              <FieldLabel>Nombre de mois</FieldLabel>
+              <FieldLabel>{t('Nombre de mois')}</FieldLabel>
               <select
                 value={p.nbMois}
                 onChange={(e) => p.setNbMois(Number(e.target.value))}
@@ -589,43 +590,43 @@ function BureauView(p: BureauViewProps) {
               >
                 {MOIS_OPTIONS.map((m) => (
                   <option key={m} value={m}>
-                    {m} mois
+                    {m} {t('mois')}
                   </option>
                 ))}
               </select>
             </div>
 
             <div>
-              <FieldLabel>Mode de paiement</FieldLabel>
+              <FieldLabel>{t('Mode de paiement')}</FieldLabel>
               <ToggleGroup value={p.modePaiement} onChange={p.setModePaiement} items={MODES} />
             </div>
 
             <div>
-              <FieldLabel>Options</FieldLabel>
+              <FieldLabel>{t('Options')}</FieldLabel>
               <OptionsChips options={p.options} toggleOption={p.toggleOption} />
             </div>
 
             {/* Informations complémentaires (facultatives) */}
             <div className="border-t border-app-border pt-4">
-              <FieldLabel>Informations complémentaires (facultatif)</FieldLabel>
+              <FieldLabel>{t('Informations complémentaires (facultatif)')}</FieldLabel>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-1">
                 <div>
-                  <label className="text-xs text-app-muted">Numéro de contrat</label>
+                  <label className="text-xs text-app-muted">{t('Numéro de contrat')}</label>
                   <input value={p.extra.numeroContrat} onChange={(e) => setX('numeroContrat', e.target.value)}
                     className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
                 </div>
                 <div>
-                  <label className="text-xs text-app-muted">Téléphone 2</label>
+                  <label className="text-xs text-app-muted">{t('Téléphone 2')}</label>
                   <input value={p.extra.tel2} onChange={(e) => setX('tel2', e.target.value)} maxLength={10}
                     className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
                 </div>
                 <div>
-                  <label className="text-xs text-app-muted">Date du prochain RDV</label>
+                  <label className="text-xs text-app-muted">{t('Date du prochain RDV')}</label>
                   <input type="date" value={p.extra.dateProchainRdv} onChange={(e) => setX('dateProchainRdv', e.target.value)}
                     className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
                 </div>
                 <div>
-                  <label className="text-xs text-app-muted">Date de paiement</label>
+                  <label className="text-xs text-app-muted">{t('Date de paiement')}</label>
                   <input type="date" value={p.extra.datePaiement} onChange={(e) => setX('datePaiement', e.target.value)}
                     className="w-full border border-app-border rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-primary/20" />
                 </div>
@@ -689,13 +690,13 @@ function TerrainView(p: TerrainViewProps) {
         <div className="rounded-[1.5rem] bg-white overflow-hidden">
           <div className="bg-primary text-white px-4 py-3 text-center">
             <div className="text-sm font-black tracking-wide">SENDISTRI Terrain</div>
-            <div className="text-[11px] text-green-100">Encaissement mobile</div>
+            <div className="text-[11px] text-green-100">{t('Encaissement mobile')}</div>
           </div>
 
           <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
             {/* Client */}
             <div>
-              <FieldLabel>Client</FieldLabel>
+              <FieldLabel>{t('Client')}</FieldLabel>
               <SearchBlock
                 query={p.query}
                 setQuery={p.setQuery}
@@ -710,7 +711,7 @@ function TerrainView(p: TerrainViewProps) {
 
             {/* Formule */}
             <div>
-              <FieldLabel>Formule</FieldLabel>
+              <FieldLabel>{t('Formule')}</FieldLabel>
               <select
                 value={p.effectiveFormuleId}
                 onChange={(e) => p.setFormuleId(e.target.value)}
@@ -726,7 +727,7 @@ function TerrainView(p: TerrainViewProps) {
 
             {/* Mode de paiement */}
             <div>
-              <FieldLabel>Mode de paiement</FieldLabel>
+              <FieldLabel>{t('Mode de paiement')}</FieldLabel>
               <ToggleGroup
                 value={p.modePaiement}
                 onChange={p.setModePaiement}
@@ -738,11 +739,11 @@ function TerrainView(p: TerrainViewProps) {
             {/* Recap */}
             <div className="rounded-lg border border-app-border p-3 space-y-2">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-app-muted">Montant total</span>
+                <span className="text-app-muted">{t('Montant total')}</span>
                 <span className="font-bold text-primary font-mono">{formatFCFA(p.montantTotal)}</span>
               </div>
               <div>
-                <FieldLabel>Montant reçu</FieldLabel>
+                <FieldLabel>{t('Montant reçu')}</FieldLabel>
                 <input
                   type="number"
                   value={p.montantRecu === 0 ? '' : p.montantRecu}
@@ -752,7 +753,7 @@ function TerrainView(p: TerrainViewProps) {
                 />
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="text-app-muted">Monnaie rendue</span>
+                <span className="text-app-muted">{t('Monnaie rendue')}</span>
                 <span
                   className={cn(
                     'font-bold font-mono',
@@ -765,7 +766,7 @@ function TerrainView(p: TerrainViewProps) {
             </div>
 
             <Button variant="primary" className="w-full" loading={p.submitting} onClick={p.onSubmit}>
-              Encaisser {formatFCFA(p.montantTotal)}
+              {t('Encaisser')} {formatFCFA(p.montantTotal)}
             </Button>
           </div>
         </div>
