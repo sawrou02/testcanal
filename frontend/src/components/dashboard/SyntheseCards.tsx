@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getSynthese, type SyntheseData } from '../../lib/api'
 import { formatFCFA } from '../../lib/utils'
+import { t } from '../../lib/locale'
 import { Icon } from '../ui/Icon'
 
 interface Block {
@@ -15,8 +16,8 @@ function Line({ label, value, sub, valueColor }: { label: string; value: string;
   return (
     <div className="flex items-start justify-between gap-3 px-4 py-2.5 border-b border-app-border last:border-0" style={{ borderColor: 'var(--border)' }}>
       <div className="min-w-0">
-        <div className="text-sm text-app-text" style={{ color: 'var(--text)' }}>{label}</div>
-        {sub && <div className="text-[11px] text-app-subtle" style={{ color: 'var(--text-muted)' }}>{sub}</div>}
+        <div className="text-sm text-app-text" style={{ color: 'var(--text)' }}>{t(label)}</div>
+        {sub && <div className="text-[11px] text-app-subtle" style={{ color: 'var(--text-muted)' }}>{t(sub)}</div>}
       </div>
       <div className="text-sm font-bold font-mono shrink-0" style={{ color: valueColor || 'var(--text)', fontFamily: 'IBM Plex Mono, monospace' }}>{value}</div>
     </div>
@@ -100,7 +101,7 @@ export function SyntheseCards() {
         <div key={b.title} className="rounded-xl border border-app-border bg-white shadow-sm overflow-hidden" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
           <div className="flex items-center gap-2.5 px-4 py-3" style={{ background: b.header }}>
             <span style={{ color: b.iconColor }}><Icon name={b.icon} size={20} /></span>
-            <span className="font-bold" style={{ color: b.iconColor }}>{b.title}</span>
+            <span className="font-bold" style={{ color: b.iconColor }}>{t(b.title)}</span>
           </div>
           <div>{b.lines.map((l) => <Line key={l.label} {...l} />)}</div>
         </div>

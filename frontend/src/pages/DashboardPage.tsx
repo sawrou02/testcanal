@@ -8,8 +8,10 @@ import { SkeletonCardGrid } from '../components/ui/Skeleton'
 import { useResourceItem } from '../hooks/useResource'
 import type { DashboardStats } from '../lib/api'
 import { formatFCFA } from '../lib/utils'
+import { useLocale } from '../lib/locale'
 
 export default function DashboardPage() {
+  const { t } = useLocale()
   const { data: stats, loading } = useResourceItem<DashboardStats>('/dashboard/stats')
 
   const num = (n: number | undefined) => (n ?? 0).toLocaleString('fr-FR')
@@ -19,10 +21,10 @@ export default function DashboardPage() {
       {/* Page header */}
       <div>
         <h1 className="text-xl font-black text-app-text" style={{ color: 'var(--text)' }}>
-          Tableau de bord
+          {t('Tableau de bord')}
         </h1>
         <p className="text-sm text-app-muted mt-0.5" style={{ color: 'var(--text-muted)' }}>
-          Vue d'ensemble de la distribution
+          {t("Vue d'ensemble de la distribution")}
         </p>
       </div>
 
@@ -33,37 +35,37 @@ export default function DashboardPage() {
         ) : (
           <>
             <KpiCard
-              label="Encaissé du mois"
+              label={t('Encaissé du mois')}
               value={formatFCFA(stats.encaisseDuMois)}
               delta={0}
               trend={stats.deltas?.encaisse ?? null}
-              deltaLabel="vs mois dernier"
+              deltaLabel={t('vs mois dernier')}
               color="green"
               icon="card"
             />
             <KpiCard
-              label="Recrutements"
+              label={t('Recrutements')}
               value={num(stats.recrutementsCount)}
               delta={0}
               trend={stats.deltas?.recrutements ?? null}
-              deltaLabel="vs mois dernier"
+              deltaLabel={t('vs mois dernier')}
               color="blue"
               icon="users"
             />
             <KpiCard
-              label="Réabonnements"
+              label={t('Réabonnements')}
               value={num(stats.reaboCount)}
               delta={0}
               trend={stats.deltas?.reabo ?? null}
-              deltaLabel="vs mois dernier"
+              deltaLabel={t('vs mois dernier')}
               color="gold"
               icon="trend"
             />
             <KpiCard
-              label="Stock décodeurs"
+              label={t('Stock décodeurs')}
               value={num(stats.stockDecodeurs)}
               delta={0}
-              deltaLabel="disponibles"
+              deltaLabel={t('disponibles')}
               color="red"
               icon="package"
             />

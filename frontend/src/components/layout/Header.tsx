@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { BrandStar } from '../ui/BrandStar'
 import { getRoleLabel } from '../../lib/utils'
+import { useLocale } from '../../lib/locale'
 import { useThemeStore } from '../../hooks/useTheme'
 import { useAuthStore } from '../../store/authStore'
 import {
@@ -24,6 +25,7 @@ const DOT: Record<NotificationRow['type'], string> = {
 }
 
 export function Header({ title = 'Tableau de bord' }: HeaderProps) {
+  const { t } = useLocale()
   const { theme, toggleTheme } = useThemeStore()
   const user = useAuthStore((s) => s.user)
   const logout = useAuthStore((s) => s.logout)
@@ -121,7 +123,7 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
         <BrandStar size={34} />
         <div className="flex flex-col min-w-0">
           <span className="text-sm font-black text-app-text leading-tight tracking-wide">SENDISTRI</span>
-          <h1 className="text-[11px] text-app-subtle truncate leading-tight">{title}</h1>
+          <h1 className="text-[11px] text-app-subtle truncate leading-tight">{t(title)}</h1>
         </div>
       </div>
 
@@ -132,7 +134,7 @@ export function Header({ title = 'Tableau de bord' }: HeaderProps) {
         </svg>
         <input
           type="text"
-          placeholder="Rechercher un abonné, PDV, décodeur..."
+          placeholder={t('Rechercher un abonné, PDV, décodeur...')}
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           onFocus={() => results && setSearchOpen(true)}

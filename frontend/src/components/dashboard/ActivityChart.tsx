@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import { formatDate } from '../../lib/utils'
+import { t } from '../../lib/locale'
 
 export interface ActivitePoint {
   date: string
@@ -73,20 +74,20 @@ export function ActivityChart({ data = [], loading = false }: ActivityChartProps
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-base font-bold text-app-text" style={{ color: 'var(--text)' }}>
-            Activité commerciale — 30 jours
+            {t('Activité commerciale — 30 jours')}
           </h3>
           <p className="text-sm text-app-muted" style={{ color: 'var(--text-muted)' }}>
-            Recrutements et réabonnements
+            {t('Recrutements et réabonnements')}
           </p>
         </div>
         <div className="flex items-center gap-4 text-sm">
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-0.5 bg-primary inline-block rounded" />
-            <span className="text-app-muted" style={{ color: 'var(--text-muted)' }}>Recrutements</span>
+            <span className="text-app-muted" style={{ color: 'var(--text-muted)' }}>{t('Recrutements')}</span>
           </span>
           <span className="flex items-center gap-1.5">
             <span className="w-3 h-0.5 bg-gold inline-block rounded" />
-            <span className="text-app-muted" style={{ color: 'var(--text-muted)' }}>Réabonnements</span>
+            <span className="text-app-muted" style={{ color: 'var(--text-muted)' }}>{t('Réabonnements')}</span>
           </span>
         </div>
       </div>
