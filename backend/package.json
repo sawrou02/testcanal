@@ -16,6 +16,7 @@
     "prisma:push": "prisma db push",
     "prisma:seed": "ts-node prisma/seed.ts",
     "seed:demo": "ts-node prisma/seed.demo.ts",
+    "seed:demo:full": "ts-node prisma/seed.demo.ts && ts-node prisma/seed.demo.plus.ts",
     "backup": "ts-node scripts/backup.ts",
     "db:setup": "prisma db push && ts-node prisma/seed.ts"
   },
