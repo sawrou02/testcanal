@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { cn } from '../../lib/utils'
+import { t } from '../../lib/locale'
 import { versementStats, listImmobilises } from '../../lib/api'
 
 interface AlertBanner {
@@ -28,7 +29,7 @@ export function AlertBanners() {
           next.push({
             id: 'versements',
             type: 'warn',
-            message: `${v.enAttenteCount} versement(s) en attente de validation`,
+            message: `${v.enAttenteCount} ${t('versement(s) en attente de validation')}`,
           })
         }
       } catch {
@@ -40,7 +41,7 @@ export function AlertBanners() {
           next.push({
             id: 'immobilises',
             type: 'warn',
-            message: `${immob.length} décodeur(s) immobilisé(s) depuis plus de 3 mois`,
+            message: `${immob.length} ${t('décodeur(s) immobilisé(s) depuis plus de 3 mois')}`,
           })
         }
       } catch {

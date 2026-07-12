@@ -254,6 +254,33 @@ export const EN: Record<string, string> = {
   'Exporter en Excel': 'Export to Excel',
   'Exporter en PDF': 'Export to PDF',
 
+  // --- Bandeaux d'alerte ---
+  'versement(s) en attente de validation': 'payment(s) awaiting validation',
+  'décodeur(s) immobilisé(s) depuis plus de 3 mois': 'decoder(s) idle for over 3 months',
+
+  // --- Écran de connexion ---
+  'Système ERP Distribution': 'Distribution ERP System',
+  'Tout votre réseau de distribution,': 'Your entire distribution network,',
+  'en un seul endroit.': 'in one place.',
+  'Gérez vos PDV, abonnés, encaissements, logistique et analyses en temps réel.': 'Manage your POS, subscribers, collections, logistics and analytics in real time.',
+  'PDVs actifs': 'Active POS',
+  'Abonnés actifs': 'Active subscribers',
+  'Modules métier': 'Business modules',
+  'Connexion': 'Sign in',
+  'Entrez vos identifiants pour accéder au tableau de bord': 'Enter your credentials to access the dashboard',
+  'Identifiant': 'Username',
+  'Votre identifiant': 'Your username',
+  'Mot de passe': 'Password',
+  'Vérification anti-robot — combien font': 'Anti-robot check — how much is',
+  'Votre réponse': 'Your answer',
+  'Se connecter': 'Sign in',
+  'Comptes de démonstration': 'Demo accounts',
+  'Identifiants incorrects': 'Incorrect credentials',
+  'Erreur de connexion au serveur': 'Server connection error',
+  'Vérification requise, réessayez.': 'Verification required, try again.',
+  'Trop d’essais. Résolvez le calcul ci-dessous pour continuer.': 'Too many attempts. Solve the calculation below to continue.',
+  'Compte temporairement bloqué. Réessayez dans 15 minutes.': 'Account temporarily locked. Try again in 15 minutes.',
+
   // --- Base de données globale ---
   'Base de données globale': 'Global database',
   'Tous les abonnés du réseau — recherche instantanée': 'All network subscribers — instant search',

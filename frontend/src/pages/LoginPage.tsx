@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { BrandStar } from '../components/ui/BrandStar'
 import { Button } from '../components/ui/Button'
 import { useAuthStore } from '../store/authStore'
+import { t } from '../lib/locale'
 import { getCaptcha, type CaptchaChallenge } from '../lib/api'
 
 export default function LoginPage() {
@@ -33,21 +34,21 @@ export default function LoginPage() {
           const c = await getCaptcha()
           setCaptcha(c)
           setCaptchaAnswer('')
-          setError('Trop d’essais. Résolvez le calcul ci-dessous pour continuer.')
+          setError(t('Trop d’essais. Résolvez le calcul ci-dessous pour continuer.'))
         } catch {
-          setError('Vérification requise, réessayez.')
+          setError(t('Vérification requise, réessayez.'))
         }
       } else if (data?.code === 'LOCKED') {
         setCaptcha(null)
-        setError(data.message || 'Compte temporairement bloqué. Réessayez dans 15 minutes.')
+        setError(data.message || t('Compte temporairement bloqué. Réessayez dans 15 minutes.'))
       } else if (data) {
         // Échec normal : si un captcha était affiché, on en régénère un.
         if (captcha) {
           try { setCaptcha(await getCaptcha()); setCaptchaAnswer('') } catch { /* ignore */ }
         }
-        setError(data.message || 'Identifiants incorrects')
+        setError(data.message || t('Identifiants incorrects'))
       } else {
-        setError('Erreur de connexion au serveur')
+        setError(t('Erreur de connexion au serveur'))
       }
     } finally {
       setLoading(false)
@@ -74,27 +75,27 @@ export default function LoginPage() {
             <BrandStar size={56} />
             <div>
               <div className="text-white font-black text-2xl tracking-wider">SENDISTRI</div>
-              <div className="text-green-300/60 text-sm">Système ERP Distribution</div>
+              <div className="text-green-300/60 text-sm">{t('Système ERP Distribution')}</div>
             </div>
           </div>
 
           {/* Tagline */}
           <div className="mb-12">
             <h2 className="text-white text-3xl font-black leading-snug mb-4">
-              Tout votre réseau de distribution,<br />
-              <span className="text-green-300">en un seul endroit.</span>
+              {t('Tout votre réseau de distribution,')}<br />
+              <span className="text-green-300">{t('en un seul endroit.')}</span>
             </h2>
             <p className="text-green-300/70 text-base leading-relaxed">
-              Gérez vos PDV, abonnés, encaissements, logistique et analyses en temps réel.
+              {t('Gérez vos PDV, abonnés, encaissements, logistique et analyses en temps réel.')}
             </p>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-auto">
             {[
-              { value: '1 248', label: 'PDVs actifs' },
-              { value: '42 880', label: 'Abonnés actifs' },
-              { value: '14', label: 'Modules métier' },
+              { value: '1 248', label: t('PDVs actifs') },
+              { value: '42 880', label: t('Abonnés actifs') },
+              { value: '14', label: t('Modules métier') },
             ].map((stat) => (
               <div key={stat.label} className="bg-white/10 rounded-xl p-4 text-center">
                 <div
@@ -133,15 +134,15 @@ export default function LoginPage() {
             <span className="font-black text-xl text-app-text">SENDISTRI</span>
           </div>
 
-          <h1 className="text-2xl font-black text-app-text mb-2">Connexion</h1>
+          <h1 className="text-2xl font-black text-app-text mb-2">{t('Connexion')}</h1>
           <p className="text-app-muted text-sm mb-8">
-            Entrez vos identifiants pour accéder au tableau de bord
+            {t('Entrez vos identifiants pour accéder au tableau de bord')}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-app-text mb-1.5">
-                Identifiant
+                {t('Identifiant')}
               </label>
               <input
                 type="text"
@@ -150,14 +151,14 @@ export default function LoginPage() {
                 required
                 autoCapitalize="none"
                 autoCorrect="off"
-                placeholder="Votre identifiant"
+                placeholder={t('Votre identifiant')}
                 className="w-full px-4 py-3 rounded-lg border border-app-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
               />
             </div>
 
             <div>
               <label className="block text-sm font-semibold text-app-text mb-1.5">
-                Mot de passe
+                {t('Mot de passe')}
               </label>
               <div className="relative">
                 <input
@@ -191,7 +192,7 @@ export default function LoginPage() {
             {captcha && (
               <div>
                 <label className="block text-sm font-semibold text-app-text mb-1.5">
-                  Vérification anti-robot — combien font <span className="font-mono">{captcha.question}</span>
+                  {t('Vérification anti-robot — combien font')} <span className="font-mono">{captcha.question}</span>
                 </label>
                 <input
                   type="text"
@@ -199,7 +200,7 @@ export default function LoginPage() {
                   value={captchaAnswer}
                   onChange={(e) => setCaptchaAnswer(e.target.value)}
                   required
-                  placeholder="Votre réponse"
+                  placeholder={t('Votre réponse')}
                   className="w-full px-4 py-3 rounded-lg border border-app-border text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors"
                 />
               </div>
@@ -217,14 +218,14 @@ export default function LoginPage() {
               size="lg"
               className="w-full"
             >
-              Se connecter
+              {t('Se connecter')}
             </Button>
           </form>
 
           {/* Demo hints */}
           <div className="mt-6 p-4 bg-primary-light rounded-xl border border-primary/20">
             <p className="text-sm font-semibold text-primary-dark mb-2">
-              Comptes de démonstration
+              {t('Comptes de démonstration')}
             </p>
             <div className="space-y-1 text-xs text-primary-dark/80 font-mono">
               <div>superadmin@sendistri.sn — Super Admin</div>
@@ -235,7 +236,7 @@ export default function LoginPage() {
               <div>commercial@sendistri.sn — Commercial</div>
               <div>vendeur@sendistri.sn — Vendeur</div>
               <div className="mt-2 pt-2 border-t border-primary/20 font-semibold">
-                Mot de passe : Demo123!
+                {t('Mot de passe')} : Demo123!
               </div>
             </div>
           </div>

@@ -23,6 +23,7 @@ if /i not "%REP%"=="EFFACER" (
 )
 
 cd /d "%~dp0backend"
+if not defined DATABASE_URL set "DATABASE_URL=file:./sendistri.db"
 echo.
 echo [1/3] Sauvegarde de securite de l'ancienne base...
 if exist prisma\sendistri.db copy /y prisma\sendistri.db "prisma\sendistri-avant-remise-a-zero.db" >nul

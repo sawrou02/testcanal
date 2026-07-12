@@ -21,6 +21,7 @@ set /p REP="Continuer ? (O/N) : "
 if /i not "%REP%"=="O" goto :fin
 
 cd /d "%~dp0backend"
+if not defined DATABASE_URL set "DATABASE_URL=file:./sendistri.db"
 echo.
 echo [1/2] Mise a jour de la base...
 call npx prisma db push
