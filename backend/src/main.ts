@@ -3,7 +3,37 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import helmet from 'helmet';
+import { execFileSync } from 'child_process';
+import { existsSync } from 'fs';
+import { join } from 'path';
 import { AppModule } from './app.module';
+
+/**
+ * Met automatiquement la base au niveau du code au démarrage.
+ * Évite les erreurs « table manquante » (ConfigRegion, Message, Document…)
+ * quand la mise à jour n'a pas lancé `prisma db push` manuellement.
+ * Nos changements de schéma sont TOUJOURS additifs → aucune perte de données.
+ */
+function syncDatabaseSchema() {
+  try {
+    // backend/dist/src/main.js -> racine backend = ../../..
+    const root = join(__dirname, '..', '..');
+    const prismaCli = join(root, 'node_modules', 'prisma', 'build', 'index.js');
+    const schema = join(root, 'prisma', 'schema.prisma');
+    if (!existsSync(prismaCli) || !existsSync(schema)) return;
+    execFileSync(process.execPath, [prismaCli, 'db', 'push', '--skip-generate', '--schema', schema], {
+      cwd: root,
+      stdio: 'pipe',
+      timeout: 120000,
+      env: { ...process.env, DATABASE_URL: process.env.DATABASE_URL || 'file:./sendistri.db' },
+    });
+    // eslint-disable-next-line no-console
+    console.log('Base de données synchronisée avec le schéma.');
+  } catch (e) {
+    // eslint-disable-next-line no-console
+    console.warn('Synchronisation de la base impossible (poursuite du démarrage) :', (e as Error).message?.slice(0, 200));
+  }
+}
 
 const DEFAULT_JWT_SECRETS = [
   'sendistri-secret',
@@ -31,6 +61,7 @@ function checkJwtSecret() {
 
 async function bootstrap() {
   checkJwtSecret();
+  syncDatabaseSchema();
 
   const app = await NestFactory.create(AppModule, { bodyParser: false });
 

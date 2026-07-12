@@ -34,19 +34,64 @@ export class DemoService {
     return { abonnes, encaissements, present: abonnes > 0 || encaissements > 0 };
   }
 
+  /**
+   * Garantit un minimum de référentiels (secteur, localité, PDV, formules)
+   * pour que la démo fonctionne même sur une base neuve sans PDV.
+   * Tout est tagué démo (PDV code « DEMO-PDV-… », secteur/localité « Démonstration »)
+   * afin d'être retiré proprement plus tard.
+   */
+  private async ensureReferentiels() {
+    // Formules : créées par le seed de base ; on en fabrique au besoin.
+    let formules = await this.prisma.formule.findMany({ select: { id: true, prixFormule: true } });
+    if (!formules.length) {
+      await this.prisma.formule.createMany({
+        data: [
+          { code: 'ACCESS', nomCommercial: 'Access', prixMateriel: 15000, prixFormule: 5000 },
+          { code: 'EVASION', nomCommercial: 'Évasion', prixMateriel: 15000, prixFormule: 10000 },
+          { code: 'TOUT CANAL', nomCommercial: 'Tout Canal', prixMateriel: 15000, prixFormule: 25000 },
+          { code: 'PRESTIGE', nomCommercial: 'Prestige', prixMateriel: 20000, prixFormule: 35000 },
+        ],
+      });
+      formules = await this.prisma.formule.findMany({ select: { id: true, prixFormule: true } });
+    }
+
+    // PDV : si aucun n'existe, on crée des PDV de démonstration (avec secteur/localité).
+    let pdvs = await this.prisma.pDV.findMany({ select: { id: true } });
+    if (!pdvs.length) {
+      let secteur = await this.prisma.secteur.findFirst({ select: { id: true } });
+      if (!secteur) secteur = await this.prisma.secteur.create({ data: { nom: 'Démonstration' }, select: { id: true } });
+      let localite = await this.prisma.localite.findFirst({ where: { secteurId: secteur.id }, select: { id: true } });
+      if (!localite) localite = await this.prisma.localite.create({ data: { nom: 'Démonstration', secteurId: secteur.id }, select: { id: true } });
+
+      const noms = ['Boutique Centre', 'Agence Nord', 'Réseau Sud', 'Point Vente Est', 'Apporteur Ouest', 'Boutique Plateau', 'Agence Marché', 'Réseau Corniche'];
+      await this.prisma.pDV.createMany({
+        data: noms.map((raisonSociale, i) => ({
+          code: `DEMO-PDV-${i + 1}`,
+          raisonSociale,
+          type: i % 3 === 0 ? 'AGENCE_PRINCIPALE' : i % 3 === 1 ? 'BOUTIQUE_PROPRE' : 'SOUS_RESEAU',
+          secteurId: secteur!.id,
+          localiteId: localite!.id,
+        })),
+      });
+      pdvs = await this.prisma.pDV.findMany({ select: { id: true } });
+    }
+
+    return { formules, pdvs };
+  }
+
   /** Charge les données de démonstration (idempotent). */
   async load() {
     const now = new Date();
     const jour = (offset: number) =>
       new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 10, 30);
 
-    const [pdvs, formules, user] = await Promise.all([
-      this.prisma.pDV.findMany({ select: { id: true } }),
-      this.prisma.formule.findMany({ select: { id: true, prixFormule: true } }),
-      this.prisma.user.findFirst({ select: { id: true } }),
-    ]);
-    if (!pdvs.length || !formules.length || !user) {
-      return { ok: false, message: 'Configuration de base absente (PDV / formules / utilisateur).' };
+    const user = await this.prisma.user.findFirst({ select: { id: true } });
+    if (!user) {
+      return { ok: false, message: 'Aucun utilisateur en base (relancez l’installation).' };
+    }
+    const { formules, pdvs } = await this.ensureReferentiels();
+    if (!formules.length || !pdvs.length) {
+      return { ok: false, message: 'Impossible de préparer les référentiels de démonstration.' };
     }
 
     // 1) Abonnés (échéances étalées -25 j .. +55 j)
@@ -136,7 +181,22 @@ export class DemoService {
     const abo = await this.prisma.abonne.deleteMany({
       where: { numAbonne: { startsWith: 'DEMO-' } },
     });
-    this.logger.log(`Démo retirée : -${abo.count} abonnés, -${enc.count} encaissements`);
-    return { ok: true, abonnesSupprimes: abo.count, encaissementsSupprimes: enc.count };
+
+    // PDV de démonstration (créés uniquement quand la base n'avait aucun PDV).
+    let pdvSupprimes = 0;
+    const demoPdvs = await this.prisma.pDV.findMany({
+      where: { code: { startsWith: 'DEMO-PDV-' } },
+      select: { id: true, secteurId: true, localiteId: true },
+    });
+    if (demoPdvs.length) {
+      const res = await this.prisma.pDV.deleteMany({ where: { code: { startsWith: 'DEMO-PDV-' } } }).catch(() => ({ count: 0 }));
+      pdvSupprimes = res.count;
+      // Secteur/localité « Démonstration » s'ils sont désormais vides.
+      await this.prisma.localite.deleteMany({ where: { nom: 'Démonstration', pdvs: { none: {} } } }).catch(() => undefined);
+      await this.prisma.secteur.deleteMany({ where: { nom: 'Démonstration', pdvs: { none: {} } } }).catch(() => undefined);
+    }
+
+    this.logger.log(`Démo retirée : -${abo.count} abonnés, -${enc.count} encaissements, -${pdvSupprimes} PDV`);
+    return { ok: true, abonnesSupprimes: abo.count, encaissementsSupprimes: enc.count, pdvSupprimes };
   }
 }
