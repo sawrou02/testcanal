@@ -856,6 +856,28 @@ export const saveRegion = async (dto: Partial<RegionConfig>): Promise<RegionConf
   return res.data
 }
 
+// ---- Données de démonstration (admin) ----
+export interface DemoStatus {
+  abonnes: number
+  encaissements: number
+  present: boolean
+}
+
+export const demoStatus = async (): Promise<DemoStatus> => {
+  const res = await apiClient.get<DemoStatus>('/demo/status')
+  return res.data ?? { abonnes: 0, encaissements: 0, present: false }
+}
+
+export const demoLoad = async (): Promise<{ ok: boolean; message?: string; abonnesCrees?: number; encaissementsCrees?: number }> => {
+  const res = await apiClient.post('/demo/load', {})
+  return res.data
+}
+
+export const demoClear = async (): Promise<{ ok: boolean; abonnesSupprimes: number; encaissementsSupprimes: number }> => {
+  const res = await apiClient.post('/demo/clear', {})
+  return res.data
+}
+
 // ---- Configuration passerelle SMS (admin) ----
 export interface ConfigSmsPublic {
   provider: string

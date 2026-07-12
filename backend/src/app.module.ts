@@ -38,6 +38,7 @@ import { TasksModule } from './tasks/tasks.module';
 import { SecurityModule } from './security/security.module';
 import { SmsModule } from './sms/sms.module';
 import { RegionModule } from './region/region.module';
+import { DemoModule } from './demo/demo.module';
 import { ImportModule } from './import/import.module';
 import { DocumentsModule } from './documents/documents.module';
 import { MessagesModule } from './messages/messages.module';
@@ -84,6 +85,7 @@ import { APP_FILTER } from '@nestjs/core';
     SecurityModule,
     SmsModule,
     RegionModule,
+    DemoModule,
     ImportModule,
     DocumentsModule,
     MessagesModule,
