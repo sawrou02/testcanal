@@ -4,6 +4,7 @@ import { Button } from '../../components/ui/Button'
 import { DataTable } from '../../components/ui/DataTable'
 import { useToast } from '../../components/ui/Toast'
 import { formatDate } from '../../lib/utils'
+import { t } from '../../lib/locale'
 import { listRelances, type RelanceRow, type RelancesData, type UrgenceRelance } from '../../lib/api'
 import { Card, PageHeader, fullName, asRows, type Row } from './shared'
 import { useSmsRelance } from './useSmsRelance'
@@ -13,9 +14,9 @@ const HORIZONS = [7, 15, 30, 60]
 
 /** Libellé + couleur d'urgence à partir des jours restants. */
 function urgenceInfo(u: UrgenceRelance, jours: number): { label: string; variant: 'danger' | 'warning' | 'success' } {
-  if (u === 'echu') return { label: `Échu depuis ${Math.abs(jours)} j`, variant: 'danger' }
-  if (u === 'urgent') return { label: jours === 0 ? "Aujourd'hui" : `Dans ${jours} j`, variant: 'warning' }
-  return { label: `Dans ${jours} j`, variant: 'success' }
+  if (u === 'echu') return { label: `${t('Échu depuis')} ${Math.abs(jours)} ${t('j')}`, variant: 'danger' }
+  if (u === 'urgent') return { label: jours === 0 ? t("Aujourd'hui") : `${t('Dans')} ${jours} ${t('j')}`, variant: 'warning' }
+  return { label: `${t('Dans')} ${jours} ${t('j')}`, variant: 'success' }
 }
 
 type Filtre = 'all' | UrgenceRelance
@@ -56,7 +57,7 @@ export default function RelancesPage() {
     try {
       setData(await listRelances(j))
     } catch {
-      toast.error('Erreur lors du chargement des relances')
+      toast.error(t('Erreur lors du chargement des relances'))
       setData(null)
     } finally {
       setLoading(false)
@@ -81,12 +82,12 @@ export default function RelancesPage() {
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <PageHeader
-          title="Relances de réabonnement"
-          subtitle="Abonnés à relancer — des récemment échus jusqu'aux échéances à venir"
+          title={t('Relances de réabonnement')}
+          subtitle={t("Abonnés à relancer — des récemment échus jusqu'aux échéances à venir")}
         />
         <div className="flex items-end gap-2">
           <label className="flex flex-col text-xs font-medium" style={{ color: 'var(--text-muted)' }}>
-            Horizon
+            {t('Horizon')}
             <select
               value={jours}
               onChange={(e) => setJours(Number(e.target.value))}
@@ -94,7 +95,7 @@ export default function RelancesPage() {
               style={{ background: 'var(--surface)', borderColor: 'var(--border)', color: 'var(--text)' }}
             >
               {HORIZONS.map((h) => (
-                <option key={h} value={h}>{h} jours</option>
+                <option key={h} value={h}>{h} {t('jours')}</option>
               ))}
             </select>
           </label>
@@ -103,27 +104,27 @@ export default function RelancesPage() {
 
       {/* Bandeau urgences (cliquable = filtre) */}
       <div className="grid grid-cols-2 xl:grid-cols-4 gap-4">
-        <FilterTile active={filtre === 'all'} onClick={() => setFiltre('all')} label="Total à relancer" value={c.total} accent="#0E8A4F" />
-        <FilterTile active={filtre === 'echu'} onClick={() => setFiltre('echu')} label="Déjà échus" value={c.echus} accent="#D23A2C" />
-        <FilterTile active={filtre === 'urgent'} onClick={() => setFiltre('urgent')} label="Urgent (≤ 7 j)" value={c.urgent} accent="#E2A000" />
-        <FilterTile active={filtre === 'avenir'} onClick={() => setFiltre('avenir')} label="À venir" value={c.avenir} accent="#2563EB" />
+        <FilterTile active={filtre === 'all'} onClick={() => setFiltre('all')} label={t('Total à relancer')} value={c.total} accent="#0E8A4F" />
+        <FilterTile active={filtre === 'echu'} onClick={() => setFiltre('echu')} label={t('Déjà échus')} value={c.echus} accent="#D23A2C" />
+        <FilterTile active={filtre === 'urgent'} onClick={() => setFiltre('urgent')} label={t('Urgent (≤ 7 j)')} value={c.urgent} accent="#E2A000" />
+        <FilterTile active={filtre === 'avenir'} onClick={() => setFiltre('avenir')} label={t('À venir')} value={c.avenir} accent="#2563EB" />
       </div>
 
       <Card>
         <div className="flex items-center justify-between gap-3 mb-4 flex-wrap">
           <h3 className="text-base font-bold" style={{ color: 'var(--text)' }}>
-            {filtre === 'all' ? 'Tous les abonnés à relancer' : filtre === 'echu' ? 'Abonnés déjà échus' : filtre === 'urgent' ? 'Urgents (≤ 7 jours)' : 'Échéances à venir'}
+            {filtre === 'all' ? t('Tous les abonnés à relancer') : filtre === 'echu' ? t('Abonnés déjà échus') : filtre === 'urgent' ? t('Urgents (≤ 7 jours)') : t('Échéances à venir')}
           </h3>
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
-              {filtered.length.toLocaleString('fr-FR')} abonné(s)
+              {filtered.length.toLocaleString('fr-FR')} {t('abonné(s)')}
             </span>
             <Button
               variant="secondary"
               onClick={() => exportNumbers(filtered, 'Numéros — Relances réabonnement')}
               disabled={filtered.length === 0}
             >
-              Exporter les numéros
+              {t('Exporter les numéros')}
             </Button>
             {canSendSms && (
               <Button
@@ -131,7 +132,7 @@ export default function RelancesPage() {
                 loading={sending}
                 disabled={filtered.length === 0}
               >
-                Rappel SMS ({filtered.length})
+                {t('Rappel SMS')} ({filtered.length})
               </Button>
             )}
           </div>
@@ -140,24 +141,24 @@ export default function RelancesPage() {
         <DataTable<Row>
           loading={loading}
           rows={asRows(filtered)}
-          emptyMessage="Aucun abonné à relancer sur cette période"
+          emptyMessage={t('Aucun abonné à relancer sur cette période')}
           columns={[
-            { key: 'numAbonne', label: 'N° Abonné' },
-            { key: 'nom', label: 'Nom', render: (_v, row) => fullName(row as unknown as RelanceRow) },
-            { key: 'tel1', label: 'Téléphone' },
+            { key: 'numAbonne', label: t('N° Abonné') },
+            { key: 'nom', label: t('Nom'), render: (_v, row) => fullName(row as unknown as RelanceRow) },
+            { key: 'tel1', label: t('Téléphone') },
             {
               key: 'formule',
-              label: 'Formule',
+              label: t('Formule'),
               render: (_v, row) => (row as unknown as RelanceRow).formule?.nomCommercial ?? '-',
             },
             {
               key: 'dateEcheance',
-              label: 'Échéance',
+              label: t('Échéance'),
               render: (v) => (v ? formatDate(String(v)) : '-'),
             },
             {
               key: 'urgence',
-              label: 'Urgence',
+              label: t('Urgence'),
               render: (_v, row) => {
                 const r = row as unknown as RelanceRow
                 const info = urgenceInfo(r.urgence, r.joursRestants)
@@ -166,12 +167,12 @@ export default function RelancesPage() {
             },
             {
               key: 'pdv',
-              label: 'PDV',
+              label: t('PDV'),
               render: (_v, row) => (row as unknown as RelanceRow).pdv?.raisonSociale ?? '-',
             },
             {
               key: '__wa',
-              label: 'WhatsApp',
+              label: t('WhatsApp'),
               render: (_v, row) => <WhatsAppButton abonne={row as unknown as RelanceRow} />,
             },
           ]}

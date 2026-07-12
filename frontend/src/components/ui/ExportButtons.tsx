@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Icon } from './Icon'
 import { useToast } from './Toast'
+import { t } from '../../lib/locale'
 import { exportExcel, exportPdf, type ExportColumn } from '../../lib/export'
 
 interface Props {
@@ -17,7 +18,7 @@ export function ExportButtons({ title, periode, columns, rows }: Props) {
 
   const run = async (kind: 'excel' | 'pdf') => {
     if (!rows.length) {
-      toast.info('Rien à exporter')
+      toast.info(t('Rien à exporter'))
       return
     }
     setBusy(true)
@@ -25,7 +26,7 @@ export function ExportButtons({ title, periode, columns, rows }: Props) {
       if (kind === 'excel') await exportExcel({ title, periode, columns, rows })
       else exportPdf({ title, periode, columns, rows })
     } catch {
-      toast.error("Échec de l'export")
+      toast.error(t("Échec de l'export"))
     } finally {
       setBusy(false)
     }
@@ -40,7 +41,7 @@ export function ExportButtons({ title, periode, columns, rows }: Props) {
         type="button"
         onClick={() => run('excel')}
         disabled={busy}
-        title="Exporter en Excel"
+        title={t('Exporter en Excel')}
         className={btn}
         style={{ borderColor: 'var(--border)', color: 'var(--primary-dark)' }}
       >
@@ -50,7 +51,7 @@ export function ExportButtons({ title, periode, columns, rows }: Props) {
         type="button"
         onClick={() => run('pdf')}
         disabled={busy}
-        title="Exporter en PDF"
+        title={t('Exporter en PDF')}
         className={btn}
         style={{ borderColor: 'var(--border)', color: 'var(--danger)' }}
       >

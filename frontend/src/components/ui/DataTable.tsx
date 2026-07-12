@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { cn } from '../../lib/utils'
+import { t } from '../../lib/locale'
 import { ExportButtons } from './ExportButtons'
 
 interface Column<T> {
@@ -95,7 +96,7 @@ export function DataTable<T extends Record<string, unknown>>({
             </svg>
             <input
               type="text"
-              placeholder="Rechercher..."
+              placeholder={t('Rechercher...')}
               value={search}
               onChange={(e) => { setSearch(e.target.value); setPage(1) }}
               className="pl-9 pr-3 py-2 text-sm border border-app-border rounded-lg bg-white w-full focus:outline-none focus:ring-2 focus:ring-primary/20"
@@ -112,7 +113,7 @@ export function DataTable<T extends Record<string, unknown>>({
             />
           )}
           <div className="flex items-center gap-2">
-            <span>Lignes par page:</span>
+            <span>{t('Lignes par page:')}</span>
             <select
               value={pageSize}
               onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1) }}
@@ -149,7 +150,7 @@ export function DataTable<T extends Record<string, unknown>>({
                     col.align === 'right' ? 'text-right' : col.align === 'center' ? 'text-center' : 'text-left',
                   )}
                 >
-                  {col.label}
+                  {t(col.label)}
                 </th>
               ))}
             </tr>
@@ -161,7 +162,7 @@ export function DataTable<T extends Record<string, unknown>>({
                   colSpan={columns.length + (selectable ? 1 : 0)}
                   className="text-center py-12 text-app-muted"
                 >
-                  {emptyMessage}
+                  {t(emptyMessage)}
                 </td>
               </tr>
             ) : (
@@ -233,7 +234,7 @@ export function DataTable<T extends Record<string, unknown>>({
       {totalPages > 1 && (
         <div className="flex items-center justify-between text-sm text-app-muted">
           <span>
-            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} sur {filtered.length}
+            {(page - 1) * pageSize + 1}–{Math.min(page * pageSize, filtered.length)} {t('sur')} {filtered.length}
           </span>
           <div className="flex items-center gap-1">
             <button

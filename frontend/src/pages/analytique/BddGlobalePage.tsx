@@ -7,6 +7,7 @@ import { useToast } from '../../components/ui/Toast'
 import { useAuthStore } from '../../store/authStore'
 import { useResource } from '../../hooks/useResource'
 import { formatDate } from '../../lib/utils'
+import { t } from '../../lib/locale'
 import { exportExcel } from '../../lib/export'
 import {
   bddGlobale,
@@ -58,8 +59,8 @@ export default function BddGlobalePage() {
 
   // Debounce de la saisie (350 ms) pour ne pas requêter à chaque touche.
   useEffect(() => {
-    const t = setTimeout(() => setQDebounced(q.trim()), 350)
-    return () => clearTimeout(t)
+    const timer = setTimeout(() => setQDebounced(q.trim()), 350)
+    return () => clearTimeout(timer)
   }, [q])
 
   // Tout changement de filtre revient à la page 1.
@@ -70,7 +71,7 @@ export default function BddGlobalePage() {
     try {
       setData(await bddGlobale({ q: qDebounced, statut, formuleId, page, pageSize: PAGE_SIZE }))
     } catch {
-      toast.error('Erreur lors du chargement')
+      toast.error(t('Erreur lors du chargement'))
     } finally {
       setLoading(false)
     }
@@ -104,7 +105,7 @@ export default function BddGlobalePage() {
         rows: all.rows.map((r) => ({ ...r, dateEcheance: r.dateEcheance ? formatDate(r.dateEcheance) : '' })),
       })
     } catch {
-      toast.error("Erreur lors de l'export")
+      toast.error(t("Erreur lors de l'export"))
     } finally {
       setExporting(false)
     }
@@ -145,23 +146,23 @@ export default function BddGlobalePage() {
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.nom.trim() || !form.prenom.trim()) { toast.error('Nom et prénom requis'); return }
-    if (!form.tel1.trim()) { toast.error('Téléphone requis'); return }
-    if (!form.formuleId) { toast.error('Choisissez une formule'); return }
-    if (!form.pdvId) { toast.error('Choisissez un PDV'); return }
+    if (!form.nom.trim() || !form.prenom.trim()) { toast.error(t('Nom et prénom requis')); return }
+    if (!form.tel1.trim()) { toast.error(t('Téléphone requis')); return }
+    if (!form.formuleId) { toast.error(t('Choisissez une formule')); return }
+    if (!form.pdvId) { toast.error(t('Choisissez un PDV')); return }
     setSubmitting(true)
     try {
       if (editId) {
         await updateAbonne(editId, form)
-        toast.success('Abonné modifié ✓')
+        toast.success(t('Abonné modifié ✓'))
       } else {
         await createAbonne(form)
-        toast.success('Abonné créé ✓')
+        toast.success(t('Abonné créé ✓'))
       }
       setOpen(false)
       void refetch()
     } catch {
-      toast.error("Erreur lors de l'enregistrement")
+      toast.error(t("Erreur lors de l'enregistrement"))
     } finally {
       setSubmitting(false)
     }
@@ -173,8 +174,8 @@ export default function BddGlobalePage() {
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-4 flex-wrap">
-        <PageHeader title="Base de données globale" subtitle="Tous les abonnés du réseau — recherche instantanée" />
-        {canMutate && <Button variant="primary" onClick={openCreate}>+ Nouvel abonné</Button>}
+        <PageHeader title={t('Base de données globale')} subtitle={t('Tous les abonnés du réseau — recherche instantanée')} />
+        {canMutate && <Button variant="primary" onClick={openCreate}>+ {t('Nouvel abonné')}</Button>}
       </div>
 
       <Card>
@@ -184,28 +185,28 @@ export default function BddGlobalePage() {
             type="search"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            placeholder="Rechercher : nom, téléphone, N° abonné, PDV…"
+            placeholder={t('Rechercher : nom, téléphone, N° abonné, PDV…')}
             className={selectCls + ' flex-1 min-w-[240px]'}
             style={selectStyle}
           />
           <select value={statut} onChange={(e) => setStatut(e.target.value)} className={selectCls} style={selectStyle}>
-            <option value="">Tous statuts</option>
+            <option value="">{t('Tous statuts')}</option>
             {STATUTS.map((s) => <option key={s} value={s}>{s}</option>)}
           </select>
           <select value={formuleId} onChange={(e) => setFormuleId(e.target.value)} className={selectCls} style={selectStyle}>
-            <option value="">Toutes formules</option>
+            <option value="">{t('Toutes formules')}</option>
             {formules.map((f) => <option key={f.id} value={f.id}>{f.nomCommercial}</option>)}
           </select>
           <Button variant="secondary" onClick={exportResults} loading={exporting} disabled={data.total === 0}>
-            Exporter
+            {t('Exporter')}
           </Button>
         </div>
 
         {/* Compteur */}
         <div className="text-sm mb-2" style={{ color: 'var(--text-muted)' }}>
-          {loading ? 'Chargement…' : (
-            data.total === 0 ? 'Aucun abonné trouvé'
-              : `${data.total.toLocaleString('fr-FR')} abonné(s) — affichage ${from.toLocaleString('fr-FR')}–${to.toLocaleString('fr-FR')}`
+          {loading ? t('Chargement…') : (
+            data.total === 0 ? t('Aucun abonné trouvé')
+              : `${data.total.toLocaleString('fr-FR')} ${t('abonné(s) — affichage')} ${from.toLocaleString('fr-FR')}–${to.toLocaleString('fr-FR')}`
           )}
         </div>
 
@@ -214,13 +215,13 @@ export default function BddGlobalePage() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left border-b" style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}>
-                <th className="py-2 pr-3 font-semibold">N° Abonné</th>
-                <th className="py-2 pr-3 font-semibold">Nom &amp; Prénom</th>
-                <th className="py-2 pr-3 font-semibold">Téléphone</th>
-                <th className="py-2 pr-3 font-semibold">Formule</th>
-                <th className="py-2 pr-3 font-semibold">PDV</th>
-                <th className="py-2 pr-3 font-semibold">Échéance</th>
-                <th className="py-2 pr-3 font-semibold">Statut</th>
+                <th className="py-2 pr-3 font-semibold">{t('N° Abonné')}</th>
+                <th className="py-2 pr-3 font-semibold">{t('Nom & Prénom')}</th>
+                <th className="py-2 pr-3 font-semibold">{t('Téléphone')}</th>
+                <th className="py-2 pr-3 font-semibold">{t('Formule')}</th>
+                <th className="py-2 pr-3 font-semibold">{t('PDV')}</th>
+                <th className="py-2 pr-3 font-semibold">{t('Échéance')}</th>
+                <th className="py-2 pr-3 font-semibold">{t('Statut')}</th>
                 {canMutate && <th className="py-2 font-semibold" />}
               </tr>
             </thead>
@@ -241,13 +242,13 @@ export default function BddGlobalePage() {
                   <td className="py-2 pr-3"><Badge variant={STATUT_VARIANT[r.statut] ?? 'neutral'}>{r.statut}</Badge></td>
                   {canMutate && (
                     <td className="py-2" onClick={(e) => e.stopPropagation()}>
-                      <RowDeleteButton path="/abonnes" id={r.id} confirmLabel="Résilier cet abonné ?" onDone={refetch} />
+                      <RowDeleteButton path="/abonnes" id={r.id} confirmLabel={t('Résilier cet abonné ?')} onDone={refetch} />
                     </td>
                   )}
                 </tr>
               ))}
               {!loading && data.rows.length === 0 && (
-                <tr><td colSpan={8} className="py-12 text-center" style={{ color: 'var(--text-muted)' }}>Aucun résultat</td></tr>
+                <tr><td colSpan={8} className="py-12 text-center" style={{ color: 'var(--text-muted)' }}>{t('Aucun résultat')}</td></tr>
               )}
             </tbody>
           </table>
@@ -256,54 +257,54 @@ export default function BddGlobalePage() {
         {/* Pagination */}
         {data.total > PAGE_SIZE && (
           <div className="flex items-center justify-between gap-3 mt-4 flex-wrap">
-            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Page {data.page} / {totalPages}</span>
+            <span className="text-sm" style={{ color: 'var(--text-muted)' }}>{t('Page')} {data.page} / {totalPages}</span>
             <div className="flex items-center gap-2">
-              <Button variant="secondary" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={data.page <= 1 || loading}>Précédent</Button>
-              <Button variant="secondary" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={data.page >= totalPages || loading}>Suivant</Button>
+              <Button variant="secondary" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={data.page <= 1 || loading}>{t('Précédent')}</Button>
+              <Button variant="secondary" onClick={() => setPage((p) => Math.min(totalPages, p + 1))} disabled={data.page >= totalPages || loading}>{t('Suivant')}</Button>
             </div>
           </div>
         )}
       </Card>
 
-      <Modal isOpen={open} onClose={() => !submitting && setOpen(false)} title={editId ? 'Modifier l’abonné' : 'Nouvel abonné'} size="lg">
+      <Modal isOpen={open} onClose={() => !submitting && setOpen(false)} title={editId ? t('Modifier l’abonné') : t('Nouvel abonné')} size="lg">
         <form onSubmit={submit} className="space-y-4">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <FieldLabel>N° Abonné <span className="text-app-subtle">(laisser vide = auto)</span></FieldLabel>
+              <FieldLabel>{t('N° Abonné')} <span className="text-app-subtle">({t('laisser vide = auto')})</span></FieldLabel>
               <input value={form.numAbonne} onChange={(e) => set('numAbonne', e.target.value)} className={inputCls} placeholder="ex. 12345678" />
             </div>
             <div>
-              <FieldLabel>Statut</FieldLabel>
+              <FieldLabel>{t('Statut')}</FieldLabel>
               <select value={form.statut} onChange={(e) => set('statut', e.target.value)} className={inputCls}>
                 {STATUTS.map((s) => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
-            <div><FieldLabel>Prénom</FieldLabel><input value={form.prenom} onChange={(e) => set('prenom', e.target.value)} className={inputCls} /></div>
-            <div><FieldLabel>Nom</FieldLabel><input value={form.nom} onChange={(e) => set('nom', e.target.value)} className={inputCls} /></div>
-            <div><FieldLabel>Téléphone</FieldLabel><input value={form.tel1} onChange={(e) => set('tel1', e.target.value)} className={inputCls} /></div>
-            <div><FieldLabel>Téléphone 2 <span className="text-app-subtle">(optionnel)</span></FieldLabel><input value={form.tel2} onChange={(e) => set('tel2', e.target.value)} className={inputCls} /></div>
+            <div><FieldLabel>{t('Prénom')}</FieldLabel><input value={form.prenom} onChange={(e) => set('prenom', e.target.value)} className={inputCls} /></div>
+            <div><FieldLabel>{t('Nom')}</FieldLabel><input value={form.nom} onChange={(e) => set('nom', e.target.value)} className={inputCls} /></div>
+            <div><FieldLabel>{t('Téléphone')}</FieldLabel><input value={form.tel1} onChange={(e) => set('tel1', e.target.value)} className={inputCls} /></div>
+            <div><FieldLabel>{t('Téléphone 2')} <span className="text-app-subtle">({t('optionnel')})</span></FieldLabel><input value={form.tel2} onChange={(e) => set('tel2', e.target.value)} className={inputCls} /></div>
             <div>
-              <FieldLabel>Formule</FieldLabel>
+              <FieldLabel>{t('Formule')}</FieldLabel>
               <select value={form.formuleId} onChange={(e) => set('formuleId', e.target.value)} className={inputCls}>
-                <option value="">— Choisir —</option>
+                <option value="">{t('— Choisir —')}</option>
                 {formules.map((f) => <option key={f.id} value={f.id}>{f.code} — {f.nomCommercial}</option>)}
               </select>
             </div>
             <div>
-              <FieldLabel>Point de vente</FieldLabel>
+              <FieldLabel>{t('Point de vente')}</FieldLabel>
               <select value={form.pdvId} onChange={(e) => set('pdvId', e.target.value)} className={inputCls}>
-                <option value="">— Choisir —</option>
+                <option value="">{t('— Choisir —')}</option>
                 {pdvs.map((p) => <option key={p.id} value={p.id}>{p.raisonSociale}</option>)}
               </select>
             </div>
             <div>
-              <FieldLabel>Date d’échéance <span className="text-app-subtle">(optionnel)</span></FieldLabel>
+              <FieldLabel>{t('Date d’échéance')} <span className="text-app-subtle">({t('optionnel')})</span></FieldLabel>
               <input type="date" value={form.dateEcheance} onChange={(e) => set('dateEcheance', e.target.value)} className={inputCls} />
             </div>
           </div>
           <div className="flex items-center justify-end gap-3 pt-2">
-            <Button type="button" variant="secondary" onClick={() => setOpen(false)} disabled={submitting}>Annuler</Button>
-            <Button type="submit" variant="primary" loading={submitting}>{editId ? 'Enregistrer' : 'Créer'}</Button>
+            <Button type="button" variant="secondary" onClick={() => setOpen(false)} disabled={submitting}>{t('Annuler')}</Button>
+            <Button type="submit" variant="primary" loading={submitting}>{editId ? t('Enregistrer') : t('Créer')}</Button>
           </div>
         </form>
       </Modal>
