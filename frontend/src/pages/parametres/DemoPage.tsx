@@ -9,6 +9,7 @@ export default function DemoPage() {
   const [status, setStatus] = useState<DemoStatus | null>(null)
   const [loading, setLoading] = useState(false)
   const [clearing, setClearing] = useState(false)
+  const [erreur, setErreur] = useState<string | null>(null)
 
   const refresh = useCallback(async () => {
     try {
@@ -21,15 +22,22 @@ export default function DemoPage() {
 
   const load = async () => {
     setLoading(true)
+    setErreur(null)
     try {
       const r = await demoLoad()
       if (r.ok) {
         toast.success(t('Données de démonstration chargées ✓'))
         window.setTimeout(() => window.location.reload(), 800)
       } else {
+        setErreur(r.message || t('Erreur lors du chargement'))
         toast.error(r.message || t('Erreur lors du chargement'))
       }
-    } catch {
+    } catch (e: unknown) {
+      const res = (e as { response?: { data?: { message?: string; statusCode?: number } }; message?: string })
+      const detail = res?.response?.data?.message
+        ? `${res.response.data.statusCode ?? ''} ${res.response.data.message}`.trim()
+        : res?.message || 'Erreur réseau'
+      setErreur(detail)
       toast.error(t('Erreur lors du chargement'))
     } finally {
       setLoading(false)
@@ -79,6 +87,13 @@ export default function DemoPage() {
           )}
         </div>
       </div>
+
+      {erreur && (
+        <div className="rounded-xl border p-4 text-sm" style={{ background: 'rgba(210,58,44,0.08)', borderColor: '#D23A2C', color: 'var(--text)' }}>
+          <p className="font-bold mb-1" style={{ color: '#D23A2C' }}>{t('Détail de l’erreur (à me transmettre)')} :</p>
+          <p className="font-mono text-xs break-words">{erreur}</p>
+        </div>
+      )}
 
       <div className="rounded-xl border p-5 space-y-4" style={{ background: 'var(--surface)', borderColor: 'var(--border)' }}>
         <div>

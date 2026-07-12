@@ -59,6 +59,7 @@ export const EN: Record<string, string> = {
   'Données de démonstration chargées ✓': 'Demo data loaded ✓',
   'Données de démonstration retirées ✓': 'Demo data removed ✓',
   'Erreur lors du retrait': 'Error while removing',
+  'Détail de l’erreur (à me transmettre)': 'Error details (please share with me)',
   'Objectifs': 'Targets',
   'Objectif Journalier': 'Daily Target',
   'Localités': 'Localities',

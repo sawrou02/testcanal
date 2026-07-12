@@ -79,8 +79,18 @@ export class DemoService {
     return { formules, pdvs };
   }
 
-  /** Charge les données de démonstration (idempotent). */
+  /** Charge les données de démonstration (idempotent). Ne lève jamais : renvoie la cause. */
   async load() {
+    try {
+      return await this.loadInterne();
+    } catch (e) {
+      const msg = (e as Error)?.message || String(e);
+      this.logger.error(`Échec chargement démo : ${msg}`);
+      return { ok: false, message: `Échec du chargement : ${msg.slice(0, 300)}` };
+    }
+  }
+
+  private async loadInterne() {
     const now = new Date();
     const jour = (offset: number) =>
       new Date(now.getFullYear(), now.getMonth(), now.getDate() + offset, 10, 30);
